@@ -1,0 +1,9 @@
+ Parameters are in the following order:
+   Gamma =        1.000000000000000
+   Omega =       15.707963267948966
+      w0 =       15.707963267948966
+   kappa =        2.000000000000000
+      dw =         0.400000000000000
+ epsilon =        1.000000000000000
+       N =        20
+   phase =         1

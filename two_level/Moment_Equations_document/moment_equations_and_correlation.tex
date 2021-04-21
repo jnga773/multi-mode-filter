@@ -27,7 +27,7 @@
 
 %\allowdisplaybreaks
 
-\title{Multi-Mode Filter Equations}
+\title{Two-Level Atom: One Multi-Mode Filter Moment Equations}
 \author{Jacob Ngaha}
 
 \begin{document}
@@ -132,7 +132,7 @@ Using the vector notation, we have moment equations
 
 \begin{subequations}
 	\begin{equation}
-		\ddt \langle a_{j} \bm{\sigma} \rangle = \bm{M}_{j} \langle a_{j} \bm{\sigma} \rangle +
+		\ddt \langle a_{j} \bm{\sigma} \rangle = \bm{M}_{j}^{(a)} \langle a_{j} \bm{\sigma} \rangle +
 		\begin{pmatrix}
 			0 \\
 			-\frac{1}{2} \mathcal{E}_{j} \left( \langle \sigma_{z} \rangle + 1 \right) \\
@@ -141,7 +141,7 @@ Using the vector notation, we have moment equations
 	\end{equation}
 	and
 	\begin{equation}
-		\ddt \langle a^{\dagger}_{j} \bm{\sigma} \rangle = \bm{M}_{j^{*}} \langle a^{\dagger}_{j} \bm{\sigma} \rangle +
+		\ddt \langle a^{\dagger}_{j} \bm{\sigma} \rangle = \bm{M}_{j}^{(a^{\dagger})} \langle a^{\dagger}_{j} \bm{\sigma} \rangle +
 		\begin{pmatrix}
 			-\frac{1}{2} \mathcal{E}_{j}^{*} \left( \langle \sigma_{z} \rangle + 1 \right) \\
 			0 \\
@@ -152,8 +152,8 @@ Using the vector notation, we have moment equations
 where
 \begin{subequations}
 	\begin{gather}
-		\bm{M}_{j} = \bm{M} - \left( \kappa + i \omega_{j} \right) \mathbb{1}, \\
-		 \bm{M}_{j^{*}} = \bm{M} - \left( \kappa - i \omega_{j} \right) \mathbb{1}.
+		\bm{M}_{j}^{(a)} = \bm{M} - \left( \kappa + i \omega_{j} \right) \mathbb{1}, \\
+		 \bm{M}_{j}^{(a^{\dagger})} = \bm{M} - \left( \kappa - i \omega_{j} \right) \mathbb{1}.
 	\end{gather}
 \end{subequations}
 
@@ -173,7 +173,7 @@ Using the vector notation, we have moment equations
 
 \begin{subequations}
 	\begin{equation}
-		\ddt \langle a_{j} a_{k} \bm{\sigma} \rangle = \bm{M}_{j, k} \langle a_{j} a_{k} \bm{\sigma} \rangle +
+		\ddt \langle a_{j} a_{k} \bm{\sigma} \rangle = \bm{M}_{j, k}^{(aa)} \langle a_{j} a_{k} \bm{\sigma} \rangle +
 		\begin{pmatrix}
 			0 \\
 			-\frac{1}{2} \mathcal{E}_{j} \left( \langle a_{k} \sigma_{z} \rangle + \langle a_{k} \rangle \right) - \frac{1}{2} \mathcal{E}_{k} \left( \langle a_{j} \sigma_{z} \rangle + \langle a_{j} \rangle \right) \\
@@ -182,7 +182,7 @@ Using the vector notation, we have moment equations
 	\end{equation}
 	and
 	\begin{equation}
-		\ddt \langle a^{\dagger}_{j} a^{\dagger}_{k} \bm{\sigma} \rangle = \bm{M}_{j^{*}, k^{*}} \langle a^{\dagger}_{j} a^{\dagger}_{k} \bm{\sigma} \rangle +
+		\ddt \langle a^{\dagger}_{j} a^{\dagger}_{k} \bm{\sigma} \rangle = \bm{M}_{j, k}^{(a^{\dagger} a^{\dagger})} \langle a^{\dagger}_{j} a^{\dagger}_{k} \bm{\sigma} \rangle +
 		\begin{pmatrix}
 			-\frac{1}{2} \mathcal{E}_{j}^{*} \left( \langle a^{\dagger}_{k} \sigma_{z} \rangle + \langle a^{\dagger}_{k} \rangle \right) - \frac{1}{2} \mathcal{E}_{k}^{*} \left( \langle a^{\dagger}_{j} \sigma_{z} \rangle + \langle a^{\dagger}_{j} \rangle \right) \\
 			0 \\
@@ -191,7 +191,7 @@ Using the vector notation, we have moment equations
 	\end{equation}
 	and
 	\begin{equation}
-	\ddt \langle a^{\dagger}_{j} a_{k} \bm{\sigma} \rangle = \bm{M}_{j^{*}, k} \langle a^{\dagger}_{j} a_{k} \bm{\sigma} \rangle +
+	\ddt \langle a^{\dagger}_{j} a_{k} \bm{\sigma} \rangle = \bm{M}_{j, k}^{(a^{\dagger} a)} \langle a^{\dagger}_{j} a_{k} \bm{\sigma} \rangle +
 	\begin{pmatrix}
 		-\frac{1}{2} \mathcal{E}_{j}^{*} \left( \langle a_{k} \sigma_{z} \rangle + \langle a_{k} \rangle \right) \\
 		-\frac{1}{2} \mathcal{E}_{k} \left( \langle a^{\dagger}_{j} \sigma_{z} \rangle + \langle a^{\dagger}_{j} \rangle \right) \\
@@ -202,9 +202,9 @@ Using the vector notation, we have moment equations
 where
 \begin{subequations}
 	\begin{align}
-		\bm{M}_{j, k} &= \bm{M} - \left( 2 \kappa + i \left( \omega_{j} + \omega_{k} \right) \right) \mathbb{1}, \\
-		\bm{M}_{j^{*}, k^{*}} &= \bm{M} - \left( 2 \kappa - i \left( \omega_{j} + \omega_{k} \right) \right) \mathbb{1}, \\
-		\bm{M}_{j^{*}, k} &= \bm{M} - \left( 2 \kappa - i \left( \omega_{j}- \omega_{k} \right) \right) \mathbb{1}.
+		\bm{M}_{j, k}^{(aa)} &= \bm{M} - \left( 2 \kappa + i \left( \omega_{j} + \omega_{k} \right) \right) \mathbb{1}, \\
+		\bm{M}_{j, k}^{(a^{\dagger} a^{\dagger})} &= \bm{M} - \left( 2 \kappa - i \left( \omega_{j} + \omega_{k} \right) \right) \mathbb{1}, \\
+		\bm{M}_{j, k}^{(a^{\dagger} a)} &= \bm{M} - \left( 2 \kappa - i \left( \omega_{j}- \omega_{k} \right) \right) \mathbb{1}.
 	\end{align}
 \end{subequations}
 
@@ -224,7 +224,7 @@ where
 Using the vector notation, we have moment equations
 \begin{subequations}
 	\begin{align}
-		\ddt \langle a^{\dagger}_{j} a_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j^{*}, k, l} \langle a^{\dagger}_{j} a_{k} a_{l} \rangle +
+		\ddt \langle a^{\dagger}_{j} a_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(a^{\dagger} a a)} \langle a^{\dagger}_{j} a_{k} a_{l} \rangle +
 		\begin{pmatrix}
 			-\frac{1}{2} \mathcal{E}_{j}^{*} \left( \langle a_{k} a_{l} \sigma_{z} \rangle + \langle a_{k} a_{l} \rangle \right) \\
 			-\frac{1}{2} \mathcal{E}_{k} \left( \langle a^{\dagger}_{j} a_{l} \sigma_{z} \rangle + \langle a^{\dagger}_{j} a_{l} \rangle \right) - \frac{1}{2} \mathcal{E}_{l} \left( \langle a^{\dagger}_{j} a_{k} \sigma_{z} \rangle + \langle a^{\dagger}_{j} a_{k} \rangle \right) \\
@@ -233,7 +233,7 @@ Using the vector notation, we have moment equations
 	\end{align}
 	and
 	\begin{align}
-		\ddt \langle a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j^{*}, k^{*}, l} \langle a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle +
+		\ddt \langle a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(a^{\dagger} a^{\dagger} a)} \langle a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle +
 		\begin{pmatrix}
 			-\frac{1}{2} \mathcal{E}_{j}^{*} \left( \langle a^{\dagger}_{k} a_{l} \sigma_{z} \rangle + \langle a^{\dagger}_{k} a_{l} \rangle \right) - \frac{1}{2} \mathcal{E}_{k}^{*} \left( \langle a^{\dagger}_{j} a_{l} \sigma_{z} \rangle + \langle a^{\dagger}_{j} a_{l} \rangle \right) \\
 			-\frac{1}{2} \mathcal{E}_{l} \left( \langle a^{\dagger}_{j} a^{\dagger}_{k} \sigma_{z} \rangle + \langle a^{\dagger}_{j} a^{\dagger}_{k} \rangle \right) \\
@@ -244,8 +244,8 @@ Using the vector notation, we have moment equations
 where
 \begin{subequations}
 	\begin{align}
-		\bm{M}_{j^{*}, k, l} &= \bm{M} - \left( 3 \kappa - i \omega_{j} + i \left( \omega_{k} + \omega_{l} \right) \right), \\
-		\bm{M}_{j^{*}, k^{*}, l} &= \bm{M} - \left( 3 \kappa - i \left( \omega_{j} + \omega_{k} \right) - i \omega_{l} \right).
+		\bm{M}_{j, k, l}^{(a^{\dagger} a a)} &= \bm{M} - \left( 3 \kappa - i \omega_{j} + i \left( \omega_{k} + \omega_{l} \right) \right), \\
+		\bm{M}_{j, k, l}^{(a^{\dagger} a^{\dagger} a)} &= \bm{M} - \left( 3 \kappa - i \left( \omega_{j} + \omega_{k} \right) - i \omega_{l} \right).
 	\end{align}
 \end{subequations}
 
@@ -321,7 +321,7 @@ with
 We also need to solve
 \begin{subequations}
 	\begin{equation}
-		\ddtau \langle A^{\dagger}(t) a_{j} \bm{\sigma}(t + \tau) A(t) \rangle = \bm{M}_{j} \langle A^{\dagger}(t) a_{j} \bm{\sigma}(t + \tau) A(t) \rangle +
+		\ddtau \langle A^{\dagger}(t) a_{j} \bm{\sigma}(t + \tau) A(t) \rangle = \bm{M}_{j}^{(a)} \langle A^{\dagger}(t) a_{j} \bm{\sigma}(t + \tau) A(t) \rangle +
 		\begin{pmatrix}
 			0 \\
 			-\frac{1}{2} \mathcal{E}_{j} \left( \langle A^{\dagger}(t) \sigma_{z}(t + \tau) A(t) \rangle + \langle A^{\dagger} A \rangle_{ss} \right) \\
@@ -330,7 +330,7 @@ We also need to solve
 	\end{equation}
 	and
 	\begin{equation}
-		\ddtau \langle A^{\dagger}(t) a^{\dagger}_{j} \bm{\sigma}(t + \tau) A(t) \rangle = \bm{M}_{j^{*}} \langle A^{\dagger}(t) a^{\dagger}_{j} \bm{\sigma}(t + \tau) A(t) \rangle +
+		\ddtau \langle A^{\dagger}(t) a^{\dagger}_{j} \bm{\sigma}(t + \tau) A(t) \rangle = \bm{M}_{j}^{(a^{\dagger})} \langle A^{\dagger}(t) a^{\dagger}_{j} \bm{\sigma}(t + \tau) A(t) \rangle +
 		\begin{pmatrix}
 			-\frac{1}{2} \mathcal{E}_{j}^{*} \left( \langle A^{\dagger}(t) \sigma_{z}(t + \tau) A(t) \rangle + \langle A^{\dagger} A(t) \rangle \right) \\
 			0 \\
@@ -341,8 +341,8 @@ We also need to solve
 where
 \begin{subequations}
 	\begin{gather}
-		\bm{M}_{j} = \bm{M} - \left( \kappa + i \omega_{j} \right) \mathbb{1}, \\
-		\bm{M}_{j^{*}} = \bm{M} - \left( \kappa - i \omega_{j} \right) \mathbb{1}.
+		\bm{M}_{j}^{(a)} = \bm{M} - \left( \kappa + i \omega_{j} \right) \mathbb{1}, \\
+		\bm{M}_{j}^{(a^{\dagger})} = \bm{M} - \left( \kappa - i \omega_{j} \right) \mathbb{1}.
 	\end{gather}
 \end{subequations}
 Finally, we will also need to solve

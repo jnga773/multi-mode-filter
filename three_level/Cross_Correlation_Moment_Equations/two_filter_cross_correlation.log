@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.10.18)  21 APR 2021 15:42
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.10.18)  21 APR 2021 15:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**three_level_filtered_moment_equations.tex
-(./three_level_filtered_moment_equations.tex
+**two_filter_cross_correlation.tex
+(./two_filter_cross_correlation.tex
 LaTeX2e <2017-04-15>
 Babel <3.18> and hyphenation patterns for 84 language(s) loaded.
 (/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
@@ -190,35 +190,6 @@ Package: bm 2017/01/16 v1.2c Bold Symbol Support (DPC/FMi)
 LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 141.
 LaTeX Info: Redefining \bm on input line 207.
 )
-(/usr/share/texlive/texmf-dist/tex/latex/xcolor/xcolor.sty
-Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
-
-(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg
-File: color.cfg 2016/01/02 v1.6 sample color configuration
-)
-Package xcolor Info: Driver file: pdftex.def on input line 225.
-Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1348.
-Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1352.
-Package xcolor Info: Model `RGB' extended on input line 1364.
-Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1366.
-Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1367.
-Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1368.
-Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
-Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
-Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
-)
-(/usr/share/texlive/texmf-dist/tex/latex/soul/soul.sty
-Package: soul 2003/11/17 v2.4 letterspacing/underlining (mf)
-\SOUL@word=\toks23
-\SOUL@lasttoken=\toks24
-\SOUL@cmds=\toks25
-\SOUL@buffer=\toks26
-\SOUL@token=\toks27
-\SOUL@spaceskip=\skip51
-\SOUL@ttwidth=\dimen130
-\SOUL@uldp=\dimen131
-\SOUL@ulht=\dimen132
-)
 (/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
 Package: hyperref 2018/02/06 v6.86b Hypertext links for LaTeX
 
@@ -275,7 +246,7 @@ Package: auxhook 2016/05/16 v1.4 Hooks for auxiliary files (HO)
 (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty
 Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
 )
-\@linkdim=\dimen133
+\@linkdim=\dimen130
 \Hy@linkcounter=\count105
 \Hy@pagecounter=\count106
 
@@ -301,10 +272,10 @@ Package hyperref Info: Bookmarks ON on input line 4762.
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 5115.
-\XeTeXLinkMargin=\dimen134
+\XeTeXLinkMargin=\dimen131
 \Fld@menulength=\count109
-\Field@Width=\dimen135
-\Fld@charsize=\dimen136
+\Field@Width=\dimen132
+\Fld@charsize=\dimen133
 Package hyperref Info: Hyper figures OFF on input line 6369.
 Package hyperref Info: Link nesting OFF on input line 6374.
 Package hyperref Info: Hyper index ON on input line 6377.
@@ -330,25 +301,25 @@ Package: rerunfilecheck 2016/05/16 v1.8 Rerun checks for auxiliary files (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 82.
 )
-\Hy@SectionHShift=\skip52
+\Hy@SectionHShift=\skip51
 )
-(./three_level_filtered_moment_equations.aux)
-\openout1 = `three_level_filtered_moment_equations.aux'.
+(./two_filter_cross_correlation.aux)
+\openout1 = `two_filter_cross_correlation.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: float package is loaded.
 Package caption Info: hyperref package is loaded.
@@ -357,16 +328,16 @@ Package caption Info: End \AtBeginDocument code.
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count115
-\scratchdimen=\dimen137
+\scratchdimen=\dimen134
 \scratchbox=\box30
 \nofMPsegments=\count116
 \nofMParguments=\count117
-\everyMPshowfont=\toks28
+\everyMPshowfont=\toks23
 \MPscratchCnt=\count118
-\MPscratchDim=\dimen138
+\MPscratchDim=\dimen135
 \MPnumerator=\count119
 \makeMPintoPDFobject=\count120
-\everyMPtoPDFconversion=\toks29
+\everyMPtoPDFconversion=\toks24
 ) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
 
@@ -385,7 +356,7 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 \AtBeginShipoutBox=\box31
-Package hyperref Info: Link coloring OFF on input line 39.
+Package hyperref Info: Link coloring OFF on input line 34.
 
 (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
@@ -395,90 +366,54 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
 \c@section@level=\count121
 )
-LaTeX Info: Redefining \ref on input line 39.
-LaTeX Info: Redefining \pageref on input line 39.
-LaTeX Info: Redefining \nameref on input line 39.
+LaTeX Info: Redefining \ref on input line 34.
+LaTeX Info: Redefining \pageref on input line 34.
+LaTeX Info: Redefining \nameref on input line 34.
 
-(./three_level_filtered_moment_equations.out)
-(./three_level_filtered_moment_equations.out)
+(./two_filter_cross_correlation.out) (./two_filter_cross_correlation.out)
 \@outlinefile=\write3
-\openout3 = `three_level_filtered_moment_equations.out'.
+\openout3 = `two_filter_cross_correlation.out'.
 
-LaTeX Font Info:    Try loading font information for U+msa on input line 42.
+LaTeX Font Info:    Try loading font information for U+msa on input line 37.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 42.
+LaTeX Font Info:    Try loading font information for U+msb on input line 37.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
-Overfull \hbox (2.49614pt too wide) detected at line 195
+Overfull \hbox (2.49614pt too wide) detected at line 144
 [][]\OML/cmm/b/it/10 M \OT1/cmr/m/n/10 = [][]\OML/cmm/m/it/10 :
  []
 
 [2]
-LaTeX Font Info:    Try loading font information for U+bbold on input line 256.
+LaTeX Font Info:    Try loading font information for U+bbold on input line 206.
 
- (/usr/share/texlive/texmf-dist/tex/latex/bbold/Ubbold.fd)
-Overfull \hbox (19.37184pt too wide) detected at line 289
-[][][]\OMS/cmsy/m/n/10 h\OML/cmm/m/it/10 a[]a[]\OML/cmm/b/it/10 ^^[\OMS/cmsy/m/
-n/10 i \OT1/cmr/m/n/10 = \OML/cmm/b/it/10 M[]\OMS/cmsy/m/n/10 h\OML/cmm/m/it/10
- a[]a[]\OML/cmm/b/it/10 ^^[\OMS/cmsy/m/n/10 i \OT1/cmr/m/n/10 + [] \OML/cmm/m/i
-t/10 ;
- []
-
-[3]
-Overfull \hbox (29.44362pt too wide) detected at line 305
-[][][]\OMS/cmsy/m/n/10 h\OML/cmm/m/it/10 a[]a[]\OML/cmm/b/it/10 ^^[\OMS/cmsy/m/
-n/10 i \OT1/cmr/m/n/10 = \OML/cmm/b/it/10 M[]\OMS/cmsy/m/n/10 h\OML/cmm/m/it/10
- a[]a[]\OML/cmm/b/it/10 ^^[\OMS/cmsy/m/n/10 i \OT1/cmr/m/n/10 + [] \OML/cmm/m/i
-t/10 ;
- []
-
-[4]
-Overfull \hbox (24.69154pt too wide) detected at line 366
-[]
- []
-
-
-Overfull \hbox (16.47508pt too wide) detected at line 383
-[]
- []
-
-[5] [6]
-Overfull \hbox (27.249pt too wide) detected at line 500
-[]
- []
-
-
-Overfull \hbox (20.74927pt too wide) detected at line 517
-[]
- []
-
-[7]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 534.
- [8]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 534.
- (./three_level_filtered_moment_equations.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 534.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 534.
-Package rerunfilecheck Info: File `three_level_filtered_moment_equations.out' h
-as not changed.
-(rerunfilecheck)             Checksum: 2AD231052D14CEFCAF34269CF9A927BF;922.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 534.
+ (/usr/share/texlive/texmf-dist/tex/latex/bbold/Ubbold.fd) [3] [4] [5]
+[6]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 452.
+ [7]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 452.
+ (./two_filter_cross_correlation.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 452.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 452.
+Package rerunfilecheck Info: File `two_filter_cross_correlation.out' has not ch
+anged.
+(rerunfilecheck)             Checksum: 103AA51E3BB2E057C98E2587853E8089;860.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 452.
  ) 
 Here is how much of TeX's memory you used:
- 8389 strings out of 492982
- 124564 string characters out of 6134895
- 225326 words of memory out of 5000000
- 11754 multiletter control sequences out of 15000+600000
- 17634 words of font info for 66 fonts, out of 8000000 for 9000
+ 7797 strings out of 492982
+ 117545 string characters out of 6134895
+ 212205 words of memory out of 5000000
+ 11159 multiletter control sequences out of 15000+600000
+ 17321 words of font info for 65 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 36i,15n,38p,492b,371s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 36i,16n,38p,377b,370s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/bbold-type1/bbold10.pfb></u
 sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/sha
 re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/tex
@@ -496,11 +431,10 @@ cmr5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb
 texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive
 /texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texlive/texmf
 -dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on three_level_filtered_moment_equations.pdf (8 pages, 193468 by
-tes).
+Output written on two_filter_cross_correlation.pdf (7 pages, 196836 bytes).
 PDF statistics:
- 250 PDF objects out of 1000 (max. 8388607)
- 219 compressed objects within 3 object streams
- 87 named destinations out of 1000 (max. 500000)
- 97 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 260 PDF objects out of 1000 (max. 8388607)
+ 230 compressed objects within 3 object streams
+ 101 named destinations out of 1000 (max. 500000)
+ 89 words of extra memory for PDF output out of 10000 (max. 10000000)
 

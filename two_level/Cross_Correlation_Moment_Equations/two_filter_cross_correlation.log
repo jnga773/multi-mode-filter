@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.10.18)  14 APR 2021 14:56
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.10.18)  21 APR 2021 15:42
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -354,30 +354,30 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2]
-LaTeX Font Info:    Try loading font information for U+bbold on input line 169.
+LaTeX Font Info:    Try loading font information for U+bbold on input line 166.
 
 
-(/usr/share/texlive/texmf-dist/tex/latex/bbold/Ubbold.fd) [3] [4] [5]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 377.
- [6]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 377.
+(/usr/share/texlive/texmf-dist/tex/latex/bbold/Ubbold.fd) [3] [4] [5] [6]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 439.
 
-(./two_filter_cross_correlation.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 377.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 377.
+[7]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 439.
+ (./two_filter_cross_correlation.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 439.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 439.
 Package rerunfilecheck Info: File `two_filter_cross_correlation.out' has not ch
 anged.
 (rerunfilecheck)             Checksum: 103AA51E3BB2E057C98E2587853E8089;860.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 377.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 439.
  ) 
 Here is how much of TeX's memory you used:
- 7242 strings out of 492982
- 107764 string characters out of 6134895
- 199928 words of memory out of 5000000
+ 7258 strings out of 492982
+ 107974 string characters out of 6134895
+ 202928 words of memory out of 5000000
  10624 multiletter control sequences out of 15000+600000
  17321 words of font info for 65 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 36i,15n,38p,434b,368s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 36i,15n,38p,377b,368s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/bbold-type1/bbold10.pfb></u
 sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/sha
 re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/tex
@@ -394,10 +394,10 @@ fb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texli
 ve/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on two_filter_cross_correlation.pdf (6 pages, 175523 bytes).
+Output written on two_filter_cross_correlation.pdf (7 pages, 179496 bytes).
 PDF statistics:
- 240 PDF objects out of 1000 (max. 8388607)
- 212 compressed objects within 3 object streams
- 91 named destinations out of 1000 (max. 500000)
+ 263 PDF objects out of 1000 (max. 8388607)
+ 234 compressed objects within 3 object streams
+ 107 named destinations out of 1000 (max. 500000)
  89 words of extra memory for PDF output out of 10000 (max. 10000000)
 

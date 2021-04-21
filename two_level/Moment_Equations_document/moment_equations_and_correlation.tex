@@ -22,7 +22,7 @@
 
 % Define \ddt command to represent d/dt as a fraction to save time
 \newcommand{\ddt}[1][]{\frac{\mathrm{d} #1}{\mathrm{d}t}}
-\newcommand{\ddtau}{\frac{\mathrm{d}}{\mathrm{d}\tau}}
+\newcommand{\ddtau}[1][]{\frac{\mathrm{d} #1}{\mathrm{d}\tau}}
 \newcommand{\ssth}{\textsuperscript{th}}
 
 %\allowdisplaybreaks
@@ -81,13 +81,13 @@ We may write the Bloch equations in matrix form:
 \end{equation}
 where
 \begin{equation}
-	\langle \bm{\sigma} \rangle = 
+	\langle \bm{\sigma} \rangle =
 	\begin{pmatrix}
 		\langle \sigma_{-} \rangle \\
 		\langle \sigma_{+} \rangle \\
 		\langle \sigma_{z} \rangle
 	\end{pmatrix}
-	, \quad \bm{B} = 
+	, \quad \bm{B} =
 	\begin{pmatrix}
 		0 \\
 		0 \\
@@ -96,7 +96,7 @@ where
 \end{equation}
 and
 \begin{equation}
-	\bm{M} = 
+	\bm{M} =
 	\begin{pmatrix}
 		-\frac{\gamma}{2} & 0 & i \frac{\Omega}{2} \\
 		0 & -\frac{\gamma}{2} & -i \frac{\Omega}{2} \\
@@ -105,7 +105,7 @@ and
 \end{equation}
 This differential equation has the solution
 \begin{equation}
-	\langle \bm{\sigma}(t) \rangle = e^{\bm{M} t} \left( \langle \bm{\sigma} \rangle - \langle \bm{\sigma} \rangle_{ss} \right) + \langle \bm{\sigma} \rangle_{ss},
+	\langle \bm{\sigma}(t) \rangle = e^{\bm{M} t} \left( \langle \bm{\sigma}(0) \rangle - \langle \bm{\sigma} \rangle_{ss} \right) + \langle \bm{\sigma} \rangle_{ss},
 \end{equation}
 where
 \begin{equation}
@@ -132,7 +132,7 @@ Using the vector notation, we have moment equations
 
 \begin{subequations}
 	\begin{equation}
-		\ddt \langle a_{j} \bm{\sigma} \rangle = \bm{M}^{(j)} \langle a_{j} \bm{\sigma} \rangle + 
+		\ddt \langle a_{j} \bm{\sigma} \rangle = \bm{M}_{j} \langle a_{j} \bm{\sigma} \rangle +
 		\begin{pmatrix}
 			0 \\
 			-\frac{1}{2} \mathcal{E}_{j} \left( \langle \sigma_{z} \rangle + 1 \right) \\
@@ -141,7 +141,7 @@ Using the vector notation, we have moment equations
 	\end{equation}
 	and
 	\begin{equation}
-		\ddt \langle a^{\dagger}_{j} \bm{\sigma} \rangle = \bm{M}^{(j^{*})} \langle a^{\dagger}_{j} \bm{\sigma} \rangle + 
+		\ddt \langle a^{\dagger}_{j} \bm{\sigma} \rangle = \bm{M}_{j^{*}} \langle a^{\dagger}_{j} \bm{\sigma} \rangle +
 		\begin{pmatrix}
 			-\frac{1}{2} \mathcal{E}_{j}^{*} \left( \langle \sigma_{z} \rangle + 1 \right) \\
 			0 \\
@@ -150,9 +150,12 @@ Using the vector notation, we have moment equations
 	\end{equation}
 \end{subequations}
 where
-\begin{equation}
-	\bm{M}^{(j)} = \bm{M} - \left( \kappa + i \omega_{j} \right) \mathbb{1}, \quad \bm{M}^{(j^{*})} = \bm{M} - \left( \kappa - i \omega_{j} \right) \mathbb{1}.
-\end{equation}
+\begin{subequations}
+	\begin{gather}
+		\bm{M}_{j} = \bm{M} - \left( \kappa + i \omega_{j} \right) \mathbb{1}, \\
+		 \bm{M}_{j^{*}} = \bm{M} - \left( \kappa - i \omega_{j} \right) \mathbb{1}.
+	\end{gather}
+\end{subequations}
 
 \subsection{Second-Order: Cavity Equations}
 
@@ -170,7 +173,7 @@ Using the vector notation, we have moment equations
 
 \begin{subequations}
 	\begin{equation}
-		\ddt \langle a_{j} a_{k} \bm{\sigma} \rangle = \bm{M}^{(j, k)} \langle a_{j} a_{k} \bm{\sigma} \rangle + 
+		\ddt \langle a_{j} a_{k} \bm{\sigma} \rangle = \bm{M}_{j, k} \langle a_{j} a_{k} \bm{\sigma} \rangle +
 		\begin{pmatrix}
 			0 \\
 			-\frac{1}{2} \mathcal{E}_{j} \left( \langle a_{k} \sigma_{z} \rangle + \langle a_{k} \rangle \right) - \frac{1}{2} \mathcal{E}_{k} \left( \langle a_{j} \sigma_{z} \rangle + \langle a_{j} \rangle \right) \\
@@ -179,7 +182,7 @@ Using the vector notation, we have moment equations
 	\end{equation}
 	and
 	\begin{equation}
-		\ddt \langle a^{\dagger}_{j} a^{\dagger}_{k} \bm{\sigma} \rangle = \bm{M}^{(j^{*}, k^{*})} \langle a^{\dagger}_{j} a^{\dagger}_{k} \bm{\sigma} \rangle + 
+		\ddt \langle a^{\dagger}_{j} a^{\dagger}_{k} \bm{\sigma} \rangle = \bm{M}_{j^{*}, k^{*}} \langle a^{\dagger}_{j} a^{\dagger}_{k} \bm{\sigma} \rangle +
 		\begin{pmatrix}
 			-\frac{1}{2} \mathcal{E}_{j}^{*} \left( \langle a^{\dagger}_{k} \sigma_{z} \rangle + \langle a^{\dagger}_{k} \rangle \right) - \frac{1}{2} \mathcal{E}_{k}^{*} \left( \langle a^{\dagger}_{j} \sigma_{z} \rangle + \langle a^{\dagger}_{j} \rangle \right) \\
 			0 \\
@@ -188,7 +191,7 @@ Using the vector notation, we have moment equations
 	\end{equation}
 	and
 	\begin{equation}
-	\ddt \langle a^{\dagger}_{j} a_{k} \bm{\sigma} \rangle = \bm{M}^{(j^{*}, k)} \langle a^{\dagger}_{j} a_{k} \bm{\sigma} \rangle + 
+	\ddt \langle a^{\dagger}_{j} a_{k} \bm{\sigma} \rangle = \bm{M}_{j^{*}, k} \langle a^{\dagger}_{j} a_{k} \bm{\sigma} \rangle +
 	\begin{pmatrix}
 		-\frac{1}{2} \mathcal{E}_{j}^{*} \left( \langle a_{k} \sigma_{z} \rangle + \langle a_{k} \rangle \right) \\
 		-\frac{1}{2} \mathcal{E}_{k} \left( \langle a^{\dagger}_{j} \sigma_{z} \rangle + \langle a^{\dagger}_{j} \rangle \right) \\
@@ -199,9 +202,9 @@ Using the vector notation, we have moment equations
 where
 \begin{subequations}
 	\begin{align}
-		\bm{M}^{(j, k)} &= \bm{M} - \left( 2 \kappa + i \left( \omega_{j} + \omega_{k} \right) \right) \mathbb{1}, \\
-		\bm{M}^{(j^{*}, k^{*})} &= \bm{M} - \left( 2 \kappa - i \left( \omega_{j} + \omega_{k} \right) \right) \mathbb{1}, \\
-		\bm{M}^{(j^{*}, k)} &= \bm{M} - \left( 2 \kappa - i \left( \omega_{j}- \omega_{k} \right) \right) \mathbb{1}.
+		\bm{M}_{j, k} &= \bm{M} - \left( 2 \kappa + i \left( \omega_{j} + \omega_{k} \right) \right) \mathbb{1}, \\
+		\bm{M}_{j^{*}, k^{*}} &= \bm{M} - \left( 2 \kappa - i \left( \omega_{j} + \omega_{k} \right) \right) \mathbb{1}, \\
+		\bm{M}_{j^{*}, k} &= \bm{M} - \left( 2 \kappa - i \left( \omega_{j}- \omega_{k} \right) \right) \mathbb{1}.
 	\end{align}
 \end{subequations}
 
@@ -221,7 +224,7 @@ where
 Using the vector notation, we have moment equations
 \begin{subequations}
 	\begin{align}
-		\ddt \langle a^{\dagger}_{j} a_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}^{(j^{*}, k, l)} \langle a^{\dagger}_{j} a_{k} a_{l} \rangle + 
+		\ddt \langle a^{\dagger}_{j} a_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j^{*}, k, l} \langle a^{\dagger}_{j} a_{k} a_{l} \rangle +
 		\begin{pmatrix}
 			-\frac{1}{2} \mathcal{E}_{j}^{*} \left( \langle a_{k} a_{l} \sigma_{z} \rangle + \langle a_{k} a_{l} \rangle \right) \\
 			-\frac{1}{2} \mathcal{E}_{k} \left( \langle a^{\dagger}_{j} a_{l} \sigma_{z} \rangle + \langle a^{\dagger}_{j} a_{l} \rangle \right) - \frac{1}{2} \mathcal{E}_{l} \left( \langle a^{\dagger}_{j} a_{k} \sigma_{z} \rangle + \langle a^{\dagger}_{j} a_{k} \rangle \right) \\
@@ -230,7 +233,7 @@ Using the vector notation, we have moment equations
 	\end{align}
 	and
 	\begin{align}
-		\ddt \langle a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}^{(j^{*}, k^{*}, l)} \langle a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle +
+		\ddt \langle a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j^{*}, k^{*}, l} \langle a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle +
 		\begin{pmatrix}
 			-\frac{1}{2} \mathcal{E}_{j}^{*} \left( \langle a^{\dagger}_{k} a_{l} \sigma_{z} \rangle + \langle a^{\dagger}_{k} a_{l} \rangle \right) - \frac{1}{2} \mathcal{E}_{k}^{*} \left( \langle a^{\dagger}_{j} a_{l} \sigma_{z} \rangle + \langle a^{\dagger}_{j} a_{l} \rangle \right) \\
 			-\frac{1}{2} \mathcal{E}_{l} \left( \langle a^{\dagger}_{j} a^{\dagger}_{k} \sigma_{z} \rangle + \langle a^{\dagger}_{j} a^{\dagger}_{k} \rangle \right) \\
@@ -241,8 +244,8 @@ Using the vector notation, we have moment equations
 where
 \begin{subequations}
 	\begin{align}
-		\bm{M}^{(j^{*}, k, l)} &= \bm{M} - \left( 3 \kappa - i \omega_{j} + i \left( \omega_{k} + \omega_{l} \right) \right), \\
-		\bm{M}^{(j^{*}, k^{*}, l)} &= \bm{M} - \left( 3 \kappa - i \left( \omega_{j} + \omega_{k} \right) - i \omega_{l} \right).
+		\bm{M}_{j^{*}, k, l} &= \bm{M} - \left( 3 \kappa - i \omega_{j} + i \left( \omega_{k} + \omega_{l} \right) \right), \\
+		\bm{M}_{j^{*}, k^{*}, l} &= \bm{M} - \left( 3 \kappa - i \left( \omega_{j} + \omega_{k} \right) - i \omega_{l} \right).
 	\end{align}
 \end{subequations}
 
@@ -257,25 +260,25 @@ Finally, we have
 
 \section{First-Order Correlation Function}
 
-The first-order correlation function for the filtered output field is given by
+The first-order correlation function for the filtered output field in the steady state is given by
 \begin{align}
-	G^{(1)}(t, \tau) = \langle A^{\dagger}(t + \tau) A(\tau) \rangle = \sum_{j=-N}^{N} \langle a^{\dagger}_{j} (t + \tau) A(t) \rangle.
+	G^{(1)}(t, \tau) = \langle A^{\dagger}(t + \tau) A(t) \rangle = \sum_{j=-N}^{N} \langle a^{\dagger}_{j} (t + \tau) A(t) \rangle.
 \end{align}
 We use the Quantum Regression Theorem to solve for this with the moment equations
 \begin{subequations}
 	\begin{gather}
-		\ddt \langle \bm{\sigma}(t + \tau) A(t) \rangle = \bm{M} \langle \bm{\sigma}(t + \tau) A(t) \rangle + \bm{B}, \\
-		\ddt \langle a^{\dagger}_{j}(\tau) A(t) \rangle = -\left( \kappa - i \omega_{j} \right) \langle a^{\dagger}_{j}(t + \tau) A(t) \rangle - \mathcal{E}_{j}^{*} \langle \sigma_{+}(t + \tau) A(t) \rangle,
+		\ddtau \langle \bm{\sigma}(t + \tau) A(t) \rangle = \bm{M} \langle \bm{\sigma}(t + \tau) A(t) \rangle + \bm{B}, \\
+		\ddtau \langle a^{\dagger}_{j}(t + \tau) A(t) \rangle = -\left( \kappa - i \omega_{j} \right) \langle a^{\dagger}_{j}(t + \tau) A(t) \rangle - \mathcal{E}_{j}^{*} \langle \sigma_{+}(t + \tau) A(t) \rangle,
 	\end{gather}
 \end{subequations}
 where
 \begin{equation}
-	\langle \bm{\sigma}(t + \tau) A(t) \rangle = 
+	\langle \bm{\sigma}(t + \tau) A(t) \rangle =
 	\begin{pmatrix}
 		\langle \sigma_{-}(t + \tau) A(t) \rangle \\
 		\langle \sigma_{+}(t + \tau) A(t) \rangle \\
 		\langle \sigma_{z}(t + \tau) A(t) \rangle \\
-	\end{pmatrix}, \quad \bm{B} = 
+	\end{pmatrix}, \quad \bm{B} =
 	\begin{pmatrix}
 		0 \\
 		0 \\
@@ -284,64 +287,68 @@ where
 \end{equation}
 
 \section{Second-Order Correlation Function}
-The second-order correlation function for the filtered output field is given by
+
+The second-order correlation function for the filtered output field in the steady state is given by
 \begin{equation}
-	G^{(2)}(t, \tau) = \langle A^{\dagger}(t) A^{\dagger} A(t + \tau) A(t) \rangle = \sum_{k,l=-N}^{N} \langle A^{\dagger}(0) a^{\dagger}_{k} a_{l} (\tau) A(0) \rangle,
+	G^{(2)}(t, \tau) = \langle A^{\dagger}(t) A^{\dagger} A(t + \tau) A(t) \rangle = \sum_{k,l=-N}^{N} \langle A^{\dagger}(t) a^{\dagger}_{k} a_{l} (t + \tau) A(t) \rangle,
 \end{equation}
 with the normalised second-order correlation function given by
 \begin{equation}
-	g^{(2)}(\tau) = \frac{G^{(2)}(\tau)}{\langle A^{\dagger} A \rangle_{ss}^{2}}.
+	g^{(2)}(t, \tau) = \frac{G^{(2)}(t, \tau)}{\langle A^{\dagger} A \rangle_{ss}^{2}}.
 \end{equation}
 Using the Quantum Regression Theorem, we can solve for the second-order correlation function by solving the following moment equations
 \begin{subequations}
 	\begin{gather}
-		\ddt \langle A^{\dagger}(0) \bm{\sigma} A(0) \rangle = \bm{M} \langle A^{\dagger}(0) \bm{\sigma} A(0) \rangle + \bm{B}, \\
-		\ddt \langle A^{\dagger}(0) a^{\dagger}_{j}(\tau) A(0) \rangle = -\left( \kappa - i \omega_{j} \right) \langle A^{\dagger}(0) a^{\dagger}_{j}(\tau) A(0) \rangle - \mathcal{E}_{j}^{*} \langle A^{\dagger}(0) \sigma_{+}(\tau) A(0) \rangle, \\
-		\ddt \langle A^{\dagger}(0) a_{j}(\tau) A(0) \rangle = -\left( \kappa + i \omega_{j} \right) \langle A^{\dagger}(0) a_{j}(\tau) A(0) \rangle - \mathcal{E}_{j} \langle A^{\dagger}(0) \sigma_{-}(\tau) A(0) \rangle,
+		\ddtau \langle A^{\dagger}(t) \bm{\sigma}(t + \tau) A(t) \rangle = \bm{M} \langle A^{\dagger}(t) \bm{\sigma}(t + \tau) A(t) \rangle + \bm{B}, \\
+		\ddtau \langle A^{\dagger}(t) a^{\dagger}_{j}(t + \tau) A(t) \rangle = -\left( \kappa - i \omega_{j} \right) \langle A^{\dagger}(t) a^{\dagger}_{j}(t + \tau) A(t) \rangle - \mathcal{E}_{j}^{*} \langle A^{\dagger}(t) \sigma_{+}(t + \tau) A(t) \rangle, \\
+		\ddtau \langle A^{\dagger}(t) a_{j}(t + \tau) A(t) \rangle = -\left( \kappa + i \omega_{j} \right) \langle A^{\dagger}(t) a_{j}(t + \tau) A(t) \rangle - \mathcal{E}_{j} \langle A^{\dagger}(t) \sigma_{-}(t + \tau) A(t) \rangle,
 	\end{gather}
 \end{subequations}
 with
 \begin{equation}
-	\langle \bm{\sigma} \rangle = 
+	\langle \bm{\sigma} \rangle =
 	\begin{pmatrix}
-		\langle A^{\dagger}(0) \sigma_{-}(\tau) A(0) \rangle \\
-		\langle A^{\dagger}(0) \sigma_{+}(\tau) A(0) \rangle \\
-		\langle A^{\dagger}(0) \sigma_{z}(\tau) A(0) \rangle \\
-	\end{pmatrix}, \quad \bm{B} = 
+		\langle A^{\dagger}(t) \sigma_{-}(t + \tau) A(t) \rangle \\
+		\langle A^{\dagger}(t) \sigma_{+}(t + \tau) A(t) \rangle \\
+		\langle A^{\dagger}(t) \sigma_{z}(t + \tau) A(t) \rangle \\
+	\end{pmatrix}, \quad \bm{B} =
 	\begin{pmatrix}
 		0 \\
 		0 \\
-		-\gamma \langle A^{\dagger} A \rangle_{ss}
+		-\gamma \langle A^{\dagger} A(t) \rangle
 	\end{pmatrix}.
 \end{equation}
 We also need to solve
 \begin{subequations}
 	\begin{equation}
-		\ddt \langle A^{\dagger}(0) a_{j} \bm{\sigma}(\tau) A(0) \rangle = \bm{M}^{(j)} \langle A^{\dagger}(0) a_{j} \bm{\sigma}(\tau) A(0) \rangle + 
+		\ddtau \langle A^{\dagger}(t) a_{j} \bm{\sigma}(t + \tau) A(t) \rangle = \bm{M}_{j} \langle A^{\dagger}(t) a_{j} \bm{\sigma}(t + \tau) A(t) \rangle +
 		\begin{pmatrix}
 			0 \\
-			-\frac{1}{2} \mathcal{E}_{j} \left( \langle A^{\dagger}(0) \sigma_{z}(\tau) A(0) \rangle + \langle A^{\dagger} A \rangle_{ss} \right) \\
-			-\gamma \langle A^{\dagger}(0) a_{j}(\tau) A(0) \rangle + \mathcal{E}_{j} \langle A^{\dagger}(0) \sigma_{-}(\tau) A(0) \rangle
+			-\frac{1}{2} \mathcal{E}_{j} \left( \langle A^{\dagger}(t) \sigma_{z}(t + \tau) A(t) \rangle + \langle A^{\dagger} A \rangle_{ss} \right) \\
+			-\gamma \langle A^{\dagger}(t) a_{j}(t + \tau) A(t) \rangle + \mathcal{E}_{j} \langle A^{\dagger}(t) \sigma_{-}(t + \tau) A(t) \rangle
 		\end{pmatrix},
 	\end{equation}
 	and
 	\begin{equation}
-		\ddt \langle A^{\dagger}(0) a^{\dagger}_{j} \bm{\sigma}(\tau) A(0) \rangle = \bm{M}^{(j^{*})} \langle A^{\dagger}(0) a^{\dagger}_{j} \bm{\sigma}(\tau) A(0) \rangle + 
+		\ddtau \langle A^{\dagger}(t) a^{\dagger}_{j} \bm{\sigma}(t + \tau) A(t) \rangle = \bm{M}_{j^{*}} \langle A^{\dagger}(t) a^{\dagger}_{j} \bm{\sigma}(t + \tau) A(t) \rangle +
 		\begin{pmatrix}
-			-\frac{1}{2} \mathcal{E}_{j}^{*} \left( \langle A^{\dagger}(0) \sigma_{z}(\tau) A(0) \rangle + \langle A^{\dagger} A \rangle_{ss} \right) \\
+			-\frac{1}{2} \mathcal{E}_{j}^{*} \left( \langle A^{\dagger}(t) \sigma_{z}(t + \tau) A(t) \rangle + \langle A^{\dagger} A(t) \rangle \right) \\
 			0 \\
-			-\gamma \langle A^{\dagger}(0) a^{\dagger}_{j}(\tau) A(0) \rangle + \mathcal{E}_{j}^{*} \langle A^{\dagger}(0) \sigma_{+}(\tau) A(0) \rangle
+			-\gamma \langle A^{\dagger}(t) a^{\dagger}_{j}(t + \tau) A(t) \rangle + \mathcal{E}_{j}^{*} \langle A^{\dagger}(t) \sigma_{+}(t + \tau) A(t) \rangle
 		\end{pmatrix}.
 	\end{equation}
 \end{subequations}
 where
-\begin{equation}
-	\bm{M}^{(j)} = \bm{M} - \left( \kappa + i \omega_{j} \right) \mathbb{1}, \quad \bm{M}^{(j^{*})} = \bm{M} - \left( \kappa - i \omega_{j} \right) \mathbb{1}.
-\end{equation}
+\begin{subequations}
+	\begin{gather}
+		\bm{M}_{j} = \bm{M} - \left( \kappa + i \omega_{j} \right) \mathbb{1}, \\
+		\bm{M}_{j^{*}} = \bm{M} - \left( \kappa - i \omega_{j} \right) \mathbb{1}.
+	\end{gather}
+\end{subequations}
 Finally, we will also need to solve
 \begin{align}
-	\ddt \langle A^{\dagger}(0) a^{\dagger}_{k} a_{l}(\tau) A(0) \rangle &= -\left( 2 \kappa - i \left( \omega_{k} - \omega_{l} \right) \right) \langle A^{\dagger}(0) a^{\dagger}_{k} a_{l}(\tau) A(0) \rangle \nonumber \\
-	&\quad -\mathcal{E}_{k}^{*} \langle A^{\dagger}(0) a_{l} \sigma_{+}(\tau) A(0) \rangle - \mathcal{E}_{l} \langle A^{\dagger}(0) a_{k}^{\dagger} \sigma_{-}(\tau) A(0) \rangle.
+	\ddtau \langle A^{\dagger}(t) a^{\dagger}_{k} a_{l}(t + \tau) A(t) \rangle &= -\left( 2 \kappa - i \left( \omega_{k} - \omega_{l} \right) \right) \langle A^{\dagger}(t) a^{\dagger}_{k} a_{l}(t + \tau) A(t) \rangle \nonumber \\
+	&\quad -\mathcal{E}_{k}^{*} \langle A^{\dagger}(t) a_{l} \sigma_{+}(t + \tau) A(t) \rangle - \mathcal{E}_{l} \langle A^{\dagger}(t) a_{k}^{\dagger} \sigma_{-}(t + \tau) A(t) \rangle.
 \end{align}
 
 \end{document}

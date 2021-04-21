@@ -1,0 +1,61 @@
+&ATOM
+  ! Parameters in units of the decay rate gamma
+  ! Atomic decay rate
+  Gamma = 1.0d0
+  ! Drive strength (Rabi Frequency)
+  Omega = 40.0d0
+  ! Atomic anharmonicity (omega_{fe} - \omega_{eg})
+  alpha = -120.0d0
+  ! Drive detuning from two-photon resonance (\omega_{d} - \omega_{fg}/2)
+  delta = 0.0d0
+  ! Dipole moment ratio
+  xi = 1.0d0
+  ! xi = 1.4142135623730951d0
+/
+
+&FILTER
+  ! Percentage of fluorescence aimed at cavities [Default = 0.5]
+  epsilon = 1.0d0
+  ! Number of modes either side of d0 (2N + 1 total modes) [Default = 5]
+  N = 20
+  ! Phase modulation of mode coupling [Default = 1]
+  phase = 1
+/
+
+&CAVITYA
+  ! Central resonance frequency of cavity a [Default = 0.0]
+  w0a = 15.707963267948966d0
+  ! w0a = 0.0d0
+  ! Linewidth of cavity mode a [Default = 0.001]
+  kappaa = 1.0d0
+  ! Frequency spacing of modes for cavity a [Default = 1.0]
+  dwa = 0.4d0
+/
+
+&CAVITYB
+  ! Central resonance frequency of cavity b [Default = 0.0]
+  w0b = -15.707963267948966d0
+  ! w0b = 0.0d0
+  ! Linewidth of cavity mode b [Default = 0.001]
+  kappab = 1.0d0
+  ! Frequency spacing of modes for cavity b [Default = 1.0]
+  dwb = 0.8d0
+/
+
+&SCANLIST
+  ! Max/min value of D0a [Default = 30.0]
+  scan_max = 120.0d0
+  ! Scan step size [Default = 0.5]
+  scan_step = 0.11d0
+/
+
+&TIME
+  ! time step [Default = 0.001]
+  dt = 0.001d0
+  ! maximum time to integrate for steady state [Default = 50.0]
+  t_max = 10.0d0
+  ! Maximum g1 time in units of \gamma \tau [Default = 100.0]
+  tau1_max = 100.0d0
+  ! max g2 time in units of \gamma \tau [Default = 20.0]
+  tau2_max = 10.0d0
+/

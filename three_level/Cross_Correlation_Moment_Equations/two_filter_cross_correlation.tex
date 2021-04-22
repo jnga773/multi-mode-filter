@@ -2,7 +2,7 @@
 
 %--------------------------------------------------------------------------------%
 %                                  PACKAGES                                      %
-%--------------------------------------------------------------------------------
+%--------------------------------------------------------------------------------%
 % Fonts and Math packages
 \usepackage{braket}   % braket notation |i>, <i|
 \usepackage{amsfonts} % Math fonts
@@ -248,59 +248,150 @@ where
 
 \begin{subequations}
 	\begin{align}
-		\ddt \langle a_{j} b_{k} \rangle &= -\left( \kappa_{a} + \kappa_{b} + i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) \right) \langle a_{j} b_{k} \rangle - \mathcal{E}_{j}^{(a)} \langle b_{k} \sigma_{-} \rangle - \mathcal{E}_{k}^{(b)} \langle a_{j} \sigma_{-} \rangle, \\
-		\ddt \langle a^{\dagger}_{j} b^{\dagger}_{k} \rangle &= -\left( \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) \right) \langle a^{\dagger}_{j} b^{\dagger}_{k} \rangle - \mathcal{E}_{j}^{(a) *} \langle b^{\dagger}_{k} \sigma_{+} \rangle - \mathcal{E}_{k}^{(b) *} \langle a^{\dagger}_{j} \sigma_{+} \rangle, \\
+		\ddt \langle a_{j} b_{k} \rangle &= -\left( \kappa_{a} + \kappa_{b} + i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) \right) \langle a_{j} b_{k} \rangle \nonumber \\
+		&\quad - \mathcal{E}_{j}^{(a)} \left( \langle b_{k} \sigma^{eg}_{-} \rangle + \xi \langle b_{k} \sigma^{fe}_{-} \rangle \right) - \mathcal{E}_{k}^{(b)} \left( \langle a_{j} \sigma^{eg}_{-} \rangle + \xi \langle a_{j} \sigma^{fe}_{-} \rangle \right), \\
+		%
+		\ddt \langle a^{\dagger}_{j} b^{\dagger}_{k} \rangle &= -\left( \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) \right) \langle a^{\dagger}_{j} b^{\dagger}_{k} \rangle \nonumber \\
+		&\quad  - \mathcal{E}_{j}^{(a) *} \left( \langle b^{\dagger}_{k} \sigma^{eg}_{+} \rangle + \langle b^{\dagger}_{k} \sigma^{fe}_{+} \rangle \right) - \mathcal{E}_{k}^{(b) *} \left( \langle a^{\dagger}_{j} \sigma^{eg}_{+} \rangle + \langle a^{\dagger}_{j} \sigma^{fe}_{+} \rangle \right), \\
 		%-----------------%
 		\cline{1-2}
 		%-----------------%
-		\ddt \langle a^{\dagger}_{j} a_{k} \rangle &= -\left( 2 \kappa_{a} - i \left( \omega_{j}^{(a)}- \omega_{k}^{(a)} \right) \right) \langle a^{\dagger}_{j} a_{k} \rangle - \mathcal{E}_{j}^{(a) *} \langle a_{k} \sigma_{+} \rangle - \mathcal{E}_{k}^{(a)} \langle a^{\dagger}_{j} \sigma_{-} \rangle, \\
-		\ddt \langle b^{\dagger}_{j} b_{k} \rangle &= -\left( 2 \kappa_{b} - i \left( \omega_{j}^{(b)}- \omega_{k}^{(b)} \right) \right) \langle b^{\dagger}_{j} b_{k} \rangle - \mathcal{E}_{j}^{(b) *} \langle b_{k} \sigma_{+} \rangle - \mathcal{E}_{k}^{(b)} \langle b^{\dagger}_{j} \sigma_{-} \rangle, \\
+		\ddt \langle a^{\dagger}_{j} a_{k} \rangle &= -\left( 2 \kappa_{a} - i \left( \omega_{j}^{(a)}- \omega_{k}^{(a)} \right) \right) \langle a^{\dagger}_{j} a_{k} \rangle \nonumber \\
+		&\quad - \mathcal{E}_{j}^{(a) *} \left( \langle a_{k} \sigma^{eg}_{+} \rangle + \xi \langle a_{k} \sigma^{fe}_{+} \rangle \right)- \mathcal{E}_{k}^{(a)} \left( \langle a_{j}^{\dagger} \sigma^{eg}_{-} \rangle + \xi \langle a_{j}^{\dagger} \sigma^{fe}_{-} \rangle \right), \\
+		%
+		\ddt \langle b^{\dagger}_{j} b_{k} \rangle &= -\left( 2 \kappa_{b} - i \left( \omega_{j}^{(b)}- \omega_{k}^{(b)} \right) \right) \langle b^{\dagger}_{j} b_{k} \rangle \nonumber \\
+		&\quad - \mathcal{E}_{j}^{(b) *} \left( \langle b_{k} \sigma^{eg}_{+} \rangle + \xi \langle b_{k} \sigma^{fe}_{+} \rangle \right)- \mathcal{E}_{k}^{(b)} \left( \langle b_{j}^{\dagger} \sigma^{eg}_{-} \rangle + \xi \langle b_{j}^{\dagger} \sigma^{fe}_{-} \rangle \right), \\
 		%-----------------%
 		\cline{1-2}
 		%-----------------%
-		\ddt \langle a^{\dagger}_{j} b_{k} \rangle &= -\left( \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(a)}- \omega_{k}^{(b)} \right) \right) \langle a^{\dagger}_{j} b_{k} \rangle - \mathcal{E}_{j}^{(a) *} \langle b_{k} \sigma_{+} \rangle - \mathcal{E}_{k}^{(b)} \langle a^{\dagger}_{j} \sigma_{-} \rangle, \\
-		\ddt \langle b^{\dagger}_{j} a_{k} \rangle &= -\left( \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(b)}- \omega_{k}^{(a)} \right) \right) \langle b^{\dagger}_{j} a_{k} \rangle - \mathcal{E}_{j}^{(b) *} \langle a_{k} \sigma_{+} \rangle - \mathcal{E}_{k}^{(a)} \langle b^{\dagger}_{j} \sigma_{-} \rangle.
+		\ddt \langle a^{\dagger}_{j} b_{k} \rangle &= -\left( \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(a)}- \omega_{k}^{(b)} \right) \right) \langle a^{\dagger}_{j} b_{k} \rangle \nonumber \\
+		&\quad - \mathcal{E}_{j}^{(a) *} \left( \langle b_{k} \sigma^{eg}_{+} \rangle + \xi \langle b_{k} \sigma^{fe}_{+} \rangle \right)- \mathcal{E}_{k}^{(b)} \left( \langle a_{j}^{\dagger} \sigma^{eg}_{-} \rangle + \xi \langle a_{j}^{\dagger} \sigma^{fe}_{-} \rangle \right), \\
+		%
+		\ddt \langle b^{\dagger}_{j} a_{k} \rangle &= -\left( \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(b)}- \omega_{k}^{(a)} \right) \right) \langle b^{\dagger}_{j} a_{k} \rangle \nonumber \\
+		&\quad - \mathcal{E}_{j}^{(b) *} \left( \langle a_{k} \sigma^{eg}_{+} \rangle + \xi \langle a_{k} \sigma^{fe}_{+} \rangle \right)- \mathcal{E}_{k}^{(a)} \left( \langle b_{j}^{\dagger} \sigma^{eg}_{-} \rangle + \xi \langle b_{j}^{\dagger} \sigma^{fe}_{-} \rangle \right)
 	\end{align}
 \end{subequations}
 
 \subsection{Third-Order: Cavity-Atom Coupled Equations}
 
 Using the vector notation, we have moment equations
-
 \begin{subequations}
 	\begin{equation}
-		\ddt \langle a_{j} a_{k} \bm{\sigma} \rangle = \bm{M}^{(j, k)} \langle a_{j} a_{k} \bm{\sigma} \rangle + 
+		\ddt \langle a_{j} b_{k} \bm{\sigma} \rangle = \bm{M}_{j, k}^{(ab)} \langle a_{j} b_{k} \bm{\sigma} \rangle +
 		\begin{pmatrix}
+			-\mathcal{E}_{j}^{(a)} \langle b_{k} \sigma^{eg}_{-} \rangle - \mathcal{E}_{k}^{(b)} \langle a_{j} \sigma^{eg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(a)} \xi \langle b_{k} \sigma^{fg}_{-} \rangle - \mathcal{E}_{k}^{(b)} \xi \langle a_{j} \sigma^{fg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(a)} \langle b_{k} \sigma^{ee} \rangle - \mathcal{E}_{k}^{(b)} \langle a_{j} \sigma^{ee} \rangle \\
+			%--------------------------------------%
+			\Gamma \xi \langle a_{j} b_{k} \rangle - \mathcal{E}_{j}^{(a)} \xi \langle b_{k} \sigma^{fe}_{-} \rangle - \mathcal{E}_{k}^{(b)} \xi \langle a_{j} \sigma^{fe}_{-} \rangle \\
+			i \xi \frac{\Omega}{2} \langle a_{j} b_{k} \rangle \\
+			-i \xi \frac{\Omega}{2} \langle a_{j} b_{k} \rangle - \mathcal{E}_{j}^{(a)} \xi \left( \langle b_{k} \rangle - \langle b_{k} \sigma^{gg} \rangle - \langle b_{k} \sigma^{ee} \rangle \right) - \mathcal{E}_{k}^{(b)} \xi \left( \langle a_{j} \rangle - \langle a_{j} \sigma^{gg} \rangle - \langle a_{j} \sigma^{ee} \rangle \right) \\
+			%--------------------------------------%
 			0 \\
-			-\frac{1}{2} \mathcal{E}_{j} \left( \langle a_{k} \sigma_{z} \rangle + \langle a_{k} \rangle \right) - \frac{1}{2} \mathcal{E}_{k} \left( \langle a_{j} \sigma_{z} \rangle + \langle a_{j} \rangle \right) \\
-			-\gamma \langle a_{j} a_{k} \rangle + \mathcal{E}_{j} \langle a_{k} \sigma_{-} \rangle + \mathcal{E}_{k} \langle a_{j} \sigma_{-} \rangle
+			-\mathcal{E}_{j}^{(a)} \langle b_{k} \sigma^{fe}_{+} \rangle - \mathcal{E}_{k}^{(b)} \langle a_{j} \sigma^{fe}_{+} \rangle
 		\end{pmatrix},
 	\end{equation}
-	and
 	\begin{equation}
-		\ddt \langle a^{\dagger}_{j} a^{\dagger}_{k} \bm{\sigma} \rangle = \bm{M}^{(j^{*}, k^{*})} \langle a^{\dagger}_{j} a^{\dagger}_{k} \bm{\sigma} \rangle + 
+		\ddt \langle a^{\dagger}_{j} b^{\dagger}_{k} \bm{\sigma} \rangle = \bm{M}_{j, k}^{(a^{\dagger} b^{\dagger})} \langle a^{\dagger}_{j} b^{\dagger}_{k} \bm{\sigma} \rangle +
 		\begin{pmatrix}
-			-\frac{1}{2} \mathcal{E}_{j}^{*} \left( \langle a^{\dagger}_{k} \sigma_{z} \rangle + \langle a^{\dagger}_{k} \rangle \right) - \frac{1}{2} \mathcal{E}_{k}^{*} \left( \langle a^{\dagger}_{j} \sigma_{z} \rangle + \langle a^{\dagger}_{j} \rangle \right) \\
-			0 \\
-			-\gamma \langle a^{\dagger}_{j} a^{\dagger}_{k} \rangle + \mathcal{E}_{j}^{*} \langle a^{\dagger}_{k} \sigma_{+} \rangle + \mathcal{E}_{k}^{*} \langle a^{\dagger}_{j} \sigma_{+} \rangle
+			-\mathcal{E}_{j}^{(a) *} \langle b^{\dagger}_{k} \sigma^{eg}_{+} \rangle - \mathcal{E}_{k}^{(b) *} \langle a^{\dagger}_{j} \sigma^{eg}_{+} \rangle\\
+			-\mathcal{E}_{j}^{(a) *} \langle b^{\dagger}_{k} \sigma^{ee} \rangle -\mathcal{E}_{k}^{(b) *} \langle a^{\dagger}_{j} \sigma^{ee} \rangle \\
+			-\mathcal{E}_{j}^{(a) *} \xi \langle b^{\dagger}_{k} \sigma^{fg}_{+} \rangle - \mathcal{E}_{k}^{(b) *} \xi \langle a^{\dagger}_{j} \sigma^{fg}_{+} \rangle \\
+			%--------------------------------------%
+			\Gamma \xi^{2} \langle a_{j}^{\dagger} b^{\dagger}_{k} \rangle - \mathcal{E}_{j}^{(a) *} \xi \langle b^{\dagger}_{k} \sigma^{fe}_{+} \rangle - \mathcal{E}_{k}^{(b) *} \xi \langle a^{\dagger}_{j} \sigma^{fe}_{+} \rangle \\
+			i \xi \frac{\Omega}{2} \langle a_{j}^{\dagger} b^{\dagger}_{k} \rangle - \mathcal{E}_{j}^{(a) *} \xi \left( \langle b^{\dagger}_{k} \rangle - \langle b^{\dagger}_{k} \sigma^{gg} \rangle - \langle b^{\dagger}_{k} \sigma^{ee} \rangle \right) - \mathcal{E}_{k}^{(b) *} \xi \left( \langle a^{\dagger}_{j} \rangle - \langle a^{\dagger}_{j} \sigma^{gg} \rangle - \langle a^{\dagger}_{j} \sigma^{ee} \rangle \right) \\
+			-i \xi \frac{\Omega}{2} \langle a_{j}^{\dagger} b^{\dagger}_{k} \rangle \\
+			%--------------------------------------%
+			-\mathcal{E}_{j}^{(a) *} \langle b^{\dagger}_{k} \sigma^{fe}_{-} \rangle - \mathcal{E}_{k}^{(b) *} \langle a^{\dagger}_{j} \sigma^{fe}_{-} \rangle \\
+			0
 		\end{pmatrix},
-	\end{equation}
-	and
-	\begin{equation}
-	\ddt \langle a^{\dagger}_{j} a_{k} \bm{\sigma} \rangle = \bm{M}^{(j^{*}, k)} \langle a^{\dagger}_{j} a_{k} \bm{\sigma} \rangle + 
-	\begin{pmatrix}
-		-\frac{1}{2} \mathcal{E}_{j}^{*} \left( \langle a_{k} \sigma_{z} \rangle + \langle a_{k} \rangle \right) \\
-		-\frac{1}{2} \mathcal{E}_{k} \left( \langle a^{\dagger}_{j} \sigma_{z} \rangle + \langle a^{\dagger}_{j} \rangle \right) \\
-		-\gamma \langle a^{\dagger}_{j} a_{k} \rangle + \mathcal{E}_{j}^{*} \langle a_{k} \sigma_{+} \rangle + \mathcal{E}_{k} \langle a^{\dagger}_{j} \sigma_{-} \rangle
-	\end{pmatrix},
 	\end{equation}
 \end{subequations}
 where
 \begin{subequations}
 	\begin{align}
-		\bm{M}^{(j, k)} &= \bm{M} - \left( 2 \kappa + i \left( \omega_{j} + \omega_{k} \right) \right) \mathbb{1}, \\
-		\bm{M}^{(j^{*}, k^{*})} &= \bm{M} - \left( 2 \kappa - i \left( \omega_{j} + \omega_{k} \right) \right) \mathbb{1}, \\
-		\bm{M}^{(j^{*}, k)} &= \bm{M} - \left( 2 \kappa - i \left( \omega_{j}- \omega_{k} \right) \right) \mathbb{1}.
+		\bm{M}_{j, k}^{(ab)} &= \bm{M} - \left( \kappa_{a} + \kappa_{b} + i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) \right) \mathbb{1}, \\
+		\bm{M}_{j, k}^{(a^{\dagger} b^{\dagger})} &= \bm{M} - \left( \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) \right) \mathbb{1}; 
+	\end{align}
+\end{subequations}
+and
+\begin{subequations}
+	\begin{equation}
+		\ddt \langle a^{\dagger}_{j} a_{k} \bm{\sigma} \rangle = \bm{M}_{j, k}^{(a^{\dagger} a)} \langle a^{\dagger}_{j} a_{k} \bm{\sigma} \rangle +
+		\begin{pmatrix}
+			-\mathcal{E}_{j}^{(a) *} \langle a_{k} \sigma^{eg}_{+} \rangle - \mathcal{E}_{k}^{(a)} \langle a^{\dagger}_{j} \sigma^{eg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(a) *} \langle a_{k} \sigma^{ee} \rangle - \mathcal{E}_{k}^{(a)} \xi \langle a^{\dagger}_{j} \sigma^{fg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(a) *} \xi \langle a_{k} \sigma^{fg}_{+} \rangle - \mathcal{E}_{k}^{(a)} \langle a^{\dagger}_{j} \sigma^{ee} \rangle \\
+			%--------------------------------------%
+			\Gamma \xi^{2} \langle a^{\dagger}_{j} a_{k} \rangle - \mathcal{E}_{j}^{(a) *} \xi \langle a_{k} \sigma^{fe}_{+} \rangle - \mathcal{E}_{k}^{(a)} \xi \langle a^{\dagger}_{k} \sigma^{fe}_{-} \rangle \\
+			i \xi \frac{\Omega}{2} \langle a^{\dagger}_{j} a_{k} \rangle - \mathcal{E}_{j}^{(a) *} \xi \left( \langle a_{k} \rangle - \langle a_{k} \sigma^{gg} \rangle - \langle a_{k} \sigma^{ee} \rangle \right) \\
+			-i \xi \frac{\Omega}{2} \langle a^{\dagger}_{j} a_{k} \rangle - \mathcal{E}_{k}^{(a)} \xi \left( \langle a^{\dagger}_{j} \rangle - \langle a^{\dagger}_{j} \sigma^{gg} \rangle - \langle a^{\dagger}_{j} \sigma^{ee} \rangle \right) \\
+			%--------------------------------------%
+			-\mathcal{E}_{j}^{(a) *} \langle a_{k} \sigma^{fe}_{-} \rangle \\
+			-\mathcal{E}_{k}^{(a)} \langle a^{\dagger}_{j} \sigma^{fe}_{+} \rangle
+		\end{pmatrix},
+	\end{equation}
+	\begin{equation}
+		\ddt \langle b^{\dagger}_{j} b_{k} \bm{\sigma} \rangle = \bm{M}_{j, k}^{(b^{\dagger} b)} \langle b^{\dagger}_{j} b_{k} \bm{\sigma} \rangle +
+		\begin{pmatrix}
+			-\mathcal{E}_{j}^{(b) *} \langle b_{k} \sigma^{eg}_{+} \rangle - \mathcal{E}_{k}^{(b)} \langle b^{\dagger}_{j} \sigma^{eg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(b) *} \langle b_{k} \sigma^{ee} \rangle - \mathcal{E}_{k}^{(b)} \xi \langle b^{\dagger}_{j} \sigma^{fg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(b) *} \xi \langle b_{k} \sigma^{fg}_{+} \rangle - \mathcal{E}_{k}^{(b)} \langle b^{\dagger}_{j} \sigma^{ee} \rangle \\
+			%--------------------------------------%
+			\Gamma \xi^{2} \langle b^{\dagger}_{j} b_{k} \rangle - \mathcal{E}_{j}^{(b) *} \xi \langle b_{k} \sigma^{fe}_{+} \rangle - \mathcal{E}_{k}^{(b)} \xi \langle b^{\dagger}_{k} \sigma^{fe}_{-} \rangle \\
+			i \xi \frac{\Omega}{2} \langle b^{\dagger}_{j} b_{k} \rangle - \mathcal{E}_{j}^{(b) *} \xi \left( \langle b_{k} \rangle - \langle b_{k} \sigma^{gg} \rangle - \langle b_{k} \sigma^{ee} \rangle \right) \\
+			-i \xi \frac{\Omega}{2} \langle b^{\dagger}_{j} b_{k} \rangle - \mathcal{E}_{k}^{(b)} \xi \left( \langle b^{\dagger}_{j} \rangle - \langle b^{\dagger}_{j} \sigma^{gg} \rangle - \langle b^{\dagger}_{j} \sigma^{ee} \rangle \right) \\
+			%--------------------------------------%
+			-\mathcal{E}_{j}^{(b) *} \langle b_{k} \sigma^{fe}_{-} \rangle \\
+			-\mathcal{E}_{k}^{(b)} \langle b^{\dagger}_{j} \sigma^{fe}_{+} \rangle
+		\end{pmatrix},
+	\end{equation}
+\end{subequations}
+where
+\begin{subequations}
+	\begin{align}
+		\bm{M}_{j, k}^{(a^{\dagger} a)} &= \bm{M} - \left( 2 \kappa_{a} - i \left( \omega_{j}^{(a)} - i \omega_{k}^{(a)} \right) \right) \mathbb{1}, \\
+		\bm{M}_{j, k}^{(b^{\dagger} b)} &= \bm{M} - \left( 2 \kappa_{b} - i \left( \omega_{j}^{(b)} - i \omega_{k}^{(b)} \right) \right) \mathbb{1}; 
+	\end{align}
+\end{subequations}
+and
+\begin{subequations}
+	\begin{equation}
+		\ddt \langle a^{\dagger}_{j} b_{k} \bm{\sigma} \rangle = \bm{M}_{j, k}^{(a^{\dagger} b)} \langle a^{\dagger}_{j} b_{k} \bm{\sigma} \rangle +
+		\begin{pmatrix}
+			-\mathcal{E}_{j}^{(a) *} \langle b_{k} \sigma^{eg}_{+} \rangle - \mathcal{E}_{k}^{(b)} \langle a^{\dagger}_{j} \sigma^{eg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(a) *} \langle b_{k} \sigma^{ee} \rangle - \mathcal{E}_{k}^{(b)} \xi \langle a^{\dagger}_{j} \sigma^{fg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(a) *} \xi \langle b_{k} \sigma^{fg}_{+} \rangle - \mathcal{E}_{k}^{(b)} \langle a^{\dagger}_{j} \sigma^{ee} \rangle \\
+			%--------------------------------------%
+			\Gamma \xi^{2} \langle a^{\dagger}_{j} b_{k} \rangle - \mathcal{E}_{j}^{(a) *} \xi \langle b_{k} \sigma^{fe}_{+} \rangle - \mathcal{E}_{k}^{(b)} \xi \langle a^{\dagger}_{k} \sigma^{fe}_{-} \rangle \\
+			i \xi \frac{\Omega}{2} \langle a^{\dagger}_{j} b_{k} \rangle - \mathcal{E}_{j}^{(a) *} \xi \left( \langle b_{k} \rangle - \langle b_{k} \sigma^{gg} \rangle - \langle b_{k} \sigma^{ee} \rangle \right) \\
+			-i \xi \frac{\Omega}{2} \langle a^{\dagger}_{j} b_{k} \rangle - \mathcal{E}_{k}^{(b)} \xi \left( \langle a^{\dagger}_{j} \rangle - \langle a^{\dagger}_{j} \sigma^{gg} \rangle - \langle a^{\dagger}_{j} \sigma^{ee} \rangle \right) \\
+			%--------------------------------------%
+			-\mathcal{E}_{j}^{(a) *} \langle b_{k} \sigma^{fe}_{-} \rangle \\
+			-\mathcal{E}_{k}^{(b)} \langle a^{\dagger}_{j} \sigma^{fe}_{+} \rangle
+		\end{pmatrix},
+	\end{equation}
+	\begin{equation}
+		\ddt \langle b^{\dagger}_{j} a_{k} \bm{\sigma} \rangle = \bm{M}_{j, k}^{(b^{\dagger} a)} \langle b^{\dagger}_{j} a_{k} \bm{\sigma} \rangle +
+		\begin{pmatrix}
+			-\mathcal{E}_{j}^{(b) *} \langle a_{k} \sigma^{eg}_{+} \rangle - \mathcal{E}_{k}^{(a)} \langle b^{\dagger}_{j} \sigma^{eg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(b) *} \langle a_{k} \sigma^{ee} \rangle - \mathcal{E}_{k}^{(a)} \xi \langle b^{\dagger}_{j} \sigma^{fg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(b) *} \xi \langle a_{k} \sigma^{fg}_{+} \rangle - \mathcal{E}_{k}^{(a)} \langle b^{\dagger}_{j} \sigma^{ee} \rangle \\
+			%--------------------------------------%
+			\Gamma \xi^{2} \langle b^{\dagger}_{j} a_{k} \rangle - \mathcal{E}_{j}^{(b) *} \xi \langle a_{k} \sigma^{fe}_{+} \rangle - \mathcal{E}_{k}^{(a)} \xi \langle b^{\dagger}_{k} \sigma^{fe}_{-} \rangle \\
+			i \xi \frac{\Omega}{2} \langle b^{\dagger}_{j} a_{k} \rangle - \mathcal{E}_{j}^{(b) *} \xi \left( \langle a_{k} \rangle - \langle a_{k} \sigma^{gg} \rangle - \langle a_{k} \sigma^{ee} \rangle \right) \\
+			-i \xi \frac{\Omega}{2} \langle b^{\dagger}_{j} a_{k} \rangle - \mathcal{E}_{k}^{(a)} \xi \left( \langle b^{\dagger}_{j} \rangle - \langle b^{\dagger}_{j} \sigma^{gg} \rangle - \langle b^{\dagger}_{j} \sigma^{ee} \rangle \right) \\
+			%--------------------------------------%
+			-\mathcal{E}_{j}^{(b) *} \langle a_{k} \sigma^{fe}_{-} \rangle \\
+			-\mathcal{E}_{k}^{(a)} \langle b^{\dagger}_{j} \sigma^{fe}_{+} \rangle
+		\end{pmatrix},
+	\end{equation}
+\end{subequations}
+where
+\begin{subequations}
+	\begin{align}
+		\bm{M}_{j, k}^{(a^{\dagger} b)} &= \bm{M} - \left( \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(a)} - i \omega_{k}^{(b)} \right) \right) \mathbb{1}, \\
+		\bm{M}_{j, k}^{(b^{\dagger} a)} &= \bm{M} - \left( \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(b)} - i \omega_{k}^{(a)} \right) \right) \mathbb{1}; 
 	\end{align}
 \end{subequations}
 
@@ -308,19 +399,29 @@ where
 
 \begin{subequations}
 	\begin{align}
-		\ddt \langle a^{\dagger}_{j} a_{k} b_{l} \rangle &= -\left( 2\kappa_{a} + \kappa_{b} - i \omega_{j}^{(a)} + i \left( \omega_{k}^{(a)} + \omega_{l}^{(b)} \right) \right) \langle a^{\dagger}_{j} a_{k} b_{l} \rangle \nonumber \\
-		&\quad - \mathcal{E}_{j}^{(a) *} \langle a_{k} b_{l} \sigma_{+} \rangle - \mathcal{E}_{k}^{(a)} \langle a^{\dagger}_{j} b_{l} \sigma_{-} \rangle - \mathcal{E}_{l}^{(b)} \langle a^{\dagger}_{j} a_{k} \sigma_{-} \rangle , \\
-		\ddt \langle b^{\dagger}_{j} b_{k} a_{l} \rangle &= -\left( \kappa_{a} + 2\kappa_{b} - i \omega_{j}^{(b)} + i \left( \omega_{k}^{(b)} + \omega_{l}^{(a)} \right) \right) \langle b^{\dagger}_{j} b_{k} a_{l} \rangle \nonumber \\
-		&\quad - \mathcal{E}_{j}^{(b) *} \langle b_{k} a_{l} \sigma_{+} \rangle - \mathcal{E}_{k}^{(b)} \langle b^{\dagger}_{j} a_{l} \sigma_{-} \rangle - \mathcal{E}_{l}^{(a)} \langle b^{\dagger}_{j} b_{k} \sigma_{-} \rangle ,
+		\ddt \langle a^{\dagger}_{j} a_{k} b_{l} \rangle &= -\left( 2\kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(a)} - \omega_{k}^{(a)} - \omega_{l}^{(b)} \right) \right) \langle a^{\dagger}_{j} a_{k} b_{l} \rangle \nonumber \\
+		&\quad - \mathcal{E}_{j}^{(a) *} \left( \langle a_{k} b_{l} \sigma^{eg}_{+} \rangle + \xi \langle a_{k} b_{l} \sigma^{fe}_{+} \rangle \right) \nonumber \\
+		&\quad - \mathcal{E}_{k}^{(a)} \left( \langle a^{\dagger}_{j} b_{l} \sigma^{eg}_{-} \rangle + \xi \langle a^{\dagger}_{j} b_{l} \sigma^{fe}_{-} \rangle \right) \nonumber \\
+		&\quad - \mathcal{E}_{l}^{(b)} \left( \langle a^{\dagger}_{j} a_{k} \sigma^{eg}_{-} \rangle + \xi \langle a^{\dagger}_{j} a_{k} \sigma^{fe}_{-} \rangle \right) , \\
+		%--------------------------------------%
+		\ddt \langle b^{\dagger}_{j} b_{k} a_{l} \rangle &= -\left( \kappa_{a} + 2\kappa_{b} - i \left( \omega_{j}^{(b)} - \omega_{k}^{(b)} - \omega_{l}^{(a)} \right) \right) \langle b^{\dagger}_{j} b_{k} a_{l} \rangle \nonumber \\
+		&\quad - \mathcal{E}_{j}^{(b) *} \left( \langle b_{k} a_{l} \sigma^{eg}_{+} \rangle + \xi \langle b_{k} a_{l} \sigma^{fe}_{+} \rangle \right) \nonumber \\
+		&\quad - \mathcal{E}_{k}^{(b)} \left( \langle b^{\dagger}_{j} a_{l} \sigma^{eg}_{-} \rangle + \xi \langle b^{\dagger}_{j} a_{l} \sigma^{fe}_{-} \rangle \right) \nonumber \\
+		&\quad - \mathcal{E}_{l}^{(a)} \left( \langle b^{\dagger}_{j} b_{k} \sigma^{eg}_{-} \rangle + \xi \langle b^{\dagger}_{j} b_{k} \sigma^{fe}_{-} \rangle \right) ,
 	\end{align}
 \end{subequations}
 and
 \begin{subequations}
 	\begin{align}
-		\ddt \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle &= -\left( 2\kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(b)} + \omega_{k}^{(a)} \right) + i \omega_{l}^{(a)} \right) \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle \nonumber \\
-		&\quad - \mathcal{E}_{j}^{(b) *} \langle a^{\dagger}_{k} a_{l} \sigma_{+} \rangle - \mathcal{E}_{k}^{(a) *} \langle b^{\dagger}_{j} a_{l} \sigma_{+} \rangle - \mathcal{E}_{l}^{(a)} \langle b^{\dagger}_{j} a^{\dagger}_{k} \sigma_{-} \rangle , \\
-		\ddt \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \rangle &= -\left( \kappa_{a} + 2\kappa_{b} - i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) + i \omega_{l}^{(b)} \right) \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \rangle \nonumber \\
-		&\quad - \mathcal{E}_{j}^{(a) *} \langle b^{\dagger}_{k} b_{l} \sigma_{+} \rangle - \mathcal{E}_{k}^{(b) *} \langle a^{\dagger}_{j} b_{l} \sigma_{+} \rangle - \mathcal{E}_{l}^{(b)} \langle a^{\dagger}_{j} b^{\dagger}_{k} \sigma_{-} \rangle .
+		\ddt \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle &= -\left( 2\kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(b)} + \omega_{k}^{(a)} - \omega_{l}^{(a)} \right) \right) \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle \nonumber \\
+		&\quad - \mathcal{E}_{j}^{(b) *} \left( \langle a^{\dagger}_{k} a_{l} \sigma^{eg}_{+} \rangle + \xi \langle a^{\dagger}_{k} a_{l} \sigma^{fe}_{+} \rangle \right) \nonumber \\
+		&\quad - \mathcal{E}_{k}^{(a) *} \left( \langle b^{\dagger}_{j} a_{l} \sigma^{eg}_{+} \rangle + \xi \langle b^{\dagger}_{j} a_{l} \sigma^{fe}_{+} \rangle \right) \nonumber \\
+		&\quad - \mathcal{E}_{l}^{(a)} \left( \langle b^{\dagger}_{j} a^{\dagger}_{k} \sigma^{eg}_{-} \rangle + \xi \langle b^{\dagger}_{j} a^{\dagger}_{k} \sigma^{fe}_{-} \rangle \right) ,\\
+		%--------------------------------------%
+		\ddt \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \rangle &= -\left( \kappa_{a} + 2\kappa_{b} - i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} - \omega_{l}^{(b)} \right) \right) \langle b^{\dagger}_{j} b_{k} a_{l} \rangle \nonumber \\
+		&\quad - \mathcal{E}_{j}^{(a) *} \left( \langle b^{\dagger}_{k} b_{l} \sigma^{eg}_{+} \rangle + \xi \langle b^{\dagger}_{k} b_{l} \sigma^{fe}_{+} \rangle \right) \nonumber \\
+		&\quad - \mathcal{E}_{k}^{(b) *} \left( \langle a^{\dagger}_{j} b_{l} \sigma^{eg}_{+} \rangle + \xi \langle a^{\dagger}_{j} b_{l} \sigma^{fe}_{+} \rangle \right) \nonumber \\
+		&\quad - \mathcal{E}_{l}^{(b)} \left( \langle a^{\dagger}_{j} b^{\dagger}_{k} \sigma^{eg}_{-} \rangle + \xi \langle a^{\dagger}_{j} b^{\dagger}_{k} \sigma^{fe}_{-} \rangle \right) ,
 	\end{align}
 \end{subequations}
 
@@ -329,49 +430,85 @@ and
 Using the vector notation, we have moment equations
 \begin{subequations}
 	\begin{align}
-		\ddt \langle a^{\dagger}_{j} a_{k} b_{l} \bm{\sigma} \rangle &= \bm{M}^{(j^{*}, k, l)}_{a} \langle a^{\dagger}_{j} a_{k} b_{l} \rangle + 
+		\ddt \langle a^{\dagger}_{j} a_{k} b_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(a^{\dagger} a b)} \langle a^{\dagger}_{j} a_{k} b_{l} \rangle + \nonumber \\
+		&\quad
 		\begin{pmatrix}
-			-\frac{1}{2} \mathcal{E}_{j}^{(a) *} \left( \langle a_{k} b_{l} \sigma_{z} \rangle + \langle a_{k} b_{l} \rangle \right) \\
-			-\frac{1}{2} \mathcal{E}_{k}^{(a)} \left( \langle a^{\dagger}_{j} b_{l} \sigma_{z} \rangle + \langle a^{\dagger}_{j} b_{l} \rangle \right) - \frac{1}{2} \mathcal{E}_{l}^{(b)} \left( \langle a^{\dagger}_{j} a_{k} \sigma_{z} \rangle + \langle a^{\dagger}_{j} a_{k} \rangle \right) \\
-			-\gamma \langle a^{\dagger}_{j} a_{k} b_{l} \rangle + \mathcal{E}_{j}^{(a) *} \langle a_{k} b_{l} \sigma_{+} \rangle + \mathcal{E}_{k}^{(a)} \langle a^{\dagger}_{j} b_{l} \sigma_{-} \rangle + \mathcal{E}_{l}^{(b)} \langle a^{\dagger}_{j} a_{k} \sigma_{-} \rangle
-		\end{pmatrix}, \\
-		\ddt \langle b^{\dagger}_{j} b_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}^{(j^{*}, k, l)}_{b} \langle b^{\dagger}_{j} b_{k} a_{l} \rangle + 
+			-\mathcal{E}_{j}^{(a) *} \langle a_{k} b_{l} \sigma^{eg}_{+} \rangle - \mathcal{E}_{k}^{(a)} \langle a^{\dagger}_{j} b_{l} \sigma^{eg}_{-} \rangle - \mathcal{E}_{l}^{(b)} \langle a^{\dagger}_{j} a_{k} \sigma^{eg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(a) *} \langle a_{k} b_{l} \sigma^{ee} \rangle - \mathcal{E}_{k}^{(a)} \xi \langle a^{\dagger}_{j} b_{l} \sigma^{fg}_{-} \rangle - \mathcal{E}_{l}^{(b)} \xi \langle a^{\dagger}_{j} a_{k} \sigma^{fg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(a) *} \xi \langle a_{k} b_{l} \sigma^{fg}_{+} \rangle - \mathcal{E}_{k}^{(a)} \langle a^{\dagger}_{j} b_{l} \sigma^{ee} \rangle - \mathcal{E}_{l}^{(b)} \langle a^{\dagger}_{j} a_{k} \sigma^{ee} \rangle \\
+			%--------------------------------------%
+			\Gamma \xi^{2} \langle a^{\dagger}_{j} a_{k} b_{l} \rangle - \mathcal{E}_{j}^{(a) *} \xi \langle a_{k} b_{l} \sigma^{fe}_{+} \rangle - \mathcal{E}_{k}^{(a)} \xi \langle a^{\dagger}_{j} b_{l} \sigma^{fe}_{-} \rangle - \mathcal{E}_{l}^{(b)} \xi \langle a^{\dagger}_{j} a_{k} \sigma^{fe}_{-} \rangle \\
+			i \xi \frac{\Omega}{2} \langle a^{\dagger}_{j} a_{k} b_{l} \rangle - \mathcal{E}_{j}^{(a) *} \xi \left( \langle a_{k} b_{l} \rangle - \langle a_{k} b_{l} \sigma^{gg} \rangle - \langle a_{k} b_{l} \sigma^{ee} \rangle \right) \\
+			-i \xi \frac{\Omega}{2} \langle a^{\dagger}_{j} a_{k} b_{l} \rangle - \mathcal{E}_{k}^{(a)} \xi \left( \langle a^{\dagger}_{j} a_{k} \rangle - \langle a^{\dagger}_{j} b_{l} \sigma^{gg} \rangle - \langle a^{\dagger}_{j} b_{l} \sigma^{ee} \rangle \right) - \mathcal{E}_{l}^{(b)} \xi \left( \langle a^{\dagger}_{j} b_{l} \rangle - \langle a^{\dagger}_{j} a_{k} \sigma^{gg} \rangle - \langle a^{\dagger}_{j} a_{k} \sigma^{ee} \rangle \right) \\
+			%--------------------------------------%
+			-\mathcal{E}_{j}^{(a) *} \langle a_{k} b_{l} \sigma^{fe}_{-} \rangle \\
+			-\mathcal{E}_{k}^{(a)} \langle a^{\dagger}_{j} b_{l} \sigma^{fe}_{+} \rangle - \mathcal{E}_{l}^{(b)} \langle a^{\dagger}_{j} a_{k} \sigma^{fe}_{-} \rangle
+		\end{pmatrix},
+	\end{align}
+	\begin{align}
+		\ddt \langle b^{\dagger}_{j} b_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(b^{\dagger} b a)} \langle b^{\dagger}_{j} b_{k} a_{l} \rangle + \nonumber \\
+		&\quad
 		\begin{pmatrix}
-			-\frac{1}{2} \mathcal{E}_{j}^{(b) *} \left( \langle b_{k} a_{l} \sigma_{z} \rangle + \langle b_{k} a_{l} \rangle \right) \\
-			-\frac{1}{2} \mathcal{E}_{k}^{(b)} \left( \langle b^{\dagger}_{j} a_{l} \sigma_{z} \rangle + \langle b^{\dagger}_{j} a_{l} \rangle \right) - \frac{1}{2} \mathcal{E}_{l}^{(a)} \left( \langle b^{\dagger}_{j} b_{k} \sigma_{z} \rangle + \langle b^{\dagger}_{j} b_{k} \rangle \right) \\
-			-\gamma \langle b^{\dagger}_{j} a_{k} a_{l} \rangle + \mathcal{E}_{j}^{(b) *} \langle b_{k} a_{l} \sigma_{+} \rangle + \mathcal{E}_{k}^{(b)} \langle b^{\dagger}_{j} a_{l} \sigma_{-} \rangle + \mathcal{E}_{l}^{(a)} \langle b^{\dagger}_{j} b_{k} \sigma_{-} \rangle
+			-\mathcal{E}_{j}^{(b) *} \langle b_{k} a_{l} \sigma^{eg}_{+} \rangle - \mathcal{E}_{k}^{(b)} \langle b^{\dagger}_{j} a_{l} \sigma^{eg}_{-} \rangle - \mathcal{E}_{l}^{(a)} \langle b^{\dagger}_{j} b_{k} \sigma^{eg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(b) *} \langle b_{k} a_{l} \sigma^{ee} \rangle - \mathcal{E}_{k}^{(b)} \xi \langle b^{\dagger}_{j} a_{l} \sigma^{fg}_{-} \rangle - \mathcal{E}_{l}^{(a)} \xi \langle b^{\dagger}_{j} b_{k} \sigma^{fg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(b) *} \xi \langle b_{k} a_{l} \sigma^{fg}_{+} \rangle - \mathcal{E}_{k}^{(b)} \langle b^{\dagger}_{j} a_{l} \sigma^{ee} \rangle - \mathcal{E}_{l}^{(a)} \langle b^{\dagger}_{j} b_{k} \sigma^{ee} \rangle \\
+			%--------------------------------------%
+			\Gamma \xi^{2} \langle b^{\dagger}_{j} b_{k} a_{l} \rangle - \mathcal{E}_{j}^{(b) *} \xi \langle b_{k} a_{l} \sigma^{fe}_{+} \rangle - \mathcal{E}_{k}^{(b)} \xi \langle b^{\dagger}_{j} a_{l} \sigma^{fe}_{-} \rangle - \mathcal{E}_{l}^{(a)} \xi \langle b^{\dagger}_{j} b_{k} \sigma^{fe}_{-} \rangle \\
+			i \xi \frac{\Omega}{2} \langle b^{\dagger}_{j} b_{k} a_{l} \rangle - \mathcal{E}_{j}^{(b) *} \xi \left( \langle b_{k} a_{l} \rangle - \langle b_{k} a_{l} \sigma^{gg} \rangle - \langle b_{k} a_{l} \sigma^{ee} \rangle \right) \\
+			-i \xi \frac{\Omega}{2} \langle b^{\dagger}_{j} b_{k} a_{l} \rangle - \mathcal{E}_{k}^{(b)} \xi \left( \langle b^{\dagger}_{j} b_{k} \rangle - \langle b^{\dagger}_{j} a_{l} \sigma^{gg} \rangle - \langle b^{\dagger}_{j} a_{l} \sigma^{ee} \rangle \right) - \mathcal{E}_{l}^{(a)} \xi \left( \langle b^{\dagger}_{j} a_{l} \rangle - \langle b^{\dagger}_{j} b_{k} \sigma^{gg} \rangle - \langle b^{\dagger}_{j} b_{k} \sigma^{ee} \rangle \right) \\
+			%--------------------------------------%
+			-\mathcal{E}_{j}^{(b) *} \langle b_{k} a_{l} \sigma^{fe}_{-} \rangle \\
+			-\mathcal{E}_{k}^{(b)} \langle b^{\dagger}_{j} a_{l} \sigma^{fe}_{+} \rangle - \mathcal{E}_{l}^{(a)} \langle b^{\dagger}_{j} b_{k} \sigma^{fe}_{-} \rangle
 		\end{pmatrix},
 	\end{align}
 \end{subequations}
 where
 \begin{subequations}
 	\begin{align}
-		\bm{M}^{(j^{*}, k, l)}_{a} &= \bm{M} - \left( 2\kappa_{a} + \kappa_{b} - i \omega_{j}^{(a)} + i \left( \omega_{k}^{(a)} + \omega_{l}^{(b)} \right) \right), \\
-		\bm{M}^{(j^{*}, k, l)}_{b} &= \bm{M} - \left( \kappa_{a} + 2\kappa_{b} - i \omega_{j}^{(b)} + i \left( \omega_{k}^{(b)} + \omega_{l}^{(a)} \right) \right);
+		\bm{M}_{j, k, l}^{(a^{\dagger} a b)} &= \bm{M} - \left( 2 \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(a)} - \omega_{k}^{(a)} - \omega_{l}^{(b)} \right) \right), \\
+		\bm{M}_{j, k, l}^{(b^{\dagger} b a)} &= \bm{M} - \left( \kappa_{a} + 2 \kappa_{b} - i \left( \omega_{j}^{(b)} - \omega_{k}^{(b)} - \omega_{l}^{(a)} \right) \right) ;
 	\end{align}
 \end{subequations}
 and
 \begin{subequations}
 	\begin{align}
-		\ddt \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}^{(j^{*}, k^{*}, l)}_{a} \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle +
+		\ddt \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(b^{\dagger} a^{\dagger} a)} \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle + \nonumber \\
+		&\quad
 		\begin{pmatrix}
-			-\frac{1}{2} \mathcal{E}_{j}^{(b) *} \left( \langle a^{\dagger}_{k} a_{l} \sigma_{z} \rangle + \langle a^{\dagger}_{k} a_{l} \rangle \right) - \frac{1}{2} \mathcal{E}_{k}^{(a) *} \left( \langle b^{\dagger}_{j} a_{l} \sigma_{z} \rangle + \langle b^{\dagger}_{j} a_{l} \rangle \right) \\
-			-\frac{1}{2} \mathcal{E}_{l}^{(a)} \left( \langle b^{\dagger}_{j} a^{\dagger}_{k} \sigma_{z} \rangle + \langle b^{\dagger}_{j} a^{\dagger}_{k} \rangle \right) \\
-			-\gamma \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle + \mathcal{E}_{j}^{(b) *} \langle a^{\dagger}_{k} a_{l} \sigma_{+} \rangle + \mathcal{E}_{k}^{(a) *} \langle b^{\dagger}_{j} a_{l} \sigma_{+} \rangle + \mathcal{E}_{l}^{(a)} \langle b^{\dagger}_{j} a^{\dagger}_{k} \sigma_{-} \rangle
-		\end{pmatrix}, \\
-		\ddt \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \bm{\sigma} \rangle &= \bm{M}^{(j^{*}, k^{*}, l)}_{b} \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \rangle +
+			-\mathcal{E}_{j}^{(b) *} \langle a^{\dagger}_{k} a_{l} \sigma^{eg}_{+} \rangle - \mathcal{E}_{k}^{(a) *} \langle b^{\dagger}_{j} a_{l} \sigma^{eg}_{+} \rangle - \mathcal{E}_{l}^{(a)} \langle b^{\dagger}_{j} a^{\dagger}_{k} \sigma^{eg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(b) *} \langle a^{\dagger}_{k} a_{l} \sigma^{ee} \rangle - \mathcal{E}_{k}^{(a) *} \langle b^{\dagger}_{j} a_{l} \sigma^{ee} \rangle - \mathcal{E}_{l}^{(a)} \xi \langle b^{\dagger}_{j} a^{\dagger}_{k} \sigma^{fg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(b) *} \xi \langle a^{\dagger}_{k} a_{l} \sigma^{fg}_{+} \rangle - \mathcal{E}_{k}^{(a) *} \xi \langle b^{\dagger}_{j} a_{l} \sigma^{fg}_{+} \rangle - \mathcal{E}_{l}^{(a)} \langle b^{\dagger}_{j} a^{\dagger}_{k} \sigma^{ee} \rangle \\
+			%--------------------------------------%
+			\Gamma \xi^{2} \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle - \mathcal{E}_{j}^{(b) *} \xi \langle a^{\dagger}_{k} a_{l} \sigma^{fe}_{+} \rangle - \mathcal{E}_{k}^{(a) *} \xi \langle b^{\dagger}_{j} a_{l} \sigma^{fe}_{+} \rangle  - \mathcal{E}_{l}^{(a)} \xi \langle b^{\dagger}_{j} a^{\dagger}_{k} \sigma^{fe}_{-} \rangle\\
+			i \xi \frac{\Omega}{2} \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle - \mathcal{E}_{j}^{(b) *} \xi \left( \langle a^{\dagger}_{k} a_{l} \rangle - \langle a^{\dagger}_{k} a_{l} \sigma^{gg} \rangle - \langle a^{\dagger}_{k} a_{l} \sigma^{ee} \rangle \right)  - \mathcal{E}_{k}^{(a) *} \xi \left( \langle b^{\dagger}_{j} a_{l} \rangle - \langle b^{\dagger}_{j} a_{l} \sigma^{gg} \rangle - \langle b^{\dagger}_{j} a_{l} \sigma^{ee} \rangle \right) \\
+			-i \xi \frac{\Omega}{2} \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle	- \mathcal{E}_{l}^{(a)} \xi \left( \langle b^{\dagger}_{j} a^{\dagger}_{k} \rangle - \langle b^{\dagger}_{j} a^{\dagger}_{k} \sigma^{gg} \rangle - \langle b^{\dagger}_{j} a^{\dagger}_{k} \sigma^{ee} \rangle \right) \\
+			%--------------------------------------%
+			-\mathcal{E}_{j}^{(b) *} \langle a^{\dagger}_{k} a_{l} \sigma^{fe}_{-} \rangle - \mathcal{E}_{k}^{(a) *} \langle b^{\dagger}_{j} a_{l} \sigma^{fe}_{-} \rangle \\
+			-\mathcal{E}_{l}^{(a)} \langle b^{\dagger}_{j} a^{\dagger}_{k} \sigma^{fe}_{+} \rangle
+		\end{pmatrix},
+	\end{align}
+	\begin{align}
+		\ddt \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(a^{\dagger} b^{\dagger} b)} \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \rangle + \nonumber \\
+		&\quad
 		\begin{pmatrix}
-			-\frac{1}{2} \mathcal{E}_{j}^{(a) *} \left( \langle b^{\dagger}_{k} b_{l} \sigma_{z} \rangle + \langle b^{\dagger}_{k} b_{l} \rangle \right) - \frac{1}{2} \mathcal{E}_{k}^{(b) *} \left( \langle a^{\dagger}_{j} b_{l} \sigma_{z} \rangle + \langle a^{\dagger}_{j} b_{l} \rangle \right) \\
-			-\frac{1}{2} \mathcal{E}_{l}^{(b)} \left( \langle a^{\dagger}_{j} b^{\dagger}_{k} \sigma_{z} \rangle + \langle a^{\dagger}_{j} b^{\dagger}_{k} \rangle \right) \\
-			-\gamma \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \rangle + \mathcal{E}_{j}^{(a) *} \langle b^{\dagger}_{k} b_{l} \sigma_{+} \rangle + \mathcal{E}_{k}^{(b) *} \langle a^{\dagger}_{j} b_{l} \sigma_{+} \rangle + \mathcal{E}_{l}^{(b)} \langle a^{\dagger}_{j} b^{\dagger}_{k} \sigma_{-} \rangle
+			-\mathcal{E}_{j}^{(a) *} \langle b^{\dagger}_{k} b_{l} \sigma^{eg}_{+} \rangle - \mathcal{E}_{k}^{(b) *} \langle a^{\dagger}_{j} b_{l} \sigma^{eg}_{+} \rangle - \mathcal{E}_{l}^{(b)} \langle a^{\dagger}_{j} b^{\dagger}_{k} \sigma^{eg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(a) *} \langle b^{\dagger}_{k} b_{l} \sigma^{ee} \rangle - \mathcal{E}_{k}^{(b) *} \langle a^{\dagger}_{j} b_{l} \sigma^{ee} \rangle - \mathcal{E}_{l}^{(b)} \xi \langle a^{\dagger}_{j} b^{\dagger}_{k} \sigma^{fg}_{-} \rangle \\
+			-\mathcal{E}_{j}^{(a) *} \xi \langle b^{\dagger}_{k} b_{l} \sigma^{fg}_{+} \rangle - \mathcal{E}_{k}^{(b) *} \xi \langle a^{\dagger}_{j} b_{l} \sigma^{fg}_{+} \rangle - \mathcal{E}_{l}^{(b)} \langle a^{\dagger}_{j} b^{\dagger}_{k} \sigma^{ee} \rangle \\
+			%--------------------------------------%
+			\Gamma \xi^{2} \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \rangle - \mathcal{E}_{j}^{(a) *} \xi \langle b^{\dagger}_{k} b_{l} \sigma^{fe}_{+} \rangle - \mathcal{E}_{k}^{(b) *} \xi \langle a^{\dagger}_{j} b_{l} \sigma^{fe}_{+} \rangle  - \mathcal{E}_{l}^{(b)} \xi \langle a^{\dagger}_{j} b^{\dagger}_{k} \sigma^{fe}_{-} \rangle\\
+			i \xi \frac{\Omega}{2} \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \rangle - \mathcal{E}_{j}^{(a) *} \xi \left( \langle b^{\dagger}_{k} b_{l} \rangle - \langle b^{\dagger}_{k} b_{l} \sigma^{gg} \rangle - \langle b^{\dagger}_{k} b_{l} \sigma^{ee} \rangle \right)  - \mathcal{E}_{k}^{(b) *} \xi \left( \langle a^{\dagger}_{j} b_{l} \rangle - \langle a^{\dagger}_{j} b_{l} \sigma^{gg} \rangle - \langle a^{\dagger}_{j} b_{l} \sigma^{ee} \rangle \right) \\
+			-i \xi \frac{\Omega}{2} \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \rangle	- \mathcal{E}_{l}^{(b)} \xi \left( \langle a^{\dagger}_{j} b^{\dagger}_{k} \rangle - \langle a^{\dagger}_{j} b^{\dagger}_{k} \sigma^{gg} \rangle - \langle a^{\dagger}_{j} b^{\dagger}_{k} \sigma^{ee} \rangle \right) \\
+			%--------------------------------------%
+			-\mathcal{E}_{j}^{(a) *} \langle b^{\dagger}_{k} b_{l} \sigma^{fe}_{-} \rangle - \mathcal{E}_{k}^{(b) *} \langle a^{\dagger}_{j} b_{l} \sigma^{fe}_{-} \rangle \\
+			-\mathcal{E}_{l}^{(b)} \langle a^{\dagger}_{j} b^{\dagger}_{k} \sigma^{fe}_{+} \rangle
 		\end{pmatrix},
 	\end{align}
 \end{subequations}
 where
 \begin{subequations}
 	\begin{align}
-		\bm{M}^{(j^{*}, k^{*}, l)}_{a} &= \bm{M} - \left( 2 \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(b)} + \omega_{k}^{(a)} \right) - i \omega_{l}^{(a)} \right), \\
-		\bm{M}^{(j^{*}, k^{*}, l)}_{b} &= \bm{M} - \left( \kappa_{a} + 2 \kappa_{b} - i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) - i \omega_{l}^{(b)} \right). 
+		\bm{M}_{j, k, l}^{(b^{\dagger} a^{\dagger} a)} &= \bm{M} - \left( 2 \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(b)} + \omega_{k}^{(a)} - \omega_{l}^{(a)} \right) \right), \\
+		\bm{M}_{j, k, l}^{(a^{\dagger} b^{\dagger} b)} &= \bm{M} - \left( \kappa_{a} + 2 \kappa_{b} - i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} - \omega_{l}^{(b)} \right) \right).
 	\end{align}
 \end{subequations}
 
@@ -379,9 +516,11 @@ where
 
 Finally, we have
 \begin{align}
-	\ddt \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} a_{m} \rangle &= -\left( 2\kappa_{a} + 2 \kappa_{b} - i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) + i \left( \omega_{l}^{(b)} + \omega_{m}^{(a)} \right) \right) \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} a_{m} \rangle \nonumber \\
-	&\quad - \mathcal{E}_{j}^{(a) *} \langle b^{\dagger}_{k} b_{l} a_{m} \sigma_{+} \rangle - \mathcal{E}_{k}^{(b) *} \langle a^{\dagger}_{j} a_{m} b_{l} \sigma_{+} \rangle \nonumber \\
-	&\quad - \mathcal{E}_{l}^{(b)} \langle b^{\dagger}_{k} a^{\dagger}_{j} a_{m} \sigma_{-} \rangle - \mathcal{E}_{m}^{(a)} \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \sigma_{-} \rangle.
+	\ddt \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} a_{m} \rangle &= -\left( 2 \kappa_{a} + 2 \kappa_{b} - i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) + i \left( \omega_{l}^{(b)} + \omega_{m}^{(a)} \right) \right) \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} a_{m} \rangle \nonumber \\
+	&\quad - \mathcal{E}_{j}^{(a) *} \left( \langle b^{\dagger}_{k} b_{l} a_{m} \sigma^{eg}_{+} \rangle + \xi \langle b^{\dagger}_{k} b_{l} a_{m} \sigma^{fe}_{+} \rangle \right) \nonumber \\
+	&\quad - \mathcal{E}_{k}^{(b) *} \left( \langle a^{\dagger}_{j} a_{l} a_{m} \sigma^{eg}_{+} \rangle + \xi \langle a^{\dagger}_{j} a_{l} a_{m} \sigma^{fe}_{+} \rangle \right) \nonumber \\
+	&\quad - \mathcal{E}_{l}^{(b)} \left( \langle a^{\dagger}_{j} b^{\dagger}_{k} a_{m} \sigma^{eg}_{-} \rangle + \xi \langle a^{\dagger}_{j} b^{\dagger}_{k} a_{m} \sigma^{fe}_{-} \rangle \right) \nonumber \\
+	&\quad - \mathcal{E}_{m}^{(a)} \left( \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \sigma^{eg}_{-} \rangle + \xi \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \sigma^{fe}_{-} \rangle \right).
 \end{align}
 
 \section{Second-Order Cross-Correlation Function}
@@ -398,55 +537,83 @@ Using the Quantum Regression Theorem, we can solve for the second-order correlat
 \begin{subequations}
 	\begin{gather}
 		\ddtau \langle A^{\dagger}(0) \bm{\sigma} A(0) \rangle = \bm{M} \langle A^{\dagger}(0) \bm{\sigma} A(0) \rangle + \bm{B}, \\
-		\ddtau \langle A^{\dagger}(0) b^{\dagger}_{j}(\tau) A(0) \rangle = -\left( \kappa_{b} - i \omega_{j}^{(b)} \right) \langle A^{\dagger}(0) b^{\dagger}_{j}(\tau) A(0) \rangle - \mathcal{E}_{j}^{(b) *} \langle A^{\dagger}(0) \sigma_{+}(\tau) A(0) \rangle, \\
-		\ddtau \langle A^{\dagger}(0) b_{j}(\tau) A(0) \rangle = -\left( \kappa_{b} + i \omega_{j}^{(b)} \right) \langle A^{\dagger}(0) b_{j}(\tau) A(0) \rangle - \mathcal{E}_{j}^{(b)} \langle A^{\dagger}(0) \sigma_{-}(\tau) A(0) \rangle,
+		\ddtau \langle A^{\dagger}(0) b^{\dagger}_{j}(\tau) A(0) \rangle = -\left( \kappa_{b} - i \omega_{j}^{(b)} \right) \langle A^{\dagger}(0) b^{\dagger}_{j}(\tau) A(0) \rangle - \mathcal{E}_{j}^{(b) *} \left( \langle A^{\dagger}(0) \sigma^{eg}_{+}(\tau) A(0) \rangle + \xi \langle A^{\dagger}(0) \sigma^{fe}_{+} A(0) \rangle \right), \\
+		\ddtau \langle A^{\dagger}(0) b_{j}(\tau) A(0) \rangle = -\left( \kappa_{b} + i \omega_{j}^{(b)} \right) \langle A^{\dagger}(0) b_{j}(\tau) A(0) \rangle - \mathcal{E}_{j}^{(b)} \left( \langle A^{\dagger}(0) \sigma^{eg}_{-}(\tau) A(0) \rangle + \xi \langle A^{\dagger}(0) \sigma^{fe}_{-} A(0) \rangle \right),
 	\end{gather}
 \end{subequations}
 with
 \begin{equation}
-	\langle \bm{\sigma} \rangle = 
+	\langle \bm{\sigma} \rangle =
 	\begin{pmatrix}
-		\langle A^{\dagger}(0) \sigma_{-}(\tau) A(0) \rangle \\
-		\langle A^{\dagger}(0) \sigma_{+}(\tau) A(0) \rangle \\
-		\langle A^{\dagger}(0) \sigma_{z}(\tau) A(0) \rangle \\
-	\end{pmatrix}, \quad \bm{B} = 
+		\langle A^{\dagger}(0) \sigma^{gg}(\tau) A(0) \rangle \\
+		\langle A^{\dagger}(0) \sigma^{eg}_{-}(\tau) A(0) \rangle \\
+		\langle A^{\dagger}(0) \sigma^{eg}_{+}(\tau) A(0) \rangle \\
+		\langle A^{\dagger}(0) \sigma^{ee}(\tau) A(0) \rangle \\
+		\langle A^{\dagger}(0) \sigma^{fe}_{-}(\tau) A(0) \rangle \\
+		\langle A^{\dagger}(0) \sigma^{fe}_{+}(\tau) A(0) \rangle \\
+		\langle A^{\dagger}(0) \sigma^{fg}_{-}(\tau) A(0) \rangle \\
+		\langle A^{\dagger}(0) \sigma^{fg}_{+}(\tau) A(0) \rangle
+	\end{pmatrix}, \quad \bm{B} =
 	\begin{pmatrix}
 		0 \\
 		0 \\
-		-\gamma \langle A^{\dagger} A \rangle_{ss}
+		0 \\
+		\Gamma \xi^{2} \langle A^{\dagger} A \rangle_{ss} \\
+		i \xi \frac{\Omega}{2} \langle A^{\dagger} A \rangle_{ss} \\
+		-i \xi \frac{\Omega}{2} \langle A^{\dagger} A \rangle_{ss} \\
+		0 \\
+		0
 	\end{pmatrix}.
 \end{equation}
 We also need to solve
 \begin{subequations}
-	\begin{equation}
-		\ddtau \langle A^{\dagger}(0) b_{j} \bm{\sigma}(\tau) A(0) \rangle = \bm{M}^{(j)} \langle A^{\dagger}(0) b_{j} \bm{\sigma}(\tau) A(0) \rangle + 
+	\begin{align}
+		\ddtau \langle A^{\dagger}(0) b_{j} \bm{\sigma}(\tau) A(0) \rangle &= \bm{M}_{j}^{(b)} \langle A^{\dagger}(0) b_{j} \bm{\sigma}(\tau) A(0) \rangle \nonumber \\
+		&\quad +
 		\begin{pmatrix}
+			-\mathcal{E}_{j}^{(b)} \langle A^{\dagger}(0) \sigma^{eg}_{-}(\tau) A(0) \rangle \\
+			-\mathcal{E}_{j}^{(b)} \xi \langle A^{\dagger}(0) \sigma^{fg}_{-}(\tau) A(0) \rangle \\
+			-\mathcal{E}_{j}^{(b)} \langle A^{\dagger}(0) \sigma^{ee}(\tau) A(0) \rangle \\
+			%--------------------------------------%
+			\Gamma \xi^{2} \langle A^{\dagger}(0) b_{j}(\tau) A(0) \rangle -\mathcal{E}_{j}^{(b)} \xi \langle A^{\dagger}(0) \sigma^{fe}_{-}(\tau) A(0) \rangle \\
+			i \xi \frac{\Omega}{2} \langle A^{\dagger}(0) b_{j}(\tau) A(0) \rangle \\
+			-i \xi \frac{\Omega}{2} \langle A^{\dagger}(0) b_{j}(\tau) A(0) \rangle -\mathcal{E}_{j}^{(b)} \xi \left( \langle A^{\dagger} A \rangle_{ss} - \langle A^{\dagger}(0) \sigma^{gg}(\tau) A(0) \rangle - \langle A^{\dagger}(0) \sigma^{ee}(\tau) A(0) \rangle \right) \\
+			%--------------------------------------%
 			0 \\
-			-\frac{1}{2} \mathcal{E}_{j}^{(b)} \left( \langle A^{\dagger}(0) \sigma_{z}(\tau) A(0) \rangle + \langle A^{\dagger} A \rangle_{ss} \right) \\
-			-\gamma \langle A^{\dagger}(0) b_{j}(\tau) A(0) \rangle + \mathcal{E}_{j}^{(b)} \langle A^{\dagger}(0) \sigma_{-}(\tau) A(0) \rangle
+			-\mathcal{E}_{j}^{(b)} \langle A^{\dagger}(0) \sigma^{fe}_{+}(\tau) A(0) \rangle
 		\end{pmatrix},
-	\end{equation}
+	\end{align}
 	and
-	\begin{equation}
-		\ddtau \langle A^{\dagger}(0) b^{\dagger}_{j} \bm{\sigma}(\tau) A(0) \rangle = \bm{M}^{(j^{*})} \langle A^{\dagger}(0) b^{\dagger}_{j} \bm{\sigma}(\tau) A(0) \rangle + 
+	\begin{align}
+		\ddtau \langle A^{\dagger}(0) b_{j}^{\dagger} \bm{\sigma}(\tau) A(0) \rangle &= \bm{M}_{j}^{(b^{\dagger})} \langle A^{\dagger}(0) b_{j}^{\dagger} \bm{\sigma}(\tau) A(0) \rangle \nonumber \\
+		&\quad +
 		\begin{pmatrix}
-			-\frac{1}{2} \mathcal{E}_{j}^{(b) *} \left( \langle A^{\dagger}(0) \sigma_{z}(\tau) A(0) \rangle + \langle A^{\dagger} A \rangle_{ss} \right) \\
-			0 \\
-			-\gamma \langle A^{\dagger}(0) b^{\dagger}_{j}(\tau) A(0) \rangle + \mathcal{E}_{j}^{*} \langle A^{\dagger}(0) \sigma_{+}(\tau) A(0) \rangle
-		\end{pmatrix}.
-	\end{equation}
+			-\mathcal{E}_{j}^{(b) *} \langle A^{\dagger}(0) \sigma^{eg}_{+}(\tau) A(0) \rangle \\
+			-\mathcal{E}_{j}^{(b) *} \langle A^{\dagger}(0) \sigma^{ee}(\tau) A(0) \rangle \\
+			-\mathcal{E}_{j}^{(b) *} \xi \langle A^{\dagger}(0) \sigma^{fg}_{+}(\tau) A(0) \rangle \\
+			%--------------------------------------%
+			\Gamma \xi^{2} \langle A^{\dagger}(0) b_{j}^{\dagger}(\tau) A(0) \rangle - \mathcal{E}_{j}^{(b) *} \xi \langle A^{\dagger}(0) \sigma^{fe}_{+}(\tau) A(0) \rangle \\
+			i \xi \frac{\Omega}{2} \langle A^{\dagger}(0) b_{j}^{\dagger}(\tau) A(0) \rangle - \mathcal{E}_{j}^{(b) *} \xi \left( \langle A^{\dagger} A \rangle_{ss} - \langle A^{\dagger}(0) \sigma^{gg}(\tau) A(0) \rangle - \langle A^{\dagger}(0) \sigma^{ee}(\tau) A(0) \rangle \right) \\
+			-i \xi \frac{\Omega}{2} \langle A^{\dagger}(0) b_{j}^{\dagger}(\tau) A(0) \rangle \\
+			%--------------------------------------%
+			-\mathcal{E}_{j}^{(b) *} \langle A^{\dagger}(0) \sigma^{fe}_{-}(\tau) A(0) \rangle \\
+			0
+		\end{pmatrix} , \\
+	\end{align}
 \end{subequations}
 where
 \begin{subequations}
-	\begin{align}
-		\bm{M}^{(j)} &= \bm{M} - \left( \kappa_{b} + i \omega_{j}^{(b)} \right) \mathbb{1}, \\
-		\bm{M}^{(j^{*})} &= \bm{M} - \left( \kappa_{b} - i \omega_{j}^{(b)} \right) \mathbb{1}.
-	\end{align}
+	\begin{gather}
+		\bm{M}_{j}^{(b)} = \bm{M} - \left( \kappa_{b} + i \omega_{j}^{(b)} \right) \mathbb{1}, \\
+		\bm{M}_{j}^{(b^{\dagger})} = \bm{M} - \left( \kappa_{b} - i \omega_{j}^{(b)} \right) \mathbb{1}.
+	\end{gather}
 \end{subequations}
 Finally, we will also need to solve
 \begin{align}
-	\ddtau \langle A^{\dagger}(0) b^{\dagger}_{k} b_{l}(\tau) A(0) \rangle &= -\left( 2 \kappa_{b} - i \left( \omega_{k}^{(b)} - \omega_{l}^{(b)} \right) \right) \langle A^{\dagger}(0) b^{\dagger}_{k} b_{l}(\tau) A(0) \rangle \nonumber \\
-	&\quad -\mathcal{E}_{k}^{(b) *} \langle A^{\dagger}(0) b_{l} \sigma_{+}(\tau) A(0) \rangle - \mathcal{E}_{l}^{(b)} \langle A^{\dagger}(0) b_{k}^{\dagger} \sigma_{-}(\tau) A(0) \rangle.
+	\ddtau \langle A^{\dagger}(0) b^{\dagger}_{k} b_{l}(\tau) A(0) \rangle &= -\left( 2 \kappa_{b} - i \omega_{k}^{(b)} + i \omega_{l}^{(b)} \right) \langle A^{\dagger}(0) b^{\dagger}_{k} b_{l}(\tau) A(0) \rangle \nonumber \\
+	&\quad -\mathcal{E}_{k}^{(b) *} \left( \langle A^{\dagger}(0) b_{l} \sigma^{eg}_{+}(\tau) A(0) \rangle + \xi \langle A^{\dagger}(0) b_{l} \sigma^{fe}_{+}(\tau) A(0) \rangle \right) \nonumber \\
+	&\quad - \mathcal{E}_{l}^{(b)} \left( \langle A^{\dagger}(0) b_{k}^{\dagger} \sigma^{eg}_{-}(\tau) A(0) \rangle + \xi \langle A^{\dagger}(0) b_{k}^{\dagger} \sigma^{fe}_{-}(\tau) A(0) \rangle \right).
 \end{align}
+
 
 \end{document}

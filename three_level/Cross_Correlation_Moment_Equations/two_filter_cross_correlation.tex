@@ -430,7 +430,7 @@ and
 Using the vector notation, we have moment equations
 \begin{subequations}
 	\begin{align}
-		\ddt \langle a^{\dagger}_{j} a_{k} b_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(a^{\dagger} a b)} \langle a^{\dagger}_{j} a_{k} b_{l} \rangle + \nonumber \\
+		\ddt \langle a^{\dagger}_{j} a_{k} b_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(a^{\dagger} a b)} \langle a^{\dagger}_{j} a_{k} b_{l} \bm{\sigma} \rangle + \nonumber \\
 		&\quad
 		\begin{pmatrix}
 			-\mathcal{E}_{j}^{(a) *} \langle a_{k} b_{l} \sigma^{eg}_{+} \rangle - \mathcal{E}_{k}^{(a)} \langle a^{\dagger}_{j} b_{l} \sigma^{eg}_{-} \rangle - \mathcal{E}_{l}^{(b)} \langle a^{\dagger}_{j} a_{k} \sigma^{eg}_{-} \rangle \\
@@ -446,7 +446,7 @@ Using the vector notation, we have moment equations
 		\end{pmatrix},
 	\end{align}
 	\begin{align}
-		\ddt \langle b^{\dagger}_{j} b_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(b^{\dagger} b a)} \langle b^{\dagger}_{j} b_{k} a_{l} \rangle + \nonumber \\
+		\ddt \langle b^{\dagger}_{j} b_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(b^{\dagger} b a)} \langle b^{\dagger}_{j} b_{k} a_{l} \bm{\sigma} \rangle + \nonumber \\
 		&\quad
 		\begin{pmatrix}
 			-\mathcal{E}_{j}^{(b) *} \langle b_{k} a_{l} \sigma^{eg}_{+} \rangle - \mathcal{E}_{k}^{(b)} \langle b^{\dagger}_{j} a_{l} \sigma^{eg}_{-} \rangle - \mathcal{E}_{l}^{(a)} \langle b^{\dagger}_{j} b_{k} \sigma^{eg}_{-} \rangle \\
@@ -465,14 +465,14 @@ Using the vector notation, we have moment equations
 where
 \begin{subequations}
 	\begin{align}
-		\bm{M}_{j, k, l}^{(a^{\dagger} a b)} &= \bm{M} - \left( 2 \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(a)} - \omega_{k}^{(a)} - \omega_{l}^{(b)} \right) \right), \\
-		\bm{M}_{j, k, l}^{(b^{\dagger} b a)} &= \bm{M} - \left( \kappa_{a} + 2 \kappa_{b} - i \left( \omega_{j}^{(b)} - \omega_{k}^{(b)} - \omega_{l}^{(a)} \right) \right) ;
+		\bm{M}_{j, k, l}^{(a^{\dagger} a b)} &= \bm{M} - \left( 2 \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(a)} - \omega_{k}^{(a)} - \omega_{l}^{(b)} \right) \right) \mathbb{1}, \\
+		\bm{M}_{j, k, l}^{(b^{\dagger} b a)} &= \bm{M} - \left( \kappa_{a} + 2 \kappa_{b} - i \left( \omega_{j}^{(b)} - \omega_{k}^{(b)} - \omega_{l}^{(a)} \right) \right) \mathbb{1};
 	\end{align}
 \end{subequations}
 and
 \begin{subequations}
 	\begin{align}
-		\ddt \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(b^{\dagger} a^{\dagger} a)} \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle + \nonumber \\
+		\ddt \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(b^{\dagger} a^{\dagger} a)} \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \bm{\sigma} \rangle + \nonumber \\
 		&\quad
 		\begin{pmatrix}
 			-\mathcal{E}_{j}^{(b) *} \langle a^{\dagger}_{k} a_{l} \sigma^{eg}_{+} \rangle - \mathcal{E}_{k}^{(a) *} \langle b^{\dagger}_{j} a_{l} \sigma^{eg}_{+} \rangle - \mathcal{E}_{l}^{(a)} \langle b^{\dagger}_{j} a^{\dagger}_{k} \sigma^{eg}_{-} \rangle \\
@@ -488,7 +488,7 @@ and
 		\end{pmatrix},
 	\end{align}
 	\begin{align}
-		\ddt \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(a^{\dagger} b^{\dagger} b)} \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \rangle + \nonumber \\
+		\ddt \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(a^{\dagger} b^{\dagger} b)} \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \bm{\sigma} \rangle + \nonumber \\
 		&\quad
 		\begin{pmatrix}
 			-\mathcal{E}_{j}^{(a) *} \langle b^{\dagger}_{k} b_{l} \sigma^{eg}_{+} \rangle - \mathcal{E}_{k}^{(b) *} \langle a^{\dagger}_{j} b_{l} \sigma^{eg}_{+} \rangle - \mathcal{E}_{l}^{(b)} \langle a^{\dagger}_{j} b^{\dagger}_{k} \sigma^{eg}_{-} \rangle \\
@@ -507,8 +507,8 @@ and
 where
 \begin{subequations}
 	\begin{align}
-		\bm{M}_{j, k, l}^{(b^{\dagger} a^{\dagger} a)} &= \bm{M} - \left( 2 \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(b)} + \omega_{k}^{(a)} - \omega_{l}^{(a)} \right) \right), \\
-		\bm{M}_{j, k, l}^{(a^{\dagger} b^{\dagger} b)} &= \bm{M} - \left( \kappa_{a} + 2 \kappa_{b} - i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} - \omega_{l}^{(b)} \right) \right).
+		\bm{M}_{j, k, l}^{(b^{\dagger} a^{\dagger} a)} &= \bm{M} - \left( 2 \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(b)} + \omega_{k}^{(a)} - \omega_{l}^{(a)} \right) \right) \mathbb{1}, \\
+		\bm{M}_{j, k, l}^{(a^{\dagger} b^{\dagger} b)} &= \bm{M} - \left( \kappa_{a} + 2 \kappa_{b} - i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} - \omega_{l}^{(b)} \right) \right) \mathbb{1}.
 	\end{align}
 \end{subequations}
 

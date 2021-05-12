@@ -28,8 +28,8 @@
 \usepackage{hyperref} % Clickable links in pdf
 
 % Define \ddt command to represent d/dt as a fraction to save time
-\newcommand{\ddt}{\frac{\mathrm{d}}{\mathrm{d}t}}
-\newcommand{\ddtau}{\frac{\mathrm{d}}{\mathrm{d}\tau}}
+\newcommand{\ddt}[1][]{\frac{\mathrm{d} #1}{\mathrm{d}t}}
+\newcommand{\ddtau}[1][]{\frac{\mathrm{d} #1}{\mathrm{d}\tau}}
 
 %\allowdisplaybreaks
 
@@ -349,7 +349,7 @@ where
 
 \begin{subequations}
 \begin{align}
-	\ddt \langle a^{\dagger}_{j} a_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(a^{\dagger} a a)} \langle a^{\dagger}_{j} a_{k} a_{l} \rangle + \nonumber \\
+	\ddt \langle a^{\dagger}_{j} a_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(a^{\dagger} a a)} \langle a^{\dagger}_{j} a_{k} a_{l} \bm{\sigma} \rangle + \nonumber \\
 	&\quad
 	\begin{pmatrix}
 		-\mathcal{E}_{j}^{*} \langle a_{k} a_{l} \sigma^{eg}_{+} \rangle - \mathcal{E}_{k} \langle a^{\dagger}_{j} a_{l} \sigma^{eg}_{-} \rangle - \mathcal{E}_{l} \langle a^{\dagger}_{j} a_{k} \sigma^{eg}_{-} \rangle \\
@@ -366,7 +366,7 @@ where
 \end{align}
 and
 \begin{align}
-	\ddt \langle a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(a^{\dagger} a^{\dagger} a)} \langle a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle + \nonumber \\
+	\ddt \langle a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(a^{\dagger} a^{\dagger} a)} \langle a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \bm{\sigma} \rangle + \nonumber \\
 	&\quad
 	\begin{pmatrix}
 		-\mathcal{E}_{j}^{*} \langle a^{\dagger}_{k} a_{l} \sigma^{eg}_{+} \rangle - \mathcal{E}_{k}^{*} \langle a^{\dagger}_{j} a_{l} \sigma^{eg}_{+} \rangle - \mathcal{E}_{l} \langle a^{\dagger}_{j} a^{\dagger}_{k} \sigma^{eg}_{-} \rangle \\
@@ -385,8 +385,8 @@ and
 where
 \begin{subequations}
 \begin{align}
-	\bm{M}_{j, k, l}^{(a^{\dagger} a a)} &= \bm{M} - \left( 3 \kappa - i \omega_{j} + i \left( \omega_{k} + \omega_{l} \right) \right), \\
-	\bm{M}_{j, k, l}^{(a^{\dagger} a^{\dagger} a)} &= \bm{M} - \left( 3 \kappa - i \left( \omega_{j} + \omega_{k} \right) - i \omega_{l} \right).
+	\bm{M}_{j, k, l}^{(a^{\dagger} a a)} &= \bm{M} - \left( 3 \kappa - i \omega_{j} + i \left( \omega_{k} + \omega_{l} \right) \right) \mathbb{1}, \\
+	\bm{M}_{j, k, l}^{(a^{\dagger} a^{\dagger} a)} &= \bm{M} - \left( 3 \kappa - i \left( \omega_{j} + \omega_{k} \right) - i \omega_{l} \right) \mathbb{1}.
 \end{align}
 \end{subequations}
 

@@ -17,19 +17,6 @@ from Jacobs_Functions import filename
 
 plt.close('all')
 
-# def g2_analytic(tau_in, Omega_in, gamma_in):
-#     """
-#     Analytic expression for the normalised second-order correlation function
-#     from Howard 1
-#     """
-#     from numpy import exp, sqrt, cosh, sinh, real
-#     Omega_in = complex(Omega_in)
-#     gamma_in = complex(gamma_in)
-#     d_f = sqrt((0.25 * gamma_in) ** 2 - (Omega_in ** 2))
-#     g2_f = 1.0 - exp(-(3/4) * gamma_in * tau_in) * (cosh(d_f * tau_in) + \
-#                                                     ((3/4) * gamma_in / d_f) * sinh(d_f * tau_in))
-#     return real(g2_f)
-
 def g2_dressed_states(tau_in, Omega_in, gamma_in, w0_in, auto_or_cross='auto'):
     """
     Analytic expression for the normalised second-order correlation function
@@ -62,60 +49,41 @@ w0b = round(w0b, 2)
 # tau
 tau = np.genfromtxt(filename("cross_g2_corr"), usecols=0)
 # g2
-# corr_auto = np.genfromtxt(filename("g2_corr"), usecols=1)
+corr_auto = np.genfromtxt(filename("g2_corr"), usecols=1)
 corr_cross = np.genfromtxt(filename("cross_g2_corr"), usecols=1)
 
-# # older master equation stuff
-# me_corr_auto = np.genfromtxt(filename("me_correlation"), usecols=1)
-# me_corr_cross = np.genfromtxt(filename("me_correlation"), usecols=2)
+-----------------------------------------------------------------------------#
+                        PLOT AUTO AND CROSS g^{(2)}                         #
+-----------------------------------------------------------------------------#
+fig, ax = plt.subplots(1, 2, figsize=[15, 6])
 
-#-----------------------------------------------------------------------------#
-#                         PLOT AUTO AND CROSS g^{(2)}                         #
-#-----------------------------------------------------------------------------#
-# fig, ax = plt.subplots(1, 2, figsize=[15, 6])
+# Auto-correlation
+ax[0].plot(tau, corr_auto, color='C0',
+           label='Filtered Correlation $g^{{(2)}}(0) = {}$'.format(round(corr_auto[0], 2)))
+# ax[0].plot(tau, dressed_auto, color='k', ls='dashed', alpha=0.5, label='Dressed State Approximation')
+# ax[0].plot(tau, me_corr_auto, color='C1', ls='dashed', label='Master Equation')
 
-# # Auto-correlation
-# ax[0].plot(tau, corr_auto, color='C0', label='Filtered Correlation $g^{{(2)}}(0) = {}$'.format(round(corr_auto[0], 2)))
-# # ax[0].plot(tau, dressed_auto, color='k', ls='dashed', alpha=0.5, label='Dressed State Approximation')
-# # ax[0].plot(tau, me_corr_auto, color='C1', ls='dashed', label='Master Equation')
+ax[0].set_ylabel(r'$g^{(2)}_{\mathrm{Auto}}(\tau)$', fontsize=15)
+ax[0].set_xlabel(r'$\gamma \tau$', fontsize=15)
+ax[0].set_title((r'Auto-correlation with $N = {}, \delta\omega_{{a}} = {}'
+                 r'\Gamma, \kappa_{{a}} = {} \Gamma, \omega_{{0}}^{{(a)}} = {}'
+                 r'\Gamma$').format(N, dwa, kappaa, w0a), fontsize=15)
+ax[0].legend(loc='best', fontsize=15)
 
-# ax[0].set_ylabel(r'$g^{(2)}_{\mathrm{Auto}}(\tau)$', fontsize=15)
-# ax[0].set_xlabel(r'$\gamma \tau$', fontsize=15)
-# ax[0].set_title(r'Auto-correlation with $N = {}, \delta\omega_{{a}} = {} \Gamma, \kappa_{{a}} = {} \Gamma, \omega_{{0}}^{{(a)}} = {} \Gamma$'.format(N, dwa, kappaa, w0a), fontsize=15)
-# ax[0].legend(loc='best', fontsize=15)
+# Cross-correlation
+ax[1].plot(tau, corr_cross, color='C0',
+           label='Filtered Correlation $g^{{(2)}}(0) = {}$'.format(round(corr_cross[0], 2)))
+# ax[1].plot(tau, dressed_cross, color='k', ls='dashed', alpha=0.5, label='Dressed State Approximation')
+# ax[1].plot(tau, me_corr_cross, color='C1', ls='dashed', label='Master Equation')
 
-# # Crosscorrelation
-# ax[1].plot(tau, corr_cross, color='C0', label='Filtered Correlation $g^{{(2)}}(0) = {}$'.format(round(corr_cross[0], 2)))
-# # ax[1].plot(tau, dressed_cross, color='k', ls='dashed', alpha=0.5, label='Dressed State Approximation')
-# # ax[1].plot(tau, me_corr_cross, color='C1', ls='dashed', label='Master Equation')
+ax[1].set_ylabel(r'$g^{(2)}_{\mathrm{Cross}}(\tau)$', fontsize=15)
+ax[1].set_xlabel(r'$\gamma \tau$', fontsize=15)
+ax[1].set_title((r'Auto-correlation with $N = {}, \delta\omega_{{b}} = {}'
+                 r'\Gamma, \kappa_{{b}} = {} \Gamma, \omega_{{0}}^{{(b)}} = {}'
+                 r'\Gamma$').format(N, dwb, kappab, w0b), fontsize=15)
+ax[1].legend(loc='best', fontsize=15)
 
-# ax[1].set_ylabel(r'$g^{(2)}_{\mathrm{Cross}}(\tau)$', fontsize=15)
-# ax[1].set_xlabel(r'$\gamma \tau$', fontsize=15)
-# ax[1].set_title(r'Auto-correlation with $N = {}, \delta\omega_{{b}} = {} \Gamma, \kappa_{{b}} = {} \Gamma, \omega_{{0}}^{{(b)}} = {} \Gamma$'.format(N, dwb, kappab, w0b), fontsize=15)
-# ax[1].legend(loc='best', fontsize=15)
-
-# fig.suptitle(r'Auto- and Cross-Correlations with $\Omega = {} \Gamma, \alpha = {} \Gamma, \delta = {} \Gamma, \xi = {}$'.format(Omega, alpha, delta, xi), fontsize=15)
-# fig.tight_layout()
-# fig.show()
-
-#-----------------------------------------------------------------------------#
-#                          PLOT CROSS g^{(2)} COMPARE                         #
-#-----------------------------------------------------------------------------#
-OG_data = np.genfromtxt(filename("cross_g2_corr_OG"), usecols=1)
-
-print(" Initial OG: {}".format(OG_data[0]))
-print("Initial new: {}".format(corr_cross[0]))
-
-# Plot
-plt.figure(figsize=[6, 6])
-
-plt.plot(tau, OG_data, color='C0', ls='solid', label='OG Correct Data')
-plt.plot(tau, corr_cross, color='C1', ls='dashed', label='Newer Version')
-
-plt.xlabel(r'$\gamma \tau$', fontsize=12)
-plt.ylabel(r'$g^{(2)}_{\mathrm{cross}}(\tau)$', fontsize=12)
-plt.title(r'Comparing Program Versions', fontsize=12)
-plt.legend(loc='best', fontsize=12)
-
-plt.tight_layout()
-plt.show()
+fig.suptitle((r'Auto- and Cross-Correlations with $\Omega = {} \Gamma,'
+              r'\alpha = {} \Gamma, \delta = {} \Gamma, \xi = {}$').format(Omega, alpha, delta, xi), fontsize=15)
+fig.tight_layout()
+fig.show()

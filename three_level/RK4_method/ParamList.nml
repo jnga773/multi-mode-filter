@@ -17,19 +17,19 @@
   ! Percentage of fluorescence aimed at cavities
   epsilon = 1.0d0
   ! Number of modes either side of d0 (2N + 1 total modes)
-  N = 30
+  N = 40
   ! Phase modulation of mode coupling
   phase = 1
 /
 
 &CAVITYA
   ! Central resonance frequency of cavity a
-  w0a = 75.0d0
+  w0a = -71.23105625617661d0
   ! w0a = 20.0d0
   ! Linewidth of cavity mode a
-  kappaa = 1.0d0
+  kappaa = 0.50
   ! Frequency spacing of modes for cavity a
-  dwa = 0.50
+  dwa = 0.10
 /
 
 &CAVITYB

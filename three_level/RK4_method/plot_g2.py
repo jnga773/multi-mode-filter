@@ -17,6 +17,42 @@ from Jacobs_Functions import filename
 
 plt.close('all')
 
+# Three-level Hamiltonian eigenvalues
+def three_level_eig(Omega_in, alpha_in, delta_in, xi_in, vals_or_vecs='vals'):
+    """
+    Calculates the dressed/eigenvalues of the Hamiltonian in matrix form.
+    """
+    from numpy.linalg import eig
+    from numpy import matrix
+    # Set up matrix
+    H = matrix([[0, 0.5 * Omega_in, 0],
+                [0.5 * Omega_in, -(0.5 * alpha_in) - delta_in, 0.5 * xi_in * Omega_in],
+                [0, 0.5 * xi_in * Omega_in, -2 * delta_in]])
+    # Calculate eigenvalues
+    # eigvals_out = eigvals(H)
+    eigvals_out, eigvecs_out = eig(H)
+
+    # Get the indicies that would sort them from big to small
+    sorted_indices = eigvals_out.argsort()[::-1]
+    # Return the sorted eigenvalues and eigenvectors
+    eigvals_out = eigvals_out[sorted_indices]
+    eigvecs_out = eigvecs_out[:, sorted_indices]
+
+    # This sorting will be in the order [\omega_{+}, \omega_{0}, \omega_{-}].
+    # To match it with the analytic calculations I've done, let's change it to
+    # the the order of [\omega_{0}, \omega_{+}, \omega_{-}]
+    sorted_indices = [1, 0, 2]
+    eigvals_out = eigvals_out[sorted_indices]
+    eigvecs_out = eigvecs_out[:, sorted_indices]
+
+    # Return the output depending on vals_or_vecs
+    if vals_or_vecs == 'vals':
+        return eigvals_out
+    elif vals_or_vecs == 'vecs':
+        return eigvecs_out
+    elif vals_or_vecs == 'both':
+        return eigvals_out, eigvecs_out
+
 #-----------------------------------------------------------------------------#
 #                               FILENAME THINGS                               #
 #-----------------------------------------------------------------------------#
@@ -28,6 +64,13 @@ N = int(N)
 phase = int(phase)
 Omega = round(Omega, 2)
 w0 = round(w0, 2)
+
+
+# Print out dressed state frequencies for these parameters
+ew0, ewp, ewm = three_level_eig(Omega, alpha, delta, xi)
+print(('w0 = {} \n'
+       'wp = {} \n'
+       'wm = {} \n').format(ew0, ewp, ewm))
 
 # Read the data
 tau = np.genfromtxt(filename("g2_corr"), usecols=0)

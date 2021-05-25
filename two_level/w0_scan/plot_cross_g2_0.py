@@ -22,40 +22,59 @@ def filename(file_in):
 #                                FILENAME THINGS                              #
 #-----------------------------------------------------------------------------#
 # Read parameters
-gamma, Omega, kappa, dw, epsilon, N, phase = \
-    np.genfromtxt(filename("parameters"), delimiter="=", skip_header=1, usecols=1)
+gamma, Omega, kappaa, dwa, kappab, dwb, epsilon, N, phase = \
+    np.genfromtxt(filename("cross_parameters"), delimiter="=", skip_header=1, usecols=1)
 N = int(N)
 phase = int(phase)
 Omega = round(Omega, 2)
 
 # Pull data from file
 # Central frequencies
-w0_list = np.genfromtxt(filename("w0_cross"), usecols=0)
+w0a_list = np.genfromtxt(filename("w0_cross"), usecols=0)
+w0b_list = np.genfromtxt(filename("w0_cross"), usecols=1)
 # Steady state photon number
 g2_0 = np.genfromtxt(filename("cross_corr"))
 
-X, Y =np.meshgrid(w0_list, w0_list)
+X, Y =np.meshgrid(w0a_list, w0b_list)
 
 #-----------------------------------------------------------------------------#
 #                             PLOT G2 SCAN: LINEAR                            #
 #-----------------------------------------------------------------------------#
 from matplotlib.cm import get_cmap
 from matplotlib.colors import Normalize, TwoSlopeNorm
+
 # Set colormap
-cmap = get_cmap('bwr', 256)
+if g2_0.min() < 1.0:
+    cmap = get_cmap('bwr', 256)
+    norm = TwoSlopeNorm(vmin=g2_0.min(), vcenter=1.0, vmax=g2_0.max())
+else:
+    cmap = get_cmap('Reds', 256)
+    norm = Normalize(vmin=1.0, vmax=g2_0.max())
+
+if g2_0.max() <= 1.0:
+    cmap = get_cmap('Blues_r', 256)
+    norm = Normalize(vmin=g2_0.min(), vmax=1.0)
+    
+# Print minimum and maximum
+print("g^2 minimum: {}".format(g2_0.min()))
+print("g^2 maximum: {}".format(g2_0.max()))
 
 # Set normalisation
-# norm = Normalize(vmin=g2_0.min(), vmax=g2_0.max())
-norm = TwoSlopeNorm(vmin=g2_0.min(), vcenter=1.0, vmax=g2_0.max())
 
 # Set up figure
 fig, ax = plt.subplots(1, 1, figsize=[8, 7])
 
 # Plot contourf
-# contour_plot = ax.contourf(w0_list, w0_list, g2_0, 500,
+# contour_plot = ax.contourf(w0a_list, w0b_list, g2_0, 500,
 #                             cmap=cmap, norm=norm)
 contour_plot = ax.pcolormesh(X, Y, g2_0, shading='auto',
                               cmap=cmap, norm=norm)
+
+# Plot cross
+peaks = [-Omega, 0.0, Omega]
+for i in peaks:
+    for j in peaks:
+        ax.plot(i, j, marker='x', color='green', lw=5.0)
 
 # Colour bar
 cbar = fig.colorbar(contour_plot, ax=ax,
@@ -130,28 +149,53 @@ def cmap_and_norm(boundaries_in, vcentre=1.0, ncolours_in=256):
 #--------------#
 
 # Boundary Norm
-# bounds = np.array([0.1, 0.3, 1.0, 3.0, 10.0, 30.0])
-bounds = np.array([0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0, 30.0, 100.0, 300.0])
+bounds = np.array([0.1, 0.3, 1.0, 3.0, 10.0, 30.0])
+# bounds = np.array([0.06, 0.1, 0.6, 1.0, 6.0, 10.0, 60.0, 100.0, 160.0])
+# bounds = np.array([0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0, 30.0, 100.0, 300.0])
 norm, cmap = cmap_and_norm(bounds)
+
+# Create string of bounds for labels
+str_bounds = bounds
+for place, i in enumerate(bounds):
+    str_bounds[place] = str(i)
 
 # Set up figure
 fig, ax = plt.subplots(1, 1, figsize=[8, 7])
 
 # Plot contourf
-# contour_plot = ax.contourf(w0_list, w0_list, g2_0, 500,
+# contour_plot = ax.contourf(w0a_list, w0b_list, g2_0, 500,
 #                             cmap=cmap, norm=norm)
 contour_plot = ax.pcolormesh(X, Y, g2_0, shading='auto',
                               cmap=cmap, norm=norm)
+# contour_plot = ax.imshow(g2_0, cmap=cmap, norm=norm)
+
+# # Plot crosses on peaks
+# peaks = [-Omega, 0.0, Omega]
+# for i in peaks:
+#     for j in peaks:
+#         ax.plot(i, j, marker='x', color='k', lw=5.0)
 
 # Colour bar
 cbar = fig.colorbar(contour_plot, ax=ax, ticks=bounds,
                     label=r'$g^{(2)}_{\mathrm{Cross}}(\tau=0)$')
+cbar.ax.set_yticklabels(str_bounds)
+cbar.ax.tick_params(labelsize=15)
+
+# Set ticks
+w_ticks = [-30, -1.5 * Omega, -Omega, -0.5 * Omega, 0.0, 0.5 * Omega, Omega, 1.5 * Omega, 30]
+w_ticks_str = [r'-$2\Omega$', r'$-1.5 \Omega$', r'$-\Omega$',
+               r'$-0.5 \Omega$', '0', r'$0.5 \Omega$',
+               r'$\Omega$', r'$1.5 \Omega$', r'$2\Omega$']
+ax.set_xticks(w_ticks)
+ax.set_yticks(w_ticks)
+ax.set_xticklabels(w_ticks_str)
+ax.set_yticklabels(w_ticks_str)
 
 # Set labels and title
-ax.set_xlabel(r'$\omega_{0}^{(a)} / \gamma$', fontsize=12)
-ax.set_ylabel(r'$\omega_{0}^{(b)} / \gamma$', fontsize=12)
+ax.set_xlabel(r'$\omega_{0}^{(a)} / \gamma$', fontsize=15)
+ax.set_ylabel(r'$\omega_{0}^{(b)} / \gamma$', fontsize=15)
 # ax.set_title(r'Initial Cross Correlation Value $g^{(2)}_{\mathrm{Cross}}(\tau=0)$', fontsize=12)
-ax.set_title(r'Atom: $\Omega = {} \gamma$, Filter: $\kappa = {} \gamma, N = {}, \delta\omega = {} \gamma$'.format(Omega, kappa, N, dw), fontsize=12)
+# ax.set_title(r'Atom: $\Omega = {} \gamma$, Filter: $\kappa = {} \gamma, N = {}, \delta\omega = {} \gamma$'.format(Omega, kappa, N, dw), fontsize=12)
 
 fig.tight_layout()
 fig.show()

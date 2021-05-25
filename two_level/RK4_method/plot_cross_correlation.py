@@ -40,7 +40,7 @@ filename_param = filename("parameters", parent_dir)
 filename_corr = filename("g2_corr", parent_dir)
 
 # Pull parameters from file
-gamma, Omega, w0a, w0b, kappaa, kappab, epsilon, N, dwa, dwb, phase, dt, t_max, tau1_max, tau2_max = \
+gamma, Omega, w0a, w0b, kappaa, kappab, epsilon, N, dwa, dwb, phase = \
     np.genfromtxt(fname=filename_param, delimiter="=", skip_header=1, usecols=(1,))
 N = int(N)
 phase = int(phase)

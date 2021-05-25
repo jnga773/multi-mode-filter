@@ -23,8 +23,8 @@ def mollow_triplet(Omega_in, gamma_in):
     Expression from Howard vol. 1
     """
     # Turn inputs into complex values
-    Omega_in = np.complex(Omega_in)
-    gamma_in = np.complex(gamma_in)
+    Omega_in = complex(Omega_in)
+    gamma_in = complex(gamma_in)
     # input tau
     tau_f = np.arange(0, 500, 0.01)
     # Calculate first order correlation
@@ -80,16 +80,22 @@ spec = max(photon) * spec / max(spec)
 #------------------------------------------------------------------------------#
 #                            PLOT PHOTON NUMBER SCAN                           #
 #------------------------------------------------------------------------------#
-plt.figure(figsize=[12, 8])
+plt.figure(figsize=[8, 6])
 
 # Plot photon number scan
-plt.plot(w0_list, photon)
+plt.plot(w0_list, photon, label=r'$\langle a^{\dagger} a \rangle$')
 # Plot bare spectrum of atom
-plt.plot(wlist, spec, color='k', ls='dotted', alpha=0.5)
+plt.plot(wlist, spec, color='k', ls='dotted', alpha=0.5, label='Renormalised Mollow Triplet')
 
-plt.ylabel(r'$ \langle A^{\dagger} A \rangle_{ss} $', fontsize=15)
-plt.xlabel(r'$ \omega_{0} / \gamma $', fontsize=15)
-plt.title(r'$ \Omega = %s, \mathrm{phase} = %s\pi, \kappa = %s, \delta\omega = %s, N = %s $'%(Omega, phase, kappa, dw, N), fontsize=15)
+plt.xlim(-1.5 * Omega, 1.5 * Omega)
+
+plt.ylabel(r'$ \langle A^{\dagger} A \rangle_{ss} $', fontsize=12)
+plt.xlabel(r'$ \omega_{0} / \gamma $', fontsize=12)
+if N > 0:
+    plt.title(r'Photon Number Scan $\left( \Omega = {}, \kappa = {} \gamma, \delta\omega = {} \gamma, N = {} \right)$'.format(Omega, kappa, dw, N), fontsize=12)
+else:
+    plt.title(r'Photon Number Scan $\left( \Omega = {} \gamma, \kappa = {} \gamma \right)$'.format(Omega, kappa), fontsize=12)
+plt.legend(loc='best', fontsize=12)
 
 plt.tight_layout()
 plt.show()

@@ -42,9 +42,17 @@ plt.figure(figsize=[12, 8])
 # Plot photon number scan
 plt.plot(w0_list, g2_0)
 
-plt.ylabel(r'$ g^{(2)}(\tau=0) $', fontsize=15)
-plt.xlabel(r'$ \omega_{0} / \gamma $', fontsize=15)
-plt.title(r'$ \Omega = %s, \mathrm{phase} = %s\pi, \kappa = %s, \delta\omega = %s, N = %s $'%(Omega, phase, kappa, dw, N), fontsize=15)
+plt.xlim(-1.5 * Omega, 1.5 * Omega)
 
+plt.ylabel(r'$ \langle A^{\dagger} A^{\dagger} A A \rangle_{ss} / \langle A^{\dagger} A \rangle^{2}_{ss} $', fontsize=15)
+# plt.ylabel(r'$ \langle A^{\dagger} A^{\dagger} A A \rangle_{ss} $', fontsize=15)
+plt.xlabel(r'$ \omega_{0} / \gamma $', fontsize=15)
+
+if N > 0:
+    plt.title(r'$g^{{(2)}}(\tau=0)$ with $\left( \Omega = {}, \kappa = {} \gamma, \delta\omega = {} \gamma, N = {} \right)$'.format(Omega, kappa, dw, N), fontsize=12)
+else:
+    plt.title(r'$g^{{(2)}}(\tau=0)$ with $\left( \Omega = {} \gamma, \kappa = {} \gamma \right)$'.format(Omega, kappa), fontsize=12)
+    # plt.title(r'$\langle a^{{\dagger}} a^{{\dagger}} a a \rangle_{{ss}}$ with $\left( \Omega = {} \gamma, \kappa = {} \gamma \right)$'.format(Omega, kappa), fontsize=12)
+   
 plt.tight_layout()
 plt.show()

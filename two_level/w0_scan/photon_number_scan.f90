@@ -25,19 +25,6 @@
 
 PROGRAM TWO_LEVEL_ATOM_MULTI_MODE_FILTER_STEADY_STATES
 
-! Import the MKL Library LAPACK95, from which the eigenvalue/eigenvector and
-! matrix inversion subroutines come from.
-! MUST INCLUDE THE -mkl OR /Qmkl FLAG AS A COMPILER OPTION IF USING INTEL.
-! Otherwise you'll have to link it yourself and I don't know how to do that :)
-
-USE LAPACK95
-
-! The subroutines used from LAPACK are:
-! - zGETRF - Calculates LU-factorisation of a complexmatrix so it can be
-!            inverted by...,
-! - zGETRI - Calculates the inverse of a complex matrix,
-! - zGEEV  - Calculates the eigenvalues and eigevectors of a complex matrix.
-
 !==============================================================================!
 !                    DEFINING AND DECLARING VARIABLES/ARRAYS                   !
 !==============================================================================!
@@ -86,6 +73,8 @@ REAL(KIND=8), DIMENSION(:), ALLOCATABLE                :: w0l
 INTEGER                                                :: scan
 ! Max/min value of D0a [Default = 30.0]
 REAL(KIND=8)                                           :: scan_max
+! Centre of scan list
+REAL(KIND=8)                                           :: scan_centre
 ! Scan step size [Default = 0.5]
 REAL(KIND=8)                                           :: scan_step
 
@@ -144,6 +133,18 @@ REAL(KIND=8)                                           :: photon, photon_ss
 ! Complex data
 COMPLEX(KIND=8)                                        :: moment_out
 
+! Run-time percentage printing
+! Print completion time check
+LOGICAL, PARAMETER                                     :: progress_bar = .FALSE.
+! Runtime variables
+REAL(KIND=8)                                           :: loop_start_time, loop_check_time
+REAL(KIND=8)                                           :: loop_run_time, loop_remaining_time
+! Ten percent of time steps for loop
+INTEGER                                                :: ten_percent
+! Percentage of time steps completed
+INTEGER                                                :: percentage
+CHARACTER(LEN=28), PARAMETER                           :: FMT_ss = "(T2,I3,A13,F9.2,A19,F9.2,A1)"
+
 !--------------------------!
 !     SUBROUTINE STUFF     !
 !--------------------------!
@@ -184,9 +185,7 @@ CHARACTER(LEN=512) :: LINE
 NAMELIST /ATOM/ Gamma, Omega
 NAMELIST /FILTER/ epsilon, N, phase
 NAMELIST /CAVITYA/ kappaa, w0a, dwa
-! NAMELIST /CAVITYB/ kappab, w0b, dwb
-NAMELIST /SCANLIST/ scan_max, scan_step
-! NAMELIST /TIME/ dt, t_max, tau1_max, tau2_max
+NAMELIST /SCANLIST/ scan_max, scan_centre, scan_step
 
 ! Call start time from CPU_TIME
 CALL CPU_TIME(start_time)
@@ -222,15 +221,6 @@ IF (ISTAT .NE. 0) THEN
   CALL EXIT(1)
 END IF
 
-! READ(IUNIT, NML=CAVITYB, IOSTAT=ISTAT)
-! IF (ISTAT .NE. 0) THEN
-!   BACKSPACE(IUNIT)
-!   READ(IUNIT, FMT='(A)') LINE
-!   CLOSE(IUNIT)
-!   PRINT *, "Invalid line in CAVITYB namelist: " // TRIM(line)
-!   CALL EXIT(1)
-! END IF
-
 READ(IUNIT, NML=SCANLIST, IOSTAT=ISTAT)
 IF (ISTAT .NE. 0) THEN
   BACKSPACE(IUNIT)
@@ -240,19 +230,6 @@ IF (ISTAT .NE. 0) THEN
   CALL EXIT(1)
 END IF
 
-! READ(IUNIT, NML=TIME, IOSTAT=ISTAT)
-! IF (ISTAT .NE. 0) THEN
-!   BACKSPACE(IUNIT)
-!   READ(IUNIT, FMT='(A)') LINE
-!   CLOSE(IUNIT)
-!   PRINT *, "Invalid line in TIME namelist: " // TRIM(line)
-!   CALL EXIT(1)
-! END IF
-! CLOSE(IUNIT)
-
-! Number of time-steps
-! t_steps = NINT(t_max / dt)
-
 ! Max number of scans
 no_scans = NINT(scan_max / scan_step)
 
@@ -260,6 +237,9 @@ no_scans = NINT(scan_max / scan_step)
 kappa = kappaa
 w0 = w0a
 dw = dwa
+
+! Set central frequency for scan list to zero
+scan_centre = 0.0d0
 
 !==============================================================================!
 !                DEFINING ANALYTIC MATRICES/EIGENVALUES/VECTORS                !
@@ -316,7 +296,7 @@ END DO
 ALLOCATE(w0l(-no_scans:no_scans))
 w0l = 0.0d0
 DO scan = -no_scans, no_scans
-  w0l(scan) = 0.0d0 + DBLE(scan) * scan_step
+  w0l(scan) = scan_centre + DBLE(scan) * scan_step
 END DO
 
 !------------------------------------------!
@@ -362,6 +342,20 @@ CLOSE(1)
 !                        CALCULATE STEADY-STATE MOMENTS                        !
 !==============================================================================!
 ! Cycle through each different \omega_{0} value and calculate steady states
+!---------------------------!
+!     FIRST-ORDER: ATOM     !
+!---------------------------!
+! Set matrix to be inverted
+Mat_inv = Mat_OG
+! Invert matrix
+CALL SquareMatrixInverse(N_mat, Mat_inv)
+
+! Calculate steady states
+sigma_ss = 0.0d0
+sigma_ss = -MATMUL(Mat_inv, B_OG)
+
+! Ten percent of time steps
+ten_percent = NINT((DBLE(SIZE(w0l)) / 10.0d0))
 
 ! Open file to write time and data to
 OPEN(UNIT=2, FILE=filename_photon, STATUS='REPLACE', ACTION='WRITE', RECL=4000)
@@ -379,32 +373,6 @@ DO scan = -no_scans, no_scans
       wl(j) = w0 + DBLE(j) * dw
     END IF
   END DO
-  !---------------------------!
-  !     FIRST-ORDER: ATOM     !
-  !---------------------------!
-  ! Set matrix to be inverted
-  Mat_inv = Mat_OG
-
-  ! Perform LU-factorization of matrix
-  CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-  IF (INFO .NE. 0) THEN
-    PRINT*, "zGETRF M failed :( INFO = ", INFO
-    STOP
-  END IF
-
-  ! Query optimal work space
-  ! LWORK = -1
-  ! CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
-  ! ! Set optimal work space and run again
-  ! LWORK = MIN(LWMAX, INT(WORK(1)))
-
-  ! Invert Matrix (Optimal LWORK = 3)
-  LWORK = 3
-  CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
-
-  ! Calculate steady states
-  sigma_ss = 0.0d0
-  sigma_ss = -MATMUL(Mat_inv, B_OG)
 
   ! Cycle through modes
   DO j = -N, N
@@ -444,22 +412,8 @@ DO scan = -no_scans, no_scans
 
     ! Set inverse matrix
     Mat_inv = Mat
-    ! Perform LU-factorization of matrix
-    CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-    IF (INFO .NE. 0) THEN
-      WRITE(*, '(A26,I1,A15,I3)') "zGETRF M failed on cavsig(", j , ", a) :( INFO = ", INFO
-      STOP
-    END IF
-
-    ! ! Query optimal work space
-    ! LWORK = -1
-    ! CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
-    ! ! Set optimal work space and run again
-    ! LWORK = MIN(LWMAX, INT(WORK(1)))
-
-    ! Invert Matrix (Optimal LWORK = 3)
-    LWORK = 3
-    CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+    ! Invert matrix
+    CALL SquareMatrixInverse(N_mat, Mat_inv)
 
     ! Calculate steady state
     cavsig2_ss(j, a, :) = -MATMUL(Mat_inv, B_vec)
@@ -482,22 +436,8 @@ DO scan = -no_scans, no_scans
 
     ! Set inverse matrix
     Mat_inv = Mat
-    ! Perform LU-factorization of matrix
-    CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-    IF (INFO .NE. 0) THEN
-      WRITE(*, '(A26,I1,A16,I3)') "zGETRF M failed on cavsig(", j , ", at) :( INFO = ", INFO
-      STOP
-    END IF
-
-    ! ! Query optimal work space
-    ! LWORK = -1
-    ! CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
-    ! ! Set optimal work space and run again
-    ! LWORK = MIN(LWMAX, INT(WORK(1)))
-
-    ! Invert Matrix (Optimal LWORK = 3)
-    LWORK = 3
-    CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+    ! Invert matrix
+    CALL SquareMatrixInverse(N_mat, Mat_inv)
 
     ! Calculate steady state
     cavsig2_ss(j, at, :) = -MATMUL(Mat_inv, B_vec)
@@ -534,6 +474,18 @@ DO scan = -no_scans, no_scans
   ! Write to file
   WRITE(2,*) w0, photon_ss
 
+  ! Check percentage
+  IF (progress_bar .EQV. .TRUE.) THEN
+    IF (MOD(scan, ten_percent) == 0 .AND. scan /= -no_scans) THEN
+      CALL CPU_TIME(loop_check_time)
+      percentage = NINT((100.0d0 * DBLE(scan + no_scans)) / (1.0d0 * DBLE(SIZE(w0l))))
+      loop_run_time = loop_check_time - loop_start_time
+      loop_remaining_time = ((100.0d0 * (loop_check_time - loop_start_time)) / (1.0d0 * percentage)) - loop_run_time
+      WRITE(*, FMT_ss) percentage, "%. Run time: ", loop_run_time, "s. Est. time left: ", &
+                     & loop_remaining_time, "s"
+    END IF
+  END IF
+
   ! Close scan loop
 END DO
 
@@ -549,3 +501,70 @@ CALL CPU_TIME(end_time)
 PRINT*, "Runtime: ", end_time - start_time, "seconds"
 
 END PROGRAM TWO_LEVEL_ATOM_MULTI_MODE_FILTER_STEADY_STATES
+
+! Subroutine to calculate the inverse of a matrix USING LAPACK LIBRARY
+SUBROUTINE SquareMatrixInverse(N_in, MatrixInv_out)
+  ! Import the MKL Library LAPACK95, from which the eigenvalue/eigenvector and
+  ! matrix inversion subroutines come from.
+  ! MUST INCLUDE THE -mkl OR /Qmkl FLAG AS A COMPILER OPTION IF USING INTEL.
+  ! Otherwise you'll have to link it yourself and I don't know how to do that :)
+
+  USE LAPACK95
+
+  ! The subroutines used from LAPACK are:
+  ! - zGETRF - Calculates LU-factorisation of a complexmatrix so it can be
+  !            inverted by...,
+  ! - zGETRI - Calculates the inverse of a complex matrix.
+
+  IMPLICIT NONE
+
+  !-------------------------!
+  !     INPUT ARGUMENTS     !
+  !-------------------------!
+  ! Dimension of matrix (N_in x N_in)
+  INTEGER, INTENT(IN)                                   :: N_in
+
+  !--------------------------!
+  !     OUTPUT ARGUMENTS     !
+  !--------------------------!
+  ! Inverted matrix to be output
+  COMPLEX(KIND=8), DIMENSION(N_in, N_in), INTENT(INOUT) :: MatrixInv_out
+
+  !--------------------------!
+  !     SUBROUTINE STUFF     !
+  !--------------------------!
+  ! Work space dimension
+  INTEGER, PARAMETER                                    :: LWMAX = 300
+  INTEGER                                               :: LWORK
+  ! Work space array
+  COMPLEX(KIND=8), DIMENSION(LWMAX)                     :: WORK
+  REAL(KIND=8), DIMENSION(2*N_in)                       :: RWORK
+  ! LU-factorisation array
+  INTEGER, DIMENSION(N_in)                              :: IPIV
+  ! Info IO
+  INTEGER                                               :: INFO
+
+  ! Perform LU-factorization of matrix
+  CALL zGETRF(N_in, N_in, MatrixInv_out, N_in, IPIV, INFO)
+  IF (INFO .NE. 0) THEN
+    PRINT*, "zGETRF M failed :( INFO = ", INFO
+    STOP
+  END IF
+
+  ! Query optimal work space
+  ! LWORK = -1
+  ! CALL zGETRI(N_in, MatrixInv_out, N_in, IPIV, WORK, LWORK, INFO)
+  ! ! Set optimal work space and run again
+  ! LWORK = MIN(LWMAX, INT(WORK(1)))
+
+  ! Set optimal LWORK for N_in = 3 or N_in = 8
+  IF (N_in .EQ. 3) THEN
+    LWORK = 3
+  ELSE IF (N_in .EQ. 8) THEN
+    LWORK = 8
+  END IF
+
+  CALL zGETRI(N_in, MatrixInv_out, N_in, IPIV, WORK, LWORK, INFO)
+
+  ! End of subroutine
+END SUBROUTINE SquareMatrixInverse

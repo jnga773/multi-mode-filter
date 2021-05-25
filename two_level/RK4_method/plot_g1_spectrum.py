@@ -23,8 +23,8 @@ def mollow_triplet(tau_in, gamma_in, Omega_in):
     Expression from Howard vol. 1
     """
     # Turn inputs into complex values
-    Omega_in = np.complex(Omega_in)
-    gamma_in = np.complex(gamma_in)
+    Omega_in = complex(Omega_in)
+    gamma_in = complex(gamma_in)
     # input tau
     # Calculate first order correlation
     Yf = (np.sqrt(2.0) * Omega_in) / (gamma_in)

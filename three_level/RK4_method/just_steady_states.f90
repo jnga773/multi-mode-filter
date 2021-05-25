@@ -25,19 +25,6 @@
 
 PROGRAM THREE_LEVEL_ATOM_MULTI_MODE_FILTER_STEADY_STATES
 
-! Import the MKL Library LAPACK95, from which the eigenvalue/eigenvector and
-! matrix inversion subroutines come from.
-! MUST INCLUDE THE -mkl OR /Qmkl FLAG AS A COMPILER OPTION IF USING INTEL.
-! Otherwise you'll have to link it yourself and I don't know how to do that :)
-
-USE LAPACK95
-
-! The subroutines used from LAPACK are:
-! - zGETRF - Calculates LU-factorisation of a complexmatrix so it can be
-!            inverted by...,
-! - zGETRI - Calculates the inverse of a complex matrix,
-! - zGEEV  - Calculates the eigenvalues and eigevectors of a complex matrix.
-
 !==============================================================================!
 !                    DEFINING AND DECLARING VARIABLES/ARRAYS                   !
 !==============================================================================!
@@ -173,24 +160,6 @@ REAL(KIND=8), PARAMETER                                :: xis = 1.0d0 / 6.0d0
 REAL(KIND=8)                                           :: photon_ss
 ! Complex data
 COMPLEX(KIND=8)                                        :: moment_out
-
-!--------------------------!
-!     SUBROUTINE STUFF     !
-!--------------------------!
-! Work space dimension
-INTEGER, PARAMETER                                     :: LWMAX = 300
-INTEGER                                                :: LWORK
-! Work space array
-COMPLEX(KIND=8), DIMENSION(LWMAX)                      :: WORK
-REAL(KIND=8), DIMENSION(2*N_mat)                       :: RWORK
-! Eigenvalues of matrix M
-COMPLEX(KIND=8), DIMENSION(N_mat)                      :: eigval
-! S, and S^{-1} matrix for diagonalising eigenvectors
-COMPLEX(KIND=8), DIMENSION(N_mat, N_mat)               :: S, Sinv
-! LU-factorisation array
-INTEGER, DIMENSION(N_mat)                              :: IPIV
-! Info IO
-INTEGER                                                :: INFO
 
 !------------------------!
 !     FILENAME STUFF     !
@@ -464,23 +433,8 @@ ALLOCATE(cav4_ss(-N:N, -N:N, -N:N, -N:N)); cav4_ss = 0.0d0
 IF (xi .NE. 0.0d0) THEN
   ! Set matrix to be inverted
   Mat_inv = Mat_OG
-
-  ! Perform LU-factorization of matrix
-  CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-  IF (INFO .NE. 0) THEN
-    PRINT*, "zGETRF M failed :( INFO = ", INFO
-    STOP
-  END IF
-
-  ! Query optimal work space
-  ! LWORK = -1
-  ! CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
-  ! ! Set optimal work space and run again
-  ! LWORK = MIN(LWMAX, INT(WORK(1)))
-
-  ! Invert Matrix (Optimal LWORK = 8)
-  LWORK = 8
-  CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+  ! Invert matrix
+  CALL SquareMatrixInverse(N_mat, Mat_inv)
 
   ! Calculate steady states
   sigma_ss = 0.0d0
@@ -492,32 +446,8 @@ ELSE IF (xi .EQ. 0.0d0) THEN
   ! Set Lindblad matrix
   Mat = Mat_OG
 
-  ! ! Query optimal work space
-  ! LWORK = -1
-  ! CALL zGEEV('N', 'V', N_mat, M, N_mat, eigval, S, N_mat, S, N_mat, WORK, LWORK, RWORK, INFO)
-  ! ! Set optimal work space
-  ! LWORK = MIN(LWMAX, INT(WORK(1)))
-
-  ! Calculate eigenvalues and eigenvectors (Optimal LWORK = 264)
-  LWORK = 264
-  CALL zGEEV('N', 'V', N_mat, Mat, N_mat, eigval, S, N_mat, S, N_mat, WORK, LWORK, RWORK, INFO)
-  ! Check convergence
-  IF (INFO .GT. 0) THEN
-     PRINT*, "zGEEV failed ON eigenvalues/vectors of Mat_OG"
-     STOP
-  END IF
-
-  ! Cycle through eigenvalues and, for the eigenvalue that = 0, use that
-  ! eigenvector as the steady state
-  DO x = 1, N_mat
-    IF (ABS(REAL(eigval(x))) .LT. 1D-10 .AND. ABS(REAL(eigval(x))) .LT. 1D-10) THEN
-      ! Save steady state eigenvector
-      DO j = 1, N_mat
-        sigma_ss(j) = S(j, x)
-      END DO
-    END IF
-  END DO
-
+  ! Calculate steady state from eigenvectors
+  CALL SquareMatrixZeroEigenvalue(N_mat, Mat, sigma_ss)
   ! Normalise sigma_ss so |g><g| + |e><e| = 1
   sigma_ss = sigma_ss / (REAL(sigma_ss(1)) + REAL(sigma_ss(4)))
 END IF
@@ -572,22 +502,8 @@ DO j = -N, N
 
   ! Set inverse matrix
   Mat_inv = Mat
-  ! Perform LU-factorization of matrix
-  CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-  IF (INFO .NE. 0) THEN
-    WRITE(*, '(A26,I1,A15,I3)') "zGETRF M failed on cavsig(", j , ", a) :( INFO = ", INFO
-    STOP
-  END IF
-
-  ! ! Query optimal work space
-  ! LWORK = -1
-  ! CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
-  ! ! Set optimal work space and run again
-  ! LWORK = MIN(LWMAX, INT(WORK(1)))
-
-  ! Invert Matrix (Optimal LWORK = 8)
-  LWORK = 8
-  CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+  ! Invert matrix
+  CALL SquareMatrixInverse(N_mat, Mat_inv)
 
   ! Calculate steady state
   cavsig2_ss(j, a, :) = -MATMUL(Mat_inv, B_vec)
@@ -618,22 +534,8 @@ DO j = -N, N
 
   ! Set inverse matrix
   Mat_inv = Mat
-  ! Perform LU-factorization of matrix
-  CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-  IF (INFO .NE. 0) THEN
-    WRITE(*, '(A26,I1,A16,I3)') "zGETRF M failed on cavsig(", j , ", at) :( INFO = ", INFO
-    STOP
-  END IF
-
-  ! ! Query optimal work space
-  ! LWORK = -1
-  ! CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
-  ! ! Set optimal work space and run again
-  ! LWORK = MIN(LWMAX, INT(WORK(1)))
-
-  ! Invert Matrix (Optimal LWORK = 8)
-  LWORK = 8
-  CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+  ! Invert matrix
+  CALL SquareMatrixInverse(N_mat, Mat_inv)
 
   ! Calculate steady state
   cavsig2_ss(j, at, :) = -MATMUL(Mat_inv, B_vec)
@@ -718,22 +620,8 @@ DO k = -N, N
 
     ! Set inverse matrix
     Mat_inv = Mat
-    ! Perform LU-factorization of matrix
-    CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-    IF (INFO .NE. 0) THEN
-      WRITE(*, '(A27,I3,A3,I3,A15,I4)') "zGETRF M failed on cavsig3(", j , ", ", k, ", a) :( INFO = ", INFO
-      STOP
-    END IF
-
-    ! ! Query optimal work space
-    ! LWORK = -1
-    ! CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
-    ! ! Set optimal work space and run again
-    ! LWORK = MIN(LWMAX, INT(WORK(1)))
-
-    ! Invert Matrix (Optimal LWORK = 8)
-    LWORK = 8
-    CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+    ! Invert matrix
+    CALL SquareMatrixInverse(N_mat, Mat_inv)
 
     ! Calculate steady state
     cavsig3_ss(j, k, a, :) = -MATMUL(Mat_inv, B_vec)
@@ -772,22 +660,8 @@ DO k = -N, N
 
     ! Set inverse matrix
     Mat_inv = Mat
-    ! Perform LU-factorization of matrix
-    CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-    IF (INFO .NE. 0) THEN
-      WRITE(*, '(A27,I3,A3,I3,A16,I4)') "zGETRF M failed on cavsig3(", j , ", ", k, ", at) :( INFO = ", INFO
-      STOP
-    END IF
-
-    ! ! Query optimal work space
-    ! LWORK = -1
-    ! CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
-    ! ! Set optimal work space and run again
-    ! LWORK = MIN(LWMAX, INT(WORK(1)))
-
-    ! Invert Matrix (Optimal LWORK = 8)
-    LWORK = 8
-    CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+    ! Invert matrix
+    CALL SquareMatrixInverse(N_mat, Mat_inv)
 
     ! Calculate steady state
     cavsig3_ss(j, k, at, :) = -MATMUL(Mat_inv, B_vec)
@@ -825,22 +699,8 @@ DO k = -N, N
 
     ! Set inverse matrix
     Mat_inv = Mat
-    ! Perform LU-factorization of matrix
-    CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-    IF (INFO .NE. 0) THEN
-      WRITE(*, '(A27,I3,A3,I3,A17,I4)') "zGETRF M failed on cavsig3(", j , ", ", k, ", ata) :( INFO = ", INFO
-      STOP
-    END IF
-
-    ! ! Query optimal work space
-    ! LWORK = -1
-    ! CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
-    ! ! Set optimal work space and run again
-    ! LWORK = MIN(LWMAX, INT(WORK(1)))
-
-    ! Invert Matrix (Optimal LWORK = 8)
-    LWORK = 8
-    CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+    ! Invert matrix
+    CALL SquareMatrixInverse(N_mat, Mat_inv)
 
     ! Calculate steady state
     cavsig3_ss(j, k, ata, :) = -MATMUL(Mat_inv, B_vec)
@@ -927,22 +787,8 @@ DO l = -N, N
 
       ! Set inverse matrix
       Mat_inv = Mat
-      ! Perform LU-factorization of matrix
-      CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-      IF (INFO .NE. 0) THEN
-        WRITE(*, '(A27,I3,A3,I3,A3,I3,A15,I4)') "zGETRF M failed on cavsig4(", j , ", ", k, ", ", l, ", a) :( INFO = ", INFO
-        STOP
-      END IF
-
-      ! ! Query optimal work space
-      ! LWORK = -1
-      ! CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
-      ! ! Set optimal work space and run again
-      ! LWORK = MIN(LWMAX, INT(WORK(1)))
-
-      ! Invert Matrix (Optimal LWORK = 8)
-      LWORK = 8
-      CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+      ! Invert matrix
+      CALL SquareMatrixInverse(N_mat, Mat_inv)
 
       ! Calculate steady state
       cavsig4_ss(j, k, l, a, :) = -MATMUL(Mat_inv, B_vec)
@@ -988,22 +834,8 @@ DO l = -N, N
 
       ! Set inverse matrix
       Mat_inv = Mat
-      ! Perform LU-factorization of matrix
-      CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-      IF (INFO .NE. 0) THEN
-        WRITE(*, '(A27,I3,A3,I3,A3,I3,A16,I4)') "zGETRF M failed on cavsig4(", j , ", ", k, ", ", l, ", at) :( INFO = ", INFO
-        STOP
-      END IF
-
-      ! ! Query optimal work space
-      ! LWORK = -1
-      ! CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
-      ! ! Set optimal work space and run again
-      ! LWORK = MIN(LWMAX, INT(WORK(1)))
-
-      ! Invert Matrix (Optimal LWORK = 8)
-      LWORK = 8
-      CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+      ! Invert matrix
+      CALL SquareMatrixInverse(N_mat, Mat_inv)
 
       ! Calculate steady state
       cavsig4_ss(j, k, l, at, :) = -MATMUL(Mat_inv, B_vec)
@@ -1120,3 +952,143 @@ CALL CPU_TIME(end_time)
 PRINT*, "Runtime: ", end_time - start_time, "seconds"
 
 END PROGRAM THREE_LEVEL_ATOM_MULTI_MODE_FILTER_STEADY_STATES
+
+! Subroutine to calculate the inverse of a matrix USING LAPACK LIBRARY
+SUBROUTINE SquareMatrixInverse(N_in, MatrixInv_out)
+  ! Import the MKL Library LAPACK95, from which the eigenvalue/eigenvector and
+  ! matrix inversion subroutines come from.
+  ! MUST INCLUDE THE -mkl OR /Qmkl FLAG AS A COMPILER OPTION IF USING INTEL.
+  ! Otherwise you'll have to link it yourself and I don't know how to do that :)
+
+  USE LAPACK95
+
+  ! The subroutines used from LAPACK are:
+  ! - zGETRF - Calculates LU-factorisation of a complexmatrix so it can be
+  !            inverted by...,
+  ! - zGETRI - Calculates the inverse of a complex matrix.
+
+  IMPLICIT NONE
+
+  !-------------------------!
+  !     INPUT ARGUMENTS     !
+  !-------------------------!
+  ! Dimension of matrix (N_in x N_in)
+  INTEGER, INTENT(IN)                                   :: N_in
+
+  !--------------------------!
+  !     OUTPUT ARGUMENTS     !
+  !--------------------------!
+  ! Inverted matrix to be output
+  COMPLEX(KIND=8), DIMENSION(N_in, N_in), INTENT(INOUT) :: MatrixInv_out
+
+  !--------------------------!
+  !     SUBROUTINE STUFF     !
+  !--------------------------!
+  ! Work space dimension
+  INTEGER, PARAMETER                                    :: LWMAX = 300
+  INTEGER                                               :: LWORK
+  ! Work space array
+  COMPLEX(KIND=8), DIMENSION(LWMAX)                     :: WORK
+  REAL(KIND=8), DIMENSION(2*N_in)                       :: RWORK
+  ! LU-factorisation array
+  INTEGER, DIMENSION(N_in)                              :: IPIV
+  ! Info IO
+  INTEGER                                               :: INFO
+
+  ! Perform LU-factorization of matrix
+  CALL zGETRF(N_in, N_in, MatrixInv_out, N_in, IPIV, INFO)
+  IF (INFO .NE. 0) THEN
+    PRINT*, "zGETRF M failed :( INFO = ", INFO
+    STOP
+  END IF
+
+  ! Query optimal work space
+  ! LWORK = -1
+  ! CALL zGETRI(N_in, MatrixInv_out, N_in, IPIV, WORK, LWORK, INFO)
+  ! ! Set optimal work space and run again
+  ! LWORK = MIN(LWMAX, INT(WORK(1)))
+
+  ! Set optimal LWORK for N_in = 3 or N_in = 8
+  IF (N_in .EQ. 3) THEN
+    LWORK = 3
+  ELSE IF (N_in .EQ. 8) THEN
+    LWORK = 8
+  END IF
+
+  CALL zGETRI(N_in, MatrixInv_out, N_in, IPIV, WORK, LWORK, INFO)
+
+  ! End of subroutine
+END SUBROUTINE SquareMatrixInverse
+
+! Subroutine to calculate the inverse of a matrix USING LAPACK LIBRARY
+SUBROUTINE SquareMatrixZeroEigenvalue(N_in, Matrix_in, SS_out)
+  ! Import the MKL Library LAPACK95, from which the eigenvalue/eigenvector and
+  ! matrix inversion subroutines come from.
+  ! MUST INCLUDE THE -mkl OR /Qmkl FLAG AS A COMPILER OPTION IF USING INTEL.
+  ! Otherwise you'll have to link it yourself and I don't know how to do that :)
+
+  USE LAPACK95
+
+  ! The subroutines used from LAPACK are:
+  ! - zGEEV  - Calculates the eigenvalues and eigevectors of a complex matrix.
+
+  IMPLICIT NONE
+
+  !-------------------------!
+  !     INPUT ARGUMENTS     !
+  !-------------------------!
+  ! Dimension of matrix (N_in x N_in)
+  INTEGER, INTENT(IN)                                :: N_in
+  ! Matrix to calculate eigenvalues/vectors from
+  COMPLEX(KIND=8), DIMENSION(N_in, N_in), INTENT(IN) :: Matrix_in
+
+  !--------------------------!
+  !     OUTPUT ARGUMENTS     !
+  !--------------------------!
+  ! Steady state vector out
+  COMPLEX(KIND=8), DIMENSION(N_in), INTENT(OUT)      :: SS_out
+
+  !---------------------!
+  !     OTHER STUFF     !
+  !---------------------!
+  INTEGER                                            :: j, x
+
+  !--------------------------!
+  !     SUBROUTINE STUFF     !
+  !--------------------------!
+  ! Work space dimension
+  INTEGER, PARAMETER                                 :: LWMAX = 300
+  INTEGER                                            :: LWORK
+  ! Work space array
+  COMPLEX(KIND=8), DIMENSION(LWMAX)                  :: WORK
+  REAL(KIND=8), DIMENSION(2*N_in)                    :: RWORK
+  ! Eigenvalues of matrix M
+  COMPLEX(KIND=8), DIMENSION(N_in)                   :: eigval
+  ! S, and S^{-1} matrix for diagonalising eigenvectors
+  COMPLEX(KIND=8), DIMENSION(N_in, N_in)             :: S, Sinv
+  ! Info IO
+  INTEGER                                            :: INFO
+
+  ! Calculate eigenvalues and eigenvectors (Optimal LWORK = 264)
+  LWORK = 264
+  CALL zGEEV('N', 'V', N_in, Matrix_in, N_in, eigval, S, N_in, S, N_in, WORK, LWORK, RWORK, INFO)
+  ! Check convergence
+  IF (INFO .GT. 0) THEN
+     PRINT*, "zGEEV failed ON eigenvalues/vectors of Mat_OG"
+     STOP
+  END IF
+
+  SS_out = 0.0d0
+  ! Cycle through eigenvalues and, for the eigenvalue that = 0, use that
+  ! eigenvector as the steady state
+  DO x = 1, N_in
+    IF (ABS(REAL(eigval(x))) .LT. 1D-10 .AND. ABS(REAL(eigval(x))) .LT. 1D-10) THEN
+      ! Save steady state eigenvector
+      DO j = 1, N_in
+        SS_out(j) = S(j, x)
+      END DO
+    END IF
+  END DO
+
+  ! End of subroutine
+END SUBROUTINE SquareMatrixZeroEigenvalue

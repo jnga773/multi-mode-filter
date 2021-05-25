@@ -74,31 +74,46 @@ dressed_cross = g2_dressed_states(tau, Omega, gamma, w0a, 'cross')
 # print("Initial g2 value = {}".format(corr_filter[0]))
 
 #-----------------------------------------------------------------------------#
+#                              PLOT CROSS g^{(2)}                             #
+#-----------------------------------------------------------------------------#
+# Plot
+plt.figure(figsize=[8, 6])
+
+plt.plot(tau, corr_cross)
+
+plt.xlabel(r'$\gamma \tau$', fontsize=12)
+plt.ylabel(r'$g^{(2)}_{\mathrm{cross}}(\tau)$', fontsize=12)
+plt.title(r'$\Omega = {}, \omega_{{0}}^{{(a)}} = {}, \omega_{{0}}^{{(b)}} = {}, \kappa_{{a}} = {}, \kappa_{{b}} = {}, N = {}, \delta\omega^{{(a)}} = {}, \delta\omega^{{(b)}} = {}$'.format(Omega, w0a, w0b, kappaa, kappab, N, dwa, dwb), fontsize=12)
+
+plt.tight_layout()
+plt.show()
+
+#-----------------------------------------------------------------------------#
 #                         PLOT AUTO AND CROSS g^{(2)}                         #
 #-----------------------------------------------------------------------------#
-fig, ax = plt.subplots(1, 2, figsize=[15, 6])
+# fig, ax = plt.subplots(1, 2, figsize=[15, 6])
 
-# Auto-correlation
-ax[0].plot(tau, corr_auto, color='C0', label='Filtered Correlation')
-ax[0].plot(tau, dressed_auto, color='k', ls='dashed', alpha=0.5, label='Dressed State Approximation')
+# # Auto-correlation
+# ax[0].plot(tau, corr_auto, color='C0', label='Filtered Correlation')
+# ax[0].plot(tau, dressed_auto, color='k', ls='dashed', alpha=0.5, label='Dressed State Approximation')
 
-ax[0].set_ylabel(r'$g^{(2)}_{\mathrm{Auto}}(\tau)$', fontsize=12)
-ax[0].set_xlabel(r'$\gamma \tau$', fontsize=15)
-ax[0].set_title(r'Auto-correlation with $\left( N = {}, \delta\omega_{{a}} = {}, \kappa_{{a}} = {} \gamma, \omega_{{0}}^{{(a)}} = {} \gamma \right)$'.format(N, dwa, kappaa, w0a), fontsize=15)
-ax[0].legend(loc='best', fontsize=15)
+# ax[0].set_ylabel(r'$g^{(2)}_{\mathrm{Auto}}(\tau)$', fontsize=12)
+# ax[0].set_xlabel(r'$\gamma \tau$', fontsize=15)
+# ax[0].set_title(r'Auto-correlation with $\left( N = {}, \delta\omega_{{a}} = {}, \kappa_{{a}} = {} \gamma, \omega_{{0}}^{{(a)}} = {} \gamma \right)$'.format(N, dwa, kappaa, w0a), fontsize=15)
+# ax[0].legend(loc='best', fontsize=15)
 
-# Crosscorrelation
-ax[1].plot(tau, corr_cross, color='C0', label='Filtered Correlation')
-ax[1].plot(tau, dressed_cross, color='k', ls='dashed', alpha=0.5, label='Dressed State Approximation')
+# # Crosscorrelation
+# ax[1].plot(tau, corr_cross, color='C0', label='Filtered Correlation')
+# ax[1].plot(tau, dressed_cross, color='k', ls='dashed', alpha=0.5, label='Dressed State Approximation')
 
-ax[1].set_ylabel(r'$g^{(2)}_{\mathrm{Cross}}(\tau)$', fontsize=12)
-ax[1].set_xlabel(r'$\gamma \tau$', fontsize=15)
-ax[1].set_title(r'Auto-correlation with $\left( N = {}, \delta\omega_{{b}} = {}, \kappa_{{b}} = {} \gamma, \omega_{{0}}^{{(b)}} = {} \gamma \right)$'.format(N, dwb, kappab, w0b), fontsize=15)
-ax[1].legend(loc='best', fontsize=15)
+# ax[1].set_ylabel(r'$g^{(2)}_{\mathrm{Cross}}(\tau)$', fontsize=12)
+# ax[1].set_xlabel(r'$\gamma \tau$', fontsize=15)
+# ax[1].set_title(r'Auto-correlation with $\left( N = {}, \delta\omega_{{b}} = {}, \kappa_{{b}} = {} \gamma, \omega_{{0}}^{{(b)}} = {} \gamma \right)$'.format(N, dwb, kappab, w0b), fontsize=15)
+# ax[1].legend(loc='best', fontsize=15)
 
-fig.suptitle(r'Auto- and Cross-Correlations with $\Omega = {} \gamma$'.format(Omega), fontsize=15)
-fig.tight_layout()
-fig.show()
+# fig.suptitle(r'Auto- and Cross-Correlations with $\Omega = {} \gamma$'.format(Omega), fontsize=15)
+# fig.tight_layout()
+# fig.show()
 
 #-----------------------------------------------------------------------------#
 #                          PLOT CROSS g^{(2)} COMPARE                         #
@@ -114,6 +129,24 @@ fig.show()
 # plt.xlabel(r'$\gamma \tau$', fontsize=12)
 # plt.ylabel(r'$g^{(2)}_{\mathrm{cross}}(\tau)$', fontsize=12)
 # plt.title(r'Comparing Program Versions', fontsize=12)
+
+# plt.tight_layout()
+# plt.show()
+
+#-----------------------------------------------------------------------------#
+#                        PLOT TWO-SIDED CROSS g^{(2)}                         #
+#-----------------------------------------------------------------------------#
+# # Flip and combine the cross-correlation data
+# corr_two_sided = np.concatenate((np.flip(corr_cross[1:]), corr_cross))
+# tau_two_sided = np.concatenate((-np.flip(tau[1:]), tau))
+
+# # Plot
+# plt.figure(figsize=[8, 6])
+# plt.plot(tau_two_sided, corr_two_sided)
+
+# plt.xlabel(r'$\gamma \tau$', fontsize=12)
+# plt.ylabel(r'$g^{(2)}_{\mathrm{cross}}(\tau)$', fontsize=12)
+# # plt.title(r'Comparing Program Versions', fontsize=12)
 
 # plt.tight_layout()
 # plt.show()

@@ -20,17 +20,17 @@
   w0a = 15.707963267948966d0
   ! w0a = 0.0d0
   ! Linewidth of cavity mode a [Default = 0.001]
-  kappaa = 2.0d0
+  kappaa = 1.0d0
   ! Frequency spacing of modes for cavity a [Default = 1.0]
   dwa = 0.4d0
 /
 
 &CAVITYB
   ! Central resonance frequency of cavity b [Default = 0.0]
-  ! w0b = -15.707963267948966d0
-  w0b = 0.0d0
+  w0b = -15.707963267948966d0
+  ! w0b = 0.0d0
   ! Linewidth of cavity mode b [Default = 0.001]
-  kappab = 2.0d0
+  kappab = 1.0d0
   ! Frequency spacing of modes for cavity b [Default = 1.0]
   dwb = 0.4d0
 /

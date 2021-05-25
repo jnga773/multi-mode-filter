@@ -34,19 +34,6 @@
 
 PROGRAM TWO_LEVEL_ATOM_MULTI_MODE_FILTER_MOMENTS_INITIAL_CROSS_G2
 
-! Import the MKL Library LAPACK95, from which the eigenvalue/eigenvector and
-! matrix inversion subroutines come from.
-! MUST INCLUDE THE -mkl OR /Qmkl FLAG AS A COMPILER OPTION IF USING INTEL.
-! Otherwise you'll have to link it yourself and I don't know how to do that :)
-
-USE LAPACK95
-
-! The subroutines used from LAPACK are:
-! - zGETRF - Calculates LU-factorisation of a complexmatrix so it can be
-!            inverted by...,
-! - zGETRI - Calculates the inverse of a complex matrix,
-! - zGEEV  - Calculates the eigenvalues and eigevectors of a complex matrix.
-
 !==============================================================================!
 !                    DEFINING AND DECLARING VARIABLES/ARRAYS                   !
 !==============================================================================!
@@ -87,11 +74,13 @@ REAL(KIND=8), DIMENSION(2)                             :: kappa, w0, dw
 ! Number of scans either side of centre
 INTEGER                                                :: no_scans
 ! List of central frequencies
-REAL(KIND=8), DIMENSION(:), ALLOCATABLE                :: w0l
+REAL(KIND=8), DIMENSION(:, :), ALLOCATABLE             :: w0l
 ! Scanning integer
 INTEGER                                                :: scana, scanb
 ! Max/min value of D0a [Default = 30.0]
 REAL(KIND=8)                                           :: scan_max
+! Centre of scan list
+REAL(KIND=8)                                           :: scan_centre
 ! Scan step size [Default = 0.5]
 REAL(KIND=8)                                           :: scan_step
 
@@ -170,6 +159,18 @@ COMPLEX(KIND=8)                                        :: moment_out, moment_out
 ! Matrix of correlation values
 REAL(KIND=8), DIMENSION(:, :), ALLOCATABLE             :: corr_matrix
 
+! Run-time percentage printing
+! Print completion time check
+LOGICAL, PARAMETER                                     :: progress_bar = .TRUE.
+! Runtime variables
+REAL(KIND=8)                                           :: loop_start_time, loop_check_time
+REAL(KIND=8)                                           :: loop_run_time, loop_remaining_time
+! Ten percent of time steps for loop
+INTEGER                                                :: ten_percent
+! Percentage of time steps completed
+INTEGER                                                :: percentage
+CHARACTER(LEN=28), PARAMETER                           :: FMT_ss = "(T2,I3,A13,F9.2,A19,F9.2,A1)"
+
 !--------------------------!
 !     SUBROUTINE STUFF     !
 !--------------------------!
@@ -213,8 +214,7 @@ NAMELIST /ATOM/ Gamma, Omega
 NAMELIST /FILTER/ epsilon, N, phase
 NAMELIST /CAVITYA/ kappaa, w0a, dwa
 NAMELIST /CAVITYB/ kappab, w0b, dwb
-NAMELIST /SCANLIST/ scan_max, scan_step
-! NAMELIST /TIME/ dt, t_max, tau1_max, tau2_max
+NAMELIST /SCANLIST/ scan_max, scan_centre, scan_step
 
 ! Call start time from CPU_TIME
 CALL CPU_TIME(start_time)
@@ -267,19 +267,6 @@ IF (ISTAT .NE. 0) THEN
   PRINT *, "Invalid line in SCANLIST namelist: " // TRIM(line)
   CALL EXIT(1)
 END IF
-
-! READ(IUNIT, NML=TIME, IOSTAT=ISTAT)
-! IF (ISTAT .NE. 0) THEN
-!   BACKSPACE(IUNIT)
-!   READ(IUNIT, FMT='(A)') LINE
-!   CLOSE(IUNIT)
-!   PRINT *, "Invalid line in TIME namelist: " // TRIM(line)
-!   CALL EXIT(1)
-! END IF
-! CLOSE(IUNIT)
-
-! Number of time-steps
-! t_steps = NINT(t_max / dt)
 
 ! Set system parameters
 kappa(a) = kappaa; kappa(b) = kappab
@@ -350,10 +337,11 @@ DO j = -N, N
 END DO
 
 ! Allocate central frequency list
-ALLOCATE(w0l(-no_scans:no_scans))
+ALLOCATE(w0l(-no_scans:no_scans, 2))
 w0l = 0.0d0
 DO scana = -no_scans, no_scans
-  w0l(scana) = 0.0d0 + DBLE(scana) * scan_step
+  w0l(scana, a) = scan_centre + DBLE(scana) * scan_step
+  w0l(scana, b) = w0(b) + DBLE(scana) * scan_step
 END DO
 
 ! Allocate data matrix
@@ -381,13 +369,6 @@ ALLOCATE(cavsig4_ss(-N:N, -N:N, -N:N, 4, N_mat)); cavsig4_ss = 0.0d0
 ! Fourth-order: Cavity
 ALLOCATE(cav4_ss(-N:N, -N:N, -N:N, -N:N)); cav4_ss = 0.0d0
 
-! !----------------------------!
-! !     INITIAL CONDITIONS     !
-! !----------------------------!
-! sigma = 0.0d0
-! ! Atom in ground state, cjity in vacuum.
-! sigma(sz) = -1.0d0
-
 !==============================================================================!
 !                           WRITE PARAMETERS TO FILE                           !
 !==============================================================================!
@@ -398,10 +379,10 @@ OPEN(UNIT=1, FILE=filename_parameters, STATUS='REPLACE', ACTION='WRITE')
 WRITE(1,*) "Parameters are in the following order:"
 WRITE(1,"(A10,F25.15)") "Gamma =", Gamma
 WRITE(1,"(A10,F25.15)") "Omega =", Omega
-WRITE(1,"(A10,F25.15)") "w0a =", w0a
+! WRITE(1,"(A10,F25.15)") "w0a =", w0a
 WRITE(1,"(A10,F25.15)") "kappaa =", kappaa
 WRITE(1,"(A11,F25.15)") "dwa = ", dwa
-WRITE(1,"(A10,F25.15)") "w0b =", w0b
+! WRITE(1,"(A10,F25.15)") "w0b =", w0b
 WRITE(1,"(A10,F25.15)") "kappab =", kappab
 WRITE(1,"(A11,F25.15)") "dwb = ", dwb
 WRITE(1,"(A10,F25.15)") "epsilon =", epsilon
@@ -417,6 +398,11 @@ CLOSE(1)
 !==============================================================================!
 ! Cycle through each different \omega_{0} value and calculate steady states
 
+! Ten percent of time steps
+ten_percent = NINT((DBLE(SIZE(w0l, a)) / 10.0d0))
+! Call CPU clock time
+CALL CPU_TIME(loop_start_time)
+
 ! Open file to write time and data to
 OPEN(UNIT=2, FILE=filename_w0, STATUS='REPLACE', ACTION='WRITE', RECL=4000)
 OPEN(UNIT=3, FILE=filename_cross_corr, STATUS='REPLACE', ACTION='WRITE', RECL=16000)
@@ -426,23 +412,8 @@ OPEN(UNIT=3, FILE=filename_cross_corr, STATUS='REPLACE', ACTION='WRITE', RECL=16
 !---------------------------!
 ! Set matrix to be inverted
 Mat_inv = Mat_OG
-
-! Perform LU-factorization of matrix
-CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-IF (INFO .NE. 0) THEN
-  PRINT*, "zGETRF M failed :( INFO = ", INFO
-  STOP
-END IF
-
-! Query optimal work space
-! LWORK = -1
-! CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
-! ! Set optimal work space and run again
-! LWORK = MIN(LWMAX, INT(WORK(1)))
-
-! Invert Matrix (Optimal LWORK = 3)
-LWORK = 3
-CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+! Invert matrix
+CALL SquareMatrixInverse(N_mat, Mat_inv)
 
 ! Calculate steady states
 sigma_ss = 0.0d0
@@ -452,8 +423,8 @@ sigma_ss = -MATMUL(Mat_inv, B_OG)
 DO scana = -no_scans, no_scans
   DO scanb = -no_scans, no_scans
     ! Set central resonance frequency
-    w0a = w0l(scana)
-    w0b = w0l(scanb)
+    w0a = w0l(scana, a)
+    w0b = w0l(scanb, b)
     ! Initialise mode resonance frequency list
     wl = 0.0d0
     DO j = -N, N
@@ -521,11 +492,8 @@ DO scana = -no_scans, no_scans
 
       ! Set inverse matrix
       Mat_inv = Mat
-      ! Perform LU-factorization of matrix
-      CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-      ! Invert Matrix (Optimal LWORK = 3)
-      LWORK = 3
-      CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+      ! Invert matrix
+      CALL SquareMatrixInverse(N_mat, Mat_inv)
 
       ! Calculate steady state
       cavsig2_ss(j, a, :) = -MATMUL(Mat_inv, B_vec)
@@ -548,11 +516,8 @@ DO scana = -no_scans, no_scans
 
       ! Set inverse matrix
       Mat_inv = Mat
-      ! Perform LU-factorization of matrix
-      CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-      ! Invert Matrix (Optimal LWORK = 3)
-      LWORK = 3
-      CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+      ! Invert matrix
+      CALL SquareMatrixInverse(N_mat, Mat_inv)
 
       ! Calculate steady state
       cavsig2_ss(j, at, :) = -MATMUL(Mat_inv, B_vec)
@@ -575,11 +540,8 @@ DO scana = -no_scans, no_scans
 
       ! Set inverse matrix
       Mat_inv = Mat
-      ! Perform LU-factorization of matrix
-      CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-      ! Invert Matrix (Optimal LWORK = 3)
-      LWORK = 3
-      CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+      ! Invert matrix
+      CALL SquareMatrixInverse(N_mat, Mat_inv)
 
       ! Calculate steady state
       cavsig2b_ss(j, b, :) = -MATMUL(Mat_inv, B_vec)
@@ -602,11 +564,8 @@ DO scana = -no_scans, no_scans
 
       ! Set inverse matrix
       Mat_inv = Mat
-      ! Perform LU-factorization of matrix
-      CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-      ! Invert Matrix (Optimal LWORK = 3)
-      LWORK = 3
-      CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+      ! Invert matrix
+      CALL SquareMatrixInverse(N_mat, Mat_inv)
 
       ! Calculate steady state
       cavsig2b_ss(j, bt, :) = -MATMUL(Mat_inv, B_vec)
@@ -698,11 +657,8 @@ DO scana = -no_scans, no_scans
 
         ! Set inverse matrix
         Mat_inv = Mat
-        ! Perform LU-factorization of matrix
-        CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-        ! Invert Matrix (Optimal LWORK = 3)
-        LWORK = 3
-        CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+        ! Invert matrix
+        CALL SquareMatrixInverse(N_mat, Mat_inv)
 
         ! Calculate steady state
         cavsig3_ss(j, k, ab, :) = -MATMUL(Mat_inv, B_vec)
@@ -729,11 +685,8 @@ DO scana = -no_scans, no_scans
 
         ! Set inverse matrix
         Mat_inv = Mat
-        ! Perform LU-factorization of matrix
-        CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-        ! Invert Matrix (Optimal LWORK = 3)
-        LWORK = 3
-        CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+        ! Invert matrix
+        CALL SquareMatrixInverse(N_mat, Mat_inv)
 
         ! Calculate steady state
         cavsig3_ss(j, k, atbt, :) = -MATMUL(Mat_inv, B_vec)
@@ -759,11 +712,8 @@ DO scana = -no_scans, no_scans
 
         ! Set inverse matrix
         Mat_inv = Mat
-        ! Perform LU-factorization of matrix
-        CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-        ! Invert Matrix (Optimal LWORK = 3)
-        LWORK = 3
-        CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+        ! Invert matrix
+        CALL SquareMatrixInverse(N_mat, Mat_inv)
 
         ! Calculate steady state
         cavsig3_ss(j, k, ata, :) = -MATMUL(Mat_inv, B_vec)
@@ -789,11 +739,8 @@ DO scana = -no_scans, no_scans
 
         ! Set inverse matrix
         Mat_inv = Mat
-        ! Perform LU-factorization of matrix
-        CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-        ! Invert Matrix (Optimal LWORK = 3)
-        LWORK = 3
-        CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+        ! Invert matrix
+        CALL SquareMatrixInverse(N_mat, Mat_inv)
 
         ! Calculate steady state
         cavsig3_ss(j, k, btb, :) = -MATMUL(Mat_inv, B_vec)
@@ -819,11 +766,8 @@ DO scana = -no_scans, no_scans
 
         ! Set inverse matrix
         Mat_inv = Mat
-        ! Perform LU-factorization of matrix
-        CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-        ! Invert Matrix (Optimal LWORK = 3)
-        LWORK = 3
-        CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+        ! Invert matrix
+        CALL SquareMatrixInverse(N_mat, Mat_inv)
 
         ! Calculate steady state
         cavsig3_ss(j, k, atb, :) = -MATMUL(Mat_inv, B_vec)
@@ -849,11 +793,8 @@ DO scana = -no_scans, no_scans
 
         ! Set inverse matrix
         Mat_inv = Mat
-        ! Perform LU-factorization of matrix
-        CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-        ! Invert Matrix (Optimal LWORK = 3)
-        LWORK = 3
-        CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+        ! Invert matrix
+        CALL SquareMatrixInverse(N_mat, Mat_inv)
 
         ! Calculate steady state
         cavsig3_ss(j, k, bta, :) = -MATMUL(Mat_inv, B_vec)
@@ -937,11 +878,8 @@ DO scana = -no_scans, no_scans
 
           ! Set inverse matrix
           Mat_inv = Mat
-          ! Perform LU-factorization of matrix
-          CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-          ! Invert Matrix (Optimal LWORK = 3)
-          LWORK = 3
-          CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+          ! Invert matrix
+          CALL SquareMatrixInverse(N_mat, Mat_inv)
 
           ! Calculate steady state
           cavsig4_ss(j, k, l, atab, :) = -MATMUL(Mat_inv, B_vec)
@@ -970,11 +908,8 @@ DO scana = -no_scans, no_scans
 
           ! Set inverse matrix
           Mat_inv = Mat
-          ! Perform LU-factorization of matrix
-          CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-          ! Invert Matrix (Optimal LWORK = 3)
-          LWORK = 3
-          CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+          ! Invert matrix
+          CALL SquareMatrixInverse(N_mat, Mat_inv)
 
           ! Calculate steady state
           cavsig4_ss(j, k, l, btba, :) = -MATMUL(Mat_inv, B_vec)
@@ -1003,11 +938,8 @@ DO scana = -no_scans, no_scans
 
           ! Set inverse matrix
           Mat_inv = Mat
-          ! Perform LU-factorization of matrix
-          CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-          ! Invert Matrix (Optimal LWORK = 3)
-          LWORK = 3
-          CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+          ! Invert matrix
+          CALL SquareMatrixInverse(N_mat, Mat_inv)
 
           ! Calculate steady state
           cavsig4_ss(j, k, l, btata, :) = -MATMUL(Mat_inv, B_vec)
@@ -1036,11 +968,8 @@ DO scana = -no_scans, no_scans
 
           ! Set inverse matrix
           Mat_inv = Mat
-          ! Perform LU-factorization of matrix
-          CALL zGETRF(N_mat, N_mat, Mat_inv, N_mat, IPIV, INFO)
-          ! Invert Matrix (Optimal LWORK = 3)
-          LWORK = 3
-          CALL zGETRI(N_mat, Mat_inv, N_mat, IPIV, WORK, LWORK, INFO)
+          ! Invert matrix
+          CALL SquareMatrixInverse(N_mat, Mat_inv)
 
           ! Calculate steady state
           cavsig4_ss(j, k, l, atbtb, :) = -MATMUL(Mat_inv, B_vec)
@@ -1094,10 +1023,22 @@ DO scana = -no_scans, no_scans
   !     WRITE DATA TO FILES     !
   !-----------------------------!
   ! Write \omega_{0} values
-  WRITE(2, *) w0l(scana)
+  WRITE(2, *) w0l(scana, a), w0l(scana, b)
   ! Write correlation data
   ! WRITE(3, *) corr_matrix(:, scana)
   WRITE(3, *) corr_matrix(scana, :)
+
+  ! Check percentage
+  IF (progress_bar .EQV. .TRUE.) THEN
+    IF (MOD(scana, ten_percent) == 0 .AND. scana /= -no_scans) THEN
+      CALL CPU_TIME(loop_check_time)
+      percentage = NINT((100.0d0 * DBLE(scana + no_scans)) / (0.5d0 * DBLE(SIZE(w0l))))
+      loop_run_time = loop_check_time - loop_start_time
+      loop_remaining_time = ((100.0d0 * (loop_check_time - loop_start_time)) / (1.0d0 * percentage)) - loop_run_time
+      WRITE(*, FMT_ss) percentage, "%. Run time: ", loop_run_time, "s. Est. time left: ", &
+                     & loop_remaining_time, "s"
+    END IF
+  END IF
 
   ! Close scana loop
 END DO
@@ -1115,3 +1056,70 @@ CALL CPU_TIME(end_time)
 PRINT*, "Runtime: ", end_time - start_time, "seconds"
 
 END PROGRAM TWO_LEVEL_ATOM_MULTI_MODE_FILTER_MOMENTS_INITIAL_CROSS_G2
+
+! Subroutine to calculate the inverse of a matrix USING LAPACK LIBRARY
+SUBROUTINE SquareMatrixInverse(N_in, MatrixInv_out)
+  ! Import the MKL Library LAPACK95, from which the eigenvalue/eigenvector and
+  ! matrix inversion subroutines come from.
+  ! MUST INCLUDE THE -mkl OR /Qmkl FLAG AS A COMPILER OPTION IF USING INTEL.
+  ! Otherwise you'll have to link it yourself and I don't know how to do that :)
+
+  USE LAPACK95
+
+  ! The subroutines used from LAPACK are:
+  ! - zGETRF - Calculates LU-factorisation of a complexmatrix so it can be
+  !            inverted by...,
+  ! - zGETRI - Calculates the inverse of a complex matrix.
+
+  IMPLICIT NONE
+
+  !-------------------------!
+  !     INPUT ARGUMENTS     !
+  !-------------------------!
+  ! Dimension of matrix (N_in x N_in)
+  INTEGER, INTENT(IN)                                   :: N_in
+
+  !--------------------------!
+  !     OUTPUT ARGUMENTS     !
+  !--------------------------!
+  ! Inverted matrix to be output
+  COMPLEX(KIND=8), DIMENSION(N_in, N_in), INTENT(INOUT) :: MatrixInv_out
+
+  !--------------------------!
+  !     SUBROUTINE STUFF     !
+  !--------------------------!
+  ! Work space dimension
+  INTEGER, PARAMETER                                    :: LWMAX = 300
+  INTEGER                                               :: LWORK
+  ! Work space array
+  COMPLEX(KIND=8), DIMENSION(LWMAX)                     :: WORK
+  REAL(KIND=8), DIMENSION(2*N_in)                       :: RWORK
+  ! LU-factorisation array
+  INTEGER, DIMENSION(N_in)                              :: IPIV
+  ! Info IO
+  INTEGER                                               :: INFO
+
+  ! Perform LU-factorization of matrix
+  CALL zGETRF(N_in, N_in, MatrixInv_out, N_in, IPIV, INFO)
+  IF (INFO .NE. 0) THEN
+    PRINT*, "zGETRF M failed :( INFO = ", INFO
+    STOP
+  END IF
+
+  ! Query optimal work space
+  ! LWORK = -1
+  ! CALL zGETRI(N_in, MatrixInv_out, N_in, IPIV, WORK, LWORK, INFO)
+  ! ! Set optimal work space and run again
+  ! LWORK = MIN(LWMAX, INT(WORK(1)))
+
+  ! Set optimal LWORK for N_in = 3 or N_in = 8
+  IF (N_in .EQ. 3) THEN
+    LWORK = 3
+  ELSE IF (N_in .EQ. 8) THEN
+    LWORK = 8
+  END IF
+
+  CALL zGETRI(N_in, MatrixInv_out, N_in, IPIV, WORK, LWORK, INFO)
+
+  ! End of subroutine
+END SUBROUTINE SquareMatrixInverse

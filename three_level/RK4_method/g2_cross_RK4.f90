@@ -115,26 +115,19 @@ COMPLEX(KIND=8), DIMENSION(:, :, :), ALLOCATABLE       :: k1_cav2, k2_cav2, k3_c
 ! First-order moments: Atomic equations (< \sigma >)
 COMPLEX(KIND=8), DIMENSION(N_mat)                      :: sigma_ss
 ! First-order moments: Cavity (< a >, < a^{\dagger} >)
-! COMPLEX(KIND=8), DIMENSION(:, :), ALLOCATABLE          :: cav1a_ss, cav1b_ss
-COMPLEX(KIND=8), DIMENSION(:, :, :), ALLOCATABLE       :: cav1_ss
+COMPLEX(KIND=8), DIMENSION(:, :), ALLOCATABLE          :: cav1a_ss, cav1b_ss
 ! Second-order moments: Cavity and atom (< a \sigma >, < a^{\dagger} \sigma >
-! COMPLEX(KIND=8), DIMENSION(:, :, :), ALLOCATABLE       :: cavsig2a_ss, cavsig2b_ss
-COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: cavsig2_ss
+COMPLEX(KIND=8), DIMENSION(:, :, :), ALLOCATABLE       :: cavsig2a_ss, cavsig2b_ss
 ! Second-order moments: Cavity (< a^{\dagger} a >)
-! COMPLEX(KIND=8), DIMENSION(:, :, :), ALLOCATABLE       :: cav2_ss
-COMPLEX(KIND=8), DIMENSION(:, :, :, :, :), ALLOCATABLE :: cav2_ss
+COMPLEX(KIND=8), DIMENSION(:, :, :), ALLOCATABLE       :: cav2_ss
 ! Third-order moments: Cavity and atom (< a^{2} \sigma >, < a^{\dagger 2} \sigma >, < a^{\dagger} a \sigma >)
-! COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: cavsig3_ss
-COMPLEX(KIND=8), DIMENSION(:, :, :, :, :, :), ALLOCATABLE :: cavsig3_ss
+COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: cavsig3_ss
 ! Third-order moments: Cavity (< a^{2} a^{\dagger} >, < a^{\dagger 2} a >)
-! COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: cav3_ss
-COMPLEX(KIND=8), DIMENSION(:, :, :, :, :, :, :), ALLOCATABLE :: cav3_ss
+COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: cav3_ss
 ! Fourth-order moments: Cavity and atom ( < a^{\dagger} a^{2} \sigma >, < a^{\dagger 2} a \sigma >)
-! COMPLEX(KIND=8), DIMENSION(:, :, :, :, :), ALLOCATABLE :: cavsig4_ss
-COMPLEX(KIND=8), DIMENSION(:, :, :, :, :, :, :, :), ALLOCATABLE :: cavsig4_ss
+COMPLEX(KIND=8), DIMENSION(:, :, :, :, :), ALLOCATABLE :: cavsig4_ss
 ! Fourth-order moments: Cavity (< a^{\dagger 2} a^{2} >)
 COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: cav4_ss
-! COMPLEX(KIND=8), DIMENSION(:, :, :, :, :, :, :, :), ALLOCATABLE :: cav4_ss
 
 ! Integer indices for sigma operators
 INTEGER, PARAMETER                                     :: gg = 1, ge = 2, eg = 3
@@ -339,11 +332,13 @@ DO j = -N, N
     ! Cavity A
     wl(j, a) = w0a + DBLE(j) * dwa
     ! Mode dependent phase difference
-    gkl(j, a) = DSQRT((0.5d0 * epsilon / DBLE(2*N + 1)) * Gamma * kappaa) * blackman * EXP(i * DBLE(phase) * DBLE(j) * pi / DBLE(N))
+    gkl(j, a) = DSQRT((0.5d0 * epsilon / DBLE(2*N + 1)) * Gamma * kappaa) * &
+              & blackman * EXP(i * DBLE(phase) * DBLE(j) * pi / DBLE(N))
     ! Cavity B
     wl(j, b) = w0b + DBLE(j) * dwb
     ! Mode dependent phase difference
-    gkl(j, b) = DSQRT((0.5d0 * epsilon / DBLE(2*N + 1)) * Gamma * kappab) * blackman * EXP(i * DBLE(phase) * DBLE(j) * pi / DBLE(N))
+    gkl(j, b) = DSQRT((0.5d0 * epsilon / DBLE(2*N + 1)) * Gamma * kappab) * &
+              & blackman * EXP(i * DBLE(phase) * DBLE(j) * pi / DBLE(N))
   END IF
 END DO
 
@@ -372,35 +367,21 @@ ALLOCATE(k4_cav2(-N:N, -N:N, 3)); k4_cav2 = 0.0d0
 
 ! Steady states
 ! First-order: Cavity
-! ALLOCATE(cav1a_ss(-N:N, 2)); cav1a_ss = 0.0d0
-! ALLOCATE(cav1b_ss(-N:N, 2)); cav1b_ss = 0.0d0
-ALLOCATE(cav1_ss(-N:N, 2, 2)); cav1_ss = 0.0d0
+ALLOCATE(cav1a_ss(-N:N, 2)); cav1a_ss = 0.0d0
+ALLOCATE(cav1b_ss(-N:N, 2)); cav1b_ss = 0.0d0
 ! Second-order: Cavity and Atom
-! ALLOCATE(cavsig2a_ss(-N:N, 2, N_mat)); cavsig2a_ss = 0.0d0
-! ALLOCATE(cavsig2b_ss(-N:N, 2, N_mat)); cavsig2b_ss = 0.0d0
-ALLOCATE(cavsig2_ss(-N:N, 2, N_mat, 2)); cavsig2_ss = 0.0d0
+ALLOCATE(cavsig2a_ss(-N:N, 2, N_mat)); cavsig2a_ss = 0.0d0
+ALLOCATE(cavsig2b_ss(-N:N, 2, N_mat)); cavsig2b_ss = 0.0d0
 ! Second-order: Cavity
-! ALLOCATE(cav2_ss(-N:N, -N:N, 6)); cav2_ss = 0.0d0
-ALLOCATE(cav2_ss(-N:N, -N:N, 3, 2, 2)); cav2_ss = 0.0d0
+ALLOCATE(cav2_ss(-N:N, -N:N, 6)); cav2_ss = 0.0d0
 ! Third-order: Cavity and Atom
-! ALLOCATE(cavsig3_ss(-N:N, -N:N, 6, N_mat)); cavsig3_ss = 0.0d0
-ALLOCATE(cavsig3_ss(-N:N, -N:N, 3, N_mat, 2, 2)); cavsig3_ss = 0.0d0
+ALLOCATE(cavsig3_ss(-N:N, -N:N, 6, N_mat)); cavsig3_ss = 0.0d0
 ! Third-order: Cavity
-! ALLOCATE(cav3_ss(-N:N, -N:N, -N:N, 4)); cav3_ss = 0.0d0
-ALLOCATE(cav3_ss(-N:N, -N:N, -N:N, 2, 2, 2, 2)); cav3_ss = 0.0d0
+ALLOCATE(cav3_ss(-N:N, -N:N, -N:N, 4)); cav3_ss = 0.0d0
 ! Fourth-order: Cavity and atom
-! ALLOCATE(cavsig4_ss(-N:N, -N:N, -N:N, 4, N_mat)); cavsig4_ss = 0.0d0
-ALLOCATE(cavsig4_ss(-N:N, -N:N, -N:N, 2, N_mat, 2, 2, 2)); cavsig4_ss = 0.0d0
+ALLOCATE(cavsig4_ss(-N:N, -N:N, -N:N, 4, N_mat)); cavsig4_ss = 0.0d0
 ! Fourth-order: Cavity
 ALLOCATE(cav4_ss(-N:N, -N:N, -N:N, -N:N)); cav4_ss = 0.0d0
-! ALLOCATE(cav4_ss(-N:N, -N:N, -N:N, -N:N, 2, 2, 2, 2)); cav4_ss = 0.0d0
-
-!----------------------------!
-!     INITIAL CONDITIONS     !
-!----------------------------!
-! sigma = 0.0d0
-! ! Atom in ground state, cavity in vacuum.
-! sigma(sz) = -1.0d0
 
 !==============================================================================!
 !                           WRITE PARAMETERS TO FILE                           !
@@ -459,55 +440,286 @@ ELSE IF (xi .EQ. 0.0d0) THEN
   sigma_ss = sigma_ss / (REAL(sigma_ss(1)) + REAL(sigma_ss(4)))
 END IF
 
-! Cycle through cavity operators
-DO cj = 1, 2
-  ! Cycle through modes
+! Cycle through modes
+DO j = -N, N
+  !-----------------------------!
+  !     FIRST-ORDER: CAVITY     !
+  !-----------------------------!
+  !-----------!
+  ! < a_{j} > !
+  !-----------!
+  cav1a_ss(j, a) = -gkl(j, a) * sigma_ss(ge) + &
+                 & -gkl(j, a) * xi * sigma_ss(ef)
+  cav1a_ss(j, a) = cav1a_ss(j, a) / &
+                 & (kappa(a) + i * wl(j, a))
+
+  !---------------------!
+  ! < a^{\dagger}_{j} > !
+  !---------------------!
+  cav1a_ss(j, at) = -CONJG(gkl(j, a)) * sigma_ss(eg) + &
+                  & -CONJG(gkl(j, a)) * xi * sigma_ss(fe)
+  cav1a_ss(j, at) = cav1a_ss(j, at) / &
+                  & (kappa(a) - i * wl(j, a))
+
+  !-----------!
+  ! < b_{j} > !
+  !-----------!
+  cav1b_ss(j, b) = -gkl(j, b) * sigma_ss(ge) + &
+                 & -gkl(j, b) * xi * sigma_ss(ef)
+  cav1b_ss(j, b) = cav1b_ss(j, b) / &
+                 & (kappa(b) + i * wl(j, b))
+
+  !---------------------!
+  ! < b^{\dagger}_{j} > !
+  !---------------------!
+  cav1b_ss(j, bt) = -CONJG(gkl(j, b)) * sigma_ss(eg) + &
+                  & -CONJG(gkl(j, b)) * xi * sigma_ss(fe)
+  cav1b_ss(j, bt) = cav1b_ss(j, bt) / &
+                  & (kappa(b) - i * wl(j, b))
+
+  !---------------------------------------!
+  !     SECOND-ORDER: CAVITY AND ATOM     !
+  !---------------------------------------!
+  !------------------!
+  ! < a_{j} \sigma > !
+  !------------------!
+  ! Set the diagonal matrix elements for M
+  Mat = Mat_OG
+  DO x = 1, N_mat
+    Mat(x, x) = Mat(x, x) - (kappa(a) + i * wl(j, a))
+  END DO
+
+  ! Set the non-homogeneous vector
+  B_vec = 0.0d0
+  B_vec(1) = -gkl(j, a) * sigma_ss(ge)
+  B_vec(2) = -gkl(j, a) * xi * sigma_ss(gf)
+  B_vec(3) = -gkl(j, a) * sigma_ss(ee)
+  B_vec(4) = Gamma * (xi ** 2) * cav1a_ss(j, a) + &
+           & -gkl(j, a) * xi * sigma_ss(ef)
+  B_vec(5) = i * xi * 0.5d0 * Omega * cav1a_ss(j, a)
+  B_vec(6) = -i * xi * 0.5d0 * Omega * cav1a_ss(j, a) + &
+           & gkl(j, a) * xi * sigma_ss(gg) + &
+           & gkl(j, a) * xi * sigma_ss(ee) + &
+           & -gkl(j, a) * xi
+  B_vec(7) = 0.0d0
+  B_vec(8) = -gkl(j, a) * sigma_ss(fe)
+
+  ! Set inverse matrix
+  Mat_inv = Mat
+  ! Invert matrix
+  CALL SquareMatrixInverse(N_mat, Mat_inv)
+
+  ! Calculate steady state
+  cavsig2a_ss(j, a, :) = -MATMUL(Mat_inv, B_vec)
+
+  !----------------------------!
+  ! < a^{\dagger}_{j} \sigma > !
+  !----------------------------!
+  ! Set the diagonal matrix elements for M
+  Mat = Mat_OG
+  DO x = 1, N_mat
+    Mat(x, x) = Mat(x, x) - (kappa(a) - i * wl(j, a))
+  END DO
+
+  ! Set the non-homogeneous vector
+  B_vec = 0.0d0
+  B_vec(1) = -CONJG(gkl(j, a)) * sigma_ss(eg)
+  B_vec(2) = -CONJG(gkl(j, a)) * sigma_ss(ee)
+  B_vec(3) = -CONJG(gkl(j, a)) * xi * sigma_ss(fg)
+  B_vec(4) = Gamma * (xi ** 2) * cav1a_ss(j, at) + &
+           & -CONJG(gkl(j, a)) * xi * sigma_ss(fe)
+  B_vec(5) = i * xi * 0.5d0 * Omega * cav1a_ss(j, at) + &
+           & CONJG(gkl(j, a)) * xi * sigma_ss(gg) + &
+           & CONJG(gkl(j, a)) * xi * sigma_ss(ee) + &
+           & -CONJG(gkl(j, a)) * xi
+  B_vec(6) = -i * xi * 0.5d0 * Omega * cav1a_ss(j, at)
+  B_vec(7) = -CONJG(gkl(j, a)) * sigma_ss(ef)
+  B_vec(8) = 0.0d0
+
+  ! Set inverse matrix
+  Mat_inv = Mat
+  ! Invert matrix
+  CALL SquareMatrixInverse(N_mat, Mat_inv)
+
+  ! Calculate steady state
+  cavsig2a_ss(j, at, :) = -MATMUL(Mat_inv, B_vec)
+
+  !------------------!
+  ! < b_{j} \sigma > !
+  !------------------!
+  ! Set the diagonal matrix elements for M
+  Mat = Mat_OG
+  DO x = 1, N_mat
+    Mat(x, x) = Mat(x, x) - (kappa(b) + i * wl(j, b))
+  END DO
+
+  ! Set the non-homogeneous vector
+  B_vec = 0.0d0
+  B_vec(1) = -gkl(j, b) * sigma_ss(ge)
+  B_vec(2) = -gkl(j, b) * xi * sigma_ss(gf)
+  B_vec(3) = -gkl(j, b) * sigma_ss(ee)
+  B_vec(4) = Gamma * (xi ** 2) * cav1b_ss(j, b) + &
+           & -gkl(j, b) * xi * sigma_ss(ef)
+  B_vec(5) = i * xi * 0.5d0 * Omega * cav1b_ss(j, b)
+  B_vec(6) = -i * xi * 0.5d0 * Omega * cav1b_ss(j, b) + &
+           & gkl(j, b) * xi * sigma_ss(gg) + &
+           & gkl(j, b) * xi * sigma_ss(ee) + &
+           & -gkl(j, b) * xi
+  B_vec(7) = 0.0d0
+  B_vec(8) = -gkl(j, b) * sigma_ss(fe)
+
+  ! Set inverse matrix
+  Mat_inv = Mat
+  ! Invert matrix
+  CALL SquareMatrixInverse(N_mat, Mat_inv)
+
+  ! Calculate steady state
+  cavsig2b_ss(j, b, :) = -MATMUL(Mat_inv, B_vec)
+
+  !----------------------------!
+  ! < b^{\dagger}_{j} \sigma > !
+  !----------------------------!
+  ! Set the diagonal matrix elements for M
+  Mat = Mat_OG
+  DO x = 1, N_mat
+    Mat(x, x) = Mat(x, x) - (kappa(b) - i * wl(j, b))
+  END DO
+
+  ! Set the non-homogeneous vector
+  B_vec = 0.0d0
+  B_vec(1) = -CONJG(gkl(j, b)) * sigma_ss(eg)
+  B_vec(2) = -CONJG(gkl(j, b)) * sigma_ss(ee)
+  B_vec(3) = -CONJG(gkl(j, b)) * xi * sigma_ss(fg)
+  B_vec(4) = Gamma * (xi ** 2) * cav1b_ss(j, bt) + &
+           & -CONJG(gkl(j, b)) * xi * sigma_ss(fe)
+  B_vec(5) = i * xi * 0.5d0 * Omega * cav1b_ss(j, bt) + &
+           & CONJG(gkl(j, b)) * xi * sigma_ss(gg) + &
+           & CONJG(gkl(j, b)) * xi * sigma_ss(ee) + &
+           & -CONJG(gkl(j, b)) * xi
+  B_vec(6) = -i * xi * 0.5d0 * Omega * cav1b_ss(j, bt)
+  B_vec(7) = -CONJG(gkl(j, b)) * sigma_ss(ef)
+  B_vec(8) = 0.0d0
+
+  ! Set inverse matrix
+  Mat_inv = Mat
+  ! Invert matrix
+  CALL SquareMatrixInverse(N_mat, Mat_inv)
+
+  ! Calculate steady state
+  cavsig2b_ss(j, bt, :) = -MATMUL(Mat_inv, B_vec)
+
+  ! Close j loop
+END DO
+
+moment_out = 0.0d0
+moment_out2 = 0.0d0
+
+! Cycle through modes
+DO k = -N, N
   DO j = -N, N
-    !-----------------------------!
-    !     FIRST-ORDER: CAVITY     !
-    !-----------------------------!
-    !-----------!
-    ! < a_{j} > !
-    !-----------!
-    cav1_ss(j, a, cj) = -gkl(j, cj) * sigma_ss(ge) + &
-                      & -gkl(j, cj) * xi * sigma_ss(ef)
-    cav1_ss(j, a, cj) = cav1_ss(j, a, cj) / &
-                      & (kappa(cj) + i * wl(j, cj))
+    !------------------------------!
+    !     SECOND-ORDER: CAVITY     !
+    !------------------------------!
+    !-----------------!
+    ! < a_{j} b_{k} > !
+    !-----------------!
+    cav2_ss(j, k, ab) = -gkl(j, a) * cavsig2b_ss(k, b, ge) + &
+                      & -gkl(j, a) * xi * cavsig2b_ss(k, b, ef) + &
+                      & -gkl(k, b) * cavsig2a_ss(j, a, ge) + &
+                      & -gkl(k, b) * xi * cavsig2a_ss(j, a, ef)
+    cav2_ss(j, k, ab) = cav2_ss(j, k, ab) / &
+                      & ((kappa(a) + kappa(b)) + i * (wl(j, a) + wl(k, b)))
 
-    !---------------------!
-    ! < a^{\dagger}_{j} > !
-    !---------------------!
-    cav1_ss(j, at, cj) = -CONJG(gkl(j, cj)) * sigma_ss(eg) + &
-                       & -CONJG(gkl(j, cj)) * xi * sigma_ss(fe)
-    cav1_ss(j, at, cj) = cav1_ss(j, at, cj) / &
-                       & (kappa(cj) - i * wl(j, cj))
+    !-------------------------------------!
+    ! < a^{\dagger}_{j} b^{\dagger}_{k} > !
+    !-------------------------------------!
+    cav2_ss(j, k, at) = -CONJG(gkl(j, a)) * cavsig2b_ss(k, bt, eg) + &
+                      & -CONJG(gkl(j, a)) * xi * cavsig2b_ss(k, bt, fe) + &
+                      & -CONJG(gkl(k, b)) * cavsig2a_ss(j, at, eg) + &
+                      & -CONJG(gkl(k, b)) * xi * cavsig2a_ss(j, at, fe)
+    cav2_ss(j, k, at) = cav2_ss(j, k, at) / &
+                      & ((kappa(a) + kappa(b)) - i * (wl(j, a) + wl(k, b)))
 
-    !---------------------------------------!
-    !     SECOND-ORDER: CAVITY AND ATOM     !
-    !---------------------------------------!
-    !------------------!
-    ! < a_{j} \sigma > !
-    !------------------!
+    !---------------------------!
+    ! < a^{\dagger}_{j} a_{k} > !
+    !---------------------------!
+    cav2_ss(j, k, ata) = -CONJG(gkl(j, a)) * cavsig2a_ss(k, a, eg) + &
+                       & -CONJG(gkl(j, a)) * xi * cavsig2a_ss(k, a, fe) + &
+                       & -gkl(k, a) * cavsig2a_ss(j, at, ge) + &
+                       & -gkl(k, a) * xi * cavsig2a_ss(j, at, ef)
+    cav2_ss(j, k, ata) = cav2_ss(j, k, ata) / &
+                       & (2.0d0 * kappa(a) - i * (wl(j, a) - wl(k, a)))
+
+    ! Update photon number
+    moment_out = moment_out + cav2_ss(j, k, ata)
+
+    !---------------------------!
+    ! < b^{\dagger}_{j} b_{k} > !
+    !---------------------------!
+    cav2_ss(j, k, btb) = -CONJG(gkl(j, b)) * cavsig2b_ss(k, b, eg) + &
+                       & -CONJG(gkl(j, b)) * xi * cavsig2b_ss(k, b, fe) + &
+                       & -gkl(k, b) * cavsig2b_ss(j, bt, ge) + &
+                       & -gkl(k, b) * xi * cavsig2b_ss(j, bt, ef)
+    cav2_ss(j, k, btb) = cav2_ss(j, k, btb) / &
+                       & (2.0d0 * kappa(b) - i * (wl(j, b) - wl(k, b)))
+
+    ! Update photon number
+    moment_out2 = moment_out2 + cav2_ss(j, k, btb)
+
+    !---------------------------!
+    ! < a^{\dagger}_{j} b_{k} > !
+    !---------------------------!
+    cav2_ss(j, k, atb) = -CONJG(gkl(j, a)) * cavsig2b_ss(k, b, eg) + &
+                       & -CONJG(gkl(j, a)) * xi * cavsig2b_ss(k, b, fe) + &
+                       & -gkl(k, b) * cavsig2a_ss(j, at, ge) + &
+                       & -gkl(k, b) * xi * cavsig2a_ss(j, at, ef)
+    cav2_ss(j, k, atb) = cav2_ss(j, k, atb) / &
+                       & ((kappa(a) + kappa(b)) - i * (wl(j, a) - wl(k, b)))
+
+    !---------------------------!
+    ! < b^{\dagger}_{j} b_{k} > !
+    !---------------------------!
+    cav2_ss(j, k, bta) = -CONJG(gkl(j, b)) * cavsig2a_ss(k, a, eg) + &
+                       & -CONJG(gkl(j, b)) * xi * cavsig2a_ss(k, a, fe) + &
+                       & -gkl(k, a) * cavsig2b_ss(j, bt, ge) + &
+                       & -gkl(k, a) * xi * cavsig2b_ss(j, bt, ef)
+    cav2_ss(j, k, bta) = cav2_ss(j, k, bta) / &
+                       & ((kappa(a) + kappa(b)) - i * (wl(j, b) - wl(k, a)))
+
+    !--------------------------------------!
+    !     THIRD-ORDER: CAVITY AND ATOM     !
+    !--------------------------------------!
+    !------------------------!
+    ! < a_{j} b_{k} \sigma > !
+    !------------------------!
     ! Set the diagonal matrix elements for M
     Mat = Mat_OG
     DO x = 1, N_mat
-      Mat(x, x) = Mat(x, x) - (kappa(cj) + i * wl(j, cj))
+      Mat(x, x) = Mat(x, x) - ((kappa(a) + kappa(b)) + i * (wl(j, a) + wl(k, b)))
     END DO
 
     ! Set the non-homogeneous vector
     B_vec = 0.0d0
-    B_vec(1) = -gkl(j, cj) * sigma_ss(ge)
-    B_vec(2) = -gkl(j, cj) * xi * sigma_ss(gf)
-    B_vec(3) = -gkl(j, cj) * sigma_ss(ee)
-    B_vec(4) = Gamma * (xi ** 2) * cav1_ss(j, a, cj) + &
-             & -gkl(j, cj) * xi * sigma_ss(ef)
-    B_vec(5) = i * xi * 0.5d0 * Omega * cav1_ss(j, a, cj)
-    B_vec(6) = -i * xi * 0.5d0 * Omega * cav1_ss(j, a, cj) + &
-             & gkl(j, cj) * xi * sigma_ss(gg) + &
-             & gkl(j, cj) * xi * sigma_ss(ee) + &
-             & -gkl(j, cj) * xi
+    B_vec(1) = -gkl(j, a) * cavsig2b_ss(k, b, ge) + &
+             & -gkl(k, b) * cavsig2a_ss(j, a, ge)
+    B_vec(2) = -gkl(j, a) * xi * cavsig2b_ss(k, b, gf) + &
+             & -gkl(k, b) * xi * cavsig2a_ss(j, a, gf)
+    B_vec(3) = -gkl(j, a) * cavsig2b_ss(k, b, ee) + &
+             & -gkl(k, b) * cavsig2a_ss(j, a, ee)
+    B_vec(4) = Gamma * (xi ** 2) * cav2_ss(j, k, ab) + &
+             & -gkl(j, a) * xi * cavsig2b_ss(k, b, ef) + &
+             & -gkl(k, b) * xi * cavsig2a_ss(j, a, ef)
+    B_vec(5) = i * xi * 0.5d0 * Omega * cav2_ss(j, k, ab)
+    B_vec(6) = -i * xi * 0.5d0 * Omega * cav2_ss(j, k, ab) + &
+             & gkl(j, a) * xi * cavsig2b_ss(k, b, gg) + &
+             & gkl(j, a) * xi * cavsig2b_ss(k, b, ee) + &
+             & -gkl(j, a) * xi * cav1b_ss(k, b) + &
+             & gkl(k, b) * xi * cavsig2a_ss(j, a, gg) + &
+             & gkl(k, b) * xi * cavsig2a_ss(j, a, ee) + &
+             & -gkl(k, b) * xi * cav1a_ss(j, a)
     B_vec(7) = 0.0d0
-    B_vec(8) = -gkl(j, cj) * sigma_ss(fe)
+    B_vec(8) = -gkl(j, a) * cavsig2b_ss(k, b, fe) + &
+             & -gkl(k, b) * cavsig2a_ss(j, a, fe)
 
     ! Set inverse matrix
     Mat_inv = Mat
@@ -515,30 +727,38 @@ DO cj = 1, 2
     CALL SquareMatrixInverse(N_mat, Mat_inv)
 
     ! Calculate steady state
-    cavsig2_ss(j, a, :, cj) = -MATMUL(Mat_inv, B_vec)
+    cavsig3_ss(j, k, ab, :) = -MATMUL(Mat_inv, B_vec)
 
-    !----------------------------!
-    ! < a^{\dagger}_{j} \sigma > !
-    !----------------------------!
+    !--------------------------------------------!
+    ! < a^{\dagger}_{j} b^{\dagger}_{k} \sigma > !
+    !--------------------------------------------!
     ! Set the diagonal matrix elements for M
     Mat = Mat_OG
     DO x = 1, N_mat
-      Mat(x, x) = Mat(x, x) - (kappa(cj) - i * wl(j, cj))
+      Mat(x, x) = Mat(x, x) - ((kappa(a) + kappa(b)) - i * (wl(j, a) + wl(k, b)))
     END DO
 
     ! Set the non-homogeneous vector
     B_vec = 0.0d0
-    B_vec(1) = -CONJG(gkl(j, cj)) * sigma_ss(eg)
-    B_vec(2) = -CONJG(gkl(j, cj)) * sigma_ss(ee)
-    B_vec(3) = -CONJG(gkl(j, cj)) * xi * sigma_ss(fg)
-    B_vec(4) = Gamma * (xi ** 2) * cav1_ss(j, at, cj) + &
-             & -CONJG(gkl(j, cj)) * xi * sigma_ss(fe)
-    B_vec(5) = i * xi * 0.5d0 * Omega * cav1_ss(j, at, cj) + &
-             & CONJG(gkl(j, cj)) * xi * sigma_ss(gg) + &
-             & CONJG(gkl(j, cj)) * xi * sigma_ss(ee) + &
-             & -CONJG(gkl(j, cj)) * xi
-    B_vec(6) = -i * xi * 0.5d0 * Omega * cav1_ss(j, at, cj)
-    B_vec(7) = -CONJG(gkl(j, cj)) * sigma_ss(ef)
+    B_vec(1) = -CONJG(gkl(j, a)) * cavsig2b_ss(k, bt, eg) + &
+             & -CONJG(gkl(k, b)) * cavsig2a_ss(j, at, eg)
+    B_vec(2) = -CONJG(gkl(j, a)) * cavsig2b_ss(k, bt, ee) + &
+             & -CONJG(gkl(k, b)) * cavsig2a_ss(j, at, ee)
+    B_vec(3) = -CONJG(gkl(j, a)) * xi * cavsig2b_ss(k, bt, fg) + &
+             & -CONJG(gkl(k, b)) * xi * cavsig2a_ss(j, at, fg)
+    B_vec(4) = Gamma * (xi ** 2) * cav2_ss(j, k, atbt) + &
+             & -CONJG(gkl(j, a)) * xi * cavsig2b_ss(k, bt, fe) + &
+             & -CONJG(gkl(k, b)) * xi * cavsig2a_ss(j, at, fe)
+    B_vec(5) = i * xi * 0.5d0 * Omega * cav2_ss(j, k, atbt) + &
+             & CONJG(gkl(j, a)) * xi * cavsig2b_ss(k, bt, gg) + &
+             & CONJG(gkl(j, a)) * xi * cavsig2b_ss(k, bt, ee) + &
+             & -CONJG(gkl(j, a)) * xi * cav1b_ss(k, bt) + &
+             & CONJG(gkl(k, b)) * xi * cavsig2a_ss(j, at, gg) + &
+             & CONJG(gkl(k, b)) * xi * cavsig2a_ss(j, at, ee) + &
+             & -CONJG(gkl(k, b)) * xi * cav1a_ss(j, at)
+    B_vec(6) = -i * xi * 0.5d0 * Omega * cav2_ss(j, k, atbt)
+    B_vec(7) = -CONJG(gkl(j, a)) * cavsig2b_ss(k, bt, ef) + &
+             & -CONJG(gkl(k, b)) * cavsig2a_ss(j, at, ef)
     B_vec(8) = 0.0d0
 
     ! Set inverse matrix
@@ -547,339 +767,428 @@ DO cj = 1, 2
     CALL SquareMatrixInverse(N_mat, Mat_inv)
 
     ! Calculate steady state
-    cavsig2_ss(j, at, :, cj) = -MATMUL(Mat_inv, B_vec)
+    cavsig3_ss(j, k, at, :) = -MATMUL(Mat_inv, B_vec)
 
+    !----------------------------------!
+    ! < a^{\dagger}_{j} a_{k} \sigma > !
+    !----------------------------------!
+    ! Set the diagonal matrix elements for M
+    Mat = Mat_OG
+    DO x = 1, N_mat
+      Mat(x, x) = Mat(x, x) - (2.0d0 * kappa(a) - i * (wl(j, a) - wl(k, a)))
+    END DO
+
+    ! Set the non-homogeneous vector
+    B_vec = 0.0d0
+    B_vec(1) = -CONJG(gkl(j, a)) * cavsig2a_ss(k, a, eg) + &
+             & -gkl(k, a) * cavsig2a_ss(j, at, ge)
+    B_vec(2) = -CONJG(gkl(j, a)) * cavsig2a_ss(k, a, ee) + &
+             & -gkl(k, a) * xi * cavsig2a_ss(j, at, gf)
+    B_vec(3) = -CONJG(gkl(j, a)) * xi * cavsig2a_ss(k, a, fg) + &
+             & -gkl(k, a) * cavsig2a_ss(j, at, ee)
+    B_vec(4) = Gamma * (xi ** 2) * cav2_ss(j, k, ata) + &
+             & -CONJG(gkl(j, a)) * xi * cavsig2a_ss(k, a, fe) + &
+             & -gkl(k, a) * xi * cavsig2a_ss(j, at, ef)
+    B_vec(5) = i * xi * 0.5d0 * Omega * cav2_ss(j, k, ata) + &
+             & CONJG(gkl(j, a)) * xi * cavsig2a_ss(k, a, gg) + &
+             & CONJG(gkl(j, a)) * xi * cavsig2a_ss(k, a, ee) + &
+             & -CONJG(gkl(j, a)) * xi * cav1a_ss(k, a)
+    B_vec(6) = -i * xi * 0.5d0 * Omega * cav2_ss(j, k, ata) + &
+             & gkl(k, a) * xi * cavsig2a_ss(j, at, gg) + &
+             & gkl(k, a) * xi * cavsig2a_ss(j, at, ee) + &
+             & -gkl(k, a) * xi * cav1a_ss(j, at)
+    B_vec(7) = -CONJG(gkl(j, a)) * cavsig2a_ss(k, a, ef)
+    B_vec(8) = - gkl(k, a) * cavsig2a_ss(j, at, fe)
+
+    ! Set inverse matrix
+    Mat_inv = Mat
+    ! Invert matrix
+    CALL SquareMatrixInverse(N_mat, Mat_inv)
+
+    ! Calculate steady state
+    cavsig3_ss(j, k, ata, :) = -MATMUL(Mat_inv, B_vec)
+
+    !----------------------------------!
+    ! < b^{\dagger}_{j} b_{k} \sigma > !
+    !----------------------------------!
+    ! Set the diagonal matrix elements for M
+    Mat = Mat_OG
+    DO x = 1, N_mat
+      Mat(x, x) = Mat(x, x) - (2.0d0 * kappa(b) - i * (wl(j, b) - wl(k, b)))
+    END DO
+
+    ! Set the non-homogeneous vector
+    B_vec = 0.0d0
+    B_vec(1) = -CONJG(gkl(j, b)) * cavsig2b_ss(k, b, eg) + &
+             & -gkl(k, b) * cavsig2b_ss(j, bt, ge)
+    B_vec(2) = -CONJG(gkl(j, b)) * cavsig2b_ss(k, b, ee) + &
+             & -gkl(k, b) * xi * cavsig2b_ss(j, bt, gf)
+    B_vec(3) = -CONJG(gkl(j, b)) * xi * cavsig2b_ss(k, b, fg) + &
+             & -gkl(k, b) * cavsig2b_ss(j, bt, ee)
+    B_vec(4) = Gamma * (xi ** 2) * cav2_ss(j, k, btb) + &
+             & -CONJG(gkl(j, b)) * xi * cavsig2b_ss(k, b, fe) + &
+             & -gkl(k, b) * xi * cavsig2b_ss(j, bt, ef)
+    B_vec(5) = i * xi * 0.5d0 * Omega * cav2_ss(j, k, btb) + &
+             & CONJG(gkl(j, b)) * xi * cavsig2b_ss(k, b, gg) + &
+             & CONJG(gkl(j, b)) * xi * cavsig2b_ss(k, b, ee) + &
+             & -CONJG(gkl(j, b)) * xi * cav1b_ss(k, b)
+    B_vec(6) = -i * xi * 0.5d0 * Omega * cav2_ss(j, k, btb) + &
+             & gkl(k, b) * xi * cavsig2b_ss(j, bt, gg) + &
+             & gkl(k, b) * xi * cavsig2b_ss(j, bt, ee) + &
+             & -gkl(k, b) * xi * cav1b_ss(j, bt)
+    B_vec(7) = -CONJG(gkl(j, b)) * cavsig2b_ss(k, b, ef)
+    B_vec(8) = - gkl(k, b) * cavsig2b_ss(j, bt, fe)
+
+    ! Set inverse matrix
+    Mat_inv = Mat
+    ! Invert matrix
+    CALL SquareMatrixInverse(N_mat, Mat_inv)
+
+    ! Calculate steady state
+    cavsig3_ss(j, k, btb, :) = -MATMUL(Mat_inv, B_vec)
+
+    !----------------------------------!
+    ! < a^{\dagger}_{j} b_{k} \sigma > !
+    !----------------------------------!
+    ! Set the diagonal matrix elements for M
+    Mat = Mat_OG
+    DO x = 1, N_mat
+      Mat(x, x) = Mat(x, x) - ((kappa(a) + kappa(b)) - i * (wl(j, a) - wl(k, b)))
+    END DO
+
+    ! Set the non-homogeneous vector
+    B_vec = 0.0d0
+    B_vec(1) = -CONJG(gkl(j, a)) * cavsig2b_ss(k, b, eg) + &
+             & -gkl(k, b) * cavsig2a_ss(j, at, ge)
+    B_vec(2) = -CONJG(gkl(j, a)) * cavsig2b_ss(k, b, ee) + &
+             & -gkl(k, b) * xi * cavsig2a_ss(j, at, gf)
+    B_vec(3) = -CONJG(gkl(j, a)) * xi * cavsig2b_ss(k, b, fg) + &
+             & -gkl(k, b) * cavsig2a_ss(j, at, ee)
+    B_vec(4) = Gamma * (xi ** 2) * cav2_ss(j, k, atb) + &
+             & -CONJG(gkl(j, a)) * xi * cavsig2b_ss(k, b, fe) + &
+             & -gkl(k, b) * xi * cavsig2a_ss(j, at, ef)
+    B_vec(5) = i * xi * 0.5d0 * Omega * cav2_ss(j, k, atb) + &
+             & CONJG(gkl(j, a)) * xi * cavsig2b_ss(k, b, gg) + &
+             & CONJG(gkl(j, a)) * xi * cavsig2b_ss(k, b, ee) + &
+             & -CONJG(gkl(j, a)) * xi * cav1b_ss(k, b)
+    B_vec(6) = -i * xi * 0.5d0 * Omega * cav2_ss(j, k, atb) + &
+             & gkl(k, b) * xi * cavsig2a_ss(j, at, gg) + &
+             & gkl(k, b) * xi * cavsig2a_ss(j, at, ee) + &
+             & -gkl(k, b) * xi * cav1a_ss(j, at)
+    B_vec(7) = -CONJG(gkl(j, a)) * cavsig2b_ss(k, b, ef)
+    B_vec(8) = - gkl(k, b) * cavsig2a_ss(j, at, fe)
+
+    ! Set inverse matrix
+    Mat_inv = Mat
+    ! Invert matrix
+    CALL SquareMatrixInverse(N_mat, Mat_inv)
+
+    ! Calculate steady state
+    cavsig3_ss(j, k, atb, :) = -MATMUL(Mat_inv, B_vec)
+
+    !----------------------------------!
+    ! < b^{\dagger}_{j} a_{k} \sigma > !
+    !----------------------------------!
+    ! Set the diagonal matrix elements for M
+    Mat = Mat_OG
+    DO x = 1, N_mat
+      Mat(x, x) = Mat(x, x) - ((kappa(a) + kappa(b)) - i * (wl(j, b) - wl(k, a)))
+    END DO
+
+    ! Set the non-homogeneous vector
+    B_vec = 0.0d0
+    B_vec(1) = -CONJG(gkl(j, b)) * cavsig2a_ss(k, a, eg) + &
+             & -gkl(k, a) * cavsig2b_ss(j, bt, ge)
+    B_vec(2) = -CONJG(gkl(j, b)) * cavsig2a_ss(k, a, ee) + &
+             & -gkl(k, a) * xi * cavsig2b_ss(j, bt, gf)
+    B_vec(3) = -CONJG(gkl(j, b)) * xi * cavsig2a_ss(k, a, fg) + &
+             & -gkl(k, a) * cavsig2b_ss(j, bt, ee)
+    B_vec(4) = Gamma * (xi ** 2) * cav2_ss(j, k, bta) + &
+             & -CONJG(gkl(j, b)) * xi * cavsig2a_ss(k, a, fe) + &
+             & -gkl(k, a) * xi * cavsig2b_ss(j, bt, ef)
+    B_vec(5) = i * xi * 0.5d0 * Omega * cav2_ss(j, k, bta) + &
+             & CONJG(gkl(j, b)) * xi * cavsig2a_ss(k, a, gg) + &
+             & CONJG(gkl(j, b)) * xi * cavsig2a_ss(k, a, ee) + &
+             & -CONJG(gkl(j, b)) * xi * cav1a_ss(k, a)
+    B_vec(6) = -i * xi * 0.5d0 * Omega * cav2_ss(j, k, bta) + &
+             & gkl(k, a) * xi * cavsig2b_ss(j, bt, gg) + &
+             & gkl(k, a) * xi * cavsig2b_ss(j, bt, ee) + &
+             & -gkl(k, a) * xi * cav1b_ss(j, bt)
+    B_vec(7) = -CONJG(gkl(j, b)) * cavsig2a_ss(k, a, ef)
+    B_vec(8) = - gkl(k, a) * cavsig2b_ss(j, bt, fe)
+
+    ! Set inverse matrix
+    Mat_inv = Mat
+    ! Invert matrix
+    CALL SquareMatrixInverse(N_mat, Mat_inv)
+
+    ! Calculate steady state
+    cavsig3_ss(j, k, bta, :) = -MATMUL(Mat_inv, B_vec)
+  
     ! Close j loop
   END DO
-  ! Close cj loop
+  ! Close k loop
 END DO
 
-moment_out = 0.0d0; moment_out2 = 0.0d0
-! Cycle through cavity operators
-DO ck = 1, 2
-  DO cj = 1, 2
-    ! Cycle through modes
-    DO k = -N, N
-      DO j = -N, N
-        !------------------------------!
-        !     SECOND-ORDER: CAVITY     !
-        !------------------------------!
-        !-----------------!
-        ! < a_{j} a_{k} > !
-        !-----------------!
-        cav2_ss(j, k, a, cj, ck) = -gkl(j, cj) * cavsig2_ss(k, a, ge, ck) + &
-                                 & -gkl(j, cj) * xi * cavsig2_ss(k, a, ef, ck) + &
-                                 & -gkl(k, ck) * cavsig2_ss(j, a, ge, cj) + &
-                                 & -gkl(k, ck) * xi * cavsig2_ss(j, a, ef, cj)
-        cav2_ss(j, k, a, cj, ck) = cav2_ss(j, k, a, cj, ck) / &
-                                 & ((kappa(cj) + kappa(ck)) + i * (wl(j, cj) + wl(k, ck)))
+photon_ss(a) = REAL(moment_out)
+photon_ss(b) = REAL(moment_out2)
 
-        !-------------------------------------!
-        ! < a^{\dagger}_{j} a^{\dagger}_{k} > !
-        !-------------------------------------!
-        cav2_ss(j, k, at, cj, ck) = -CONJG(gkl(j, cj)) * cavsig2_ss(k, at, eg, ck) + &
-                                  & -CONJG(gkl(j, cj)) * xi * cavsig2_ss(k, at, fe, ck) + &
-                                  & -CONJG(gkl(k, ck)) * cavsig2_ss(j, at, eg, cj) + &
-                                  & -CONJG(gkl(k, ck)) * xi * cavsig2_ss(j, at, fe, cj)
-        cav2_ss(j, k, at, cj, ck) = cav2_ss(j, k, at, cj, ck) / &
-                                  & ((kappa(cj) + kappa(ck)) - i * (wl(j, cj) + wl(k, ck)))
+! Cycle through modes
+DO l = -N, N
+  DO k = -N, N
+    DO j = -N, N
+      !-----------------------------!
+      !     THIRD-ORDER: CAVITY     !
+      !-----------------------------!
+      !---------------------------------!
+      ! < a^{\dagger}_{j} a_{k} b_{l} > !
+      !---------------------------------!
+      cav3_ss(j, k, l, atab) = -CONJG(gkl(j, a)) * cavsig3_ss(k, l, ab, eg) + &
+                             & -CONJG(gkl(j, a)) * xi * cavsig3_ss(k, l, ab, fe) + &
+                             & -gkl(k, a) * cavsig3_ss(j, l, atb, ge) + &
+                             & -gkl(k, a) * xi * cavsig3_ss(j, l, atb, ef) + &
+                             & -gkl(l, b) * cavsig3_ss(j, k, ata, ge) + &
+                             & -gkl(l, b) * xi * cavsig3_ss(j, k, ata, ef)
+      cav3_ss(j, k, l, atab) = cav3_ss(j, k, l, atab) / &
+                             & ((2.d0 * kappa(a) + kappa(b)) - i * (wl(j, a) - wl(k, a) - wl(l, b)))
 
-        !---------------------------!
-        ! < a^{\dagger}_{j} a_{k} > !
-        !---------------------------!
-        cav2_ss(j, k, ata, cj, ck) = -CONJG(gkl(j, cj)) * cavsig2_ss(k, a, eg, ck) + &
-                                   & -CONJG(gkl(j, cj)) * xi * cavsig2_ss(k, a, fe, ck) + &
-                                   & -gkl(k, ck) * cavsig2_ss(j, at, ge, cj) + &
-                                   & -gkl(k, ck) * xi * cavsig2_ss(j, at, ef, cj)
-        cav2_ss(j, k, ata, cj, ck) = cav2_ss(j, k, ata, cj, ck) / &
-                                   & ((kappa(cj) + kappa(ck)) - i * (wl(j, cj) - wl(k, ck)))
+      !---------------------------------!
+      ! < b^{\dagger}_{j} b_{k} a_{l} > !
+      !---------------------------------!
+      cav3_ss(j, k, l, btba) = -CONJG(gkl(j, b)) * cavsig3_ss(l, k, ab, eg) + &
+                             & -CONJG(gkl(j, b)) * xi * cavsig3_ss(l, k, ab, fe) + &
+                             & -gkl(k, b) * cavsig3_ss(j, l, bta, ge) + &
+                             & -gkl(k, b) * xi * cavsig3_ss(j, l, bta, ef) + &
+                             & -gkl(l, a) * cavsig3_ss(j, k, btb, ge) + &
+                             & -gkl(l, a) * xi * cavsig3_ss(j, k, btb, ef)
+      cav3_ss(j, k, l, btba) = cav3_ss(j, k, l, btba) / &
+                             & ((kappa(a) + 2.0d0 * kappa(b)) - i * (wl(j, b) - wl(k, b) - wl(l, a)))
 
-        ! Update phootn numbers
-        IF (cj .EQ. 1 .AND. ck .EQ. 1) THEN
-          moment_out = moment_out + cav2_ss(j, k, ata, cj, ck)
-        ELSE IF (cj .EQ. 2 .AND. ck .EQ. 2) THEN
-          moment_out2 = moment_out2 + cav2_ss(j, k, ata, cj, ck)
-        END IF
+      !-------------------------------------------!
+      ! < b^{\dagger}_{j} a^{\dagger}_{k} a_{l} > !
+      !-------------------------------------------!
+      cav3_ss(j, k, l, btata) = -CONJG(gkl(j, b)) * cavsig3_ss(k, l, ata, eg) + &
+                              & -CONJG(gkl(j, b)) * xi * cavsig3_ss(k, l, ata, fe) + &
+                              & -CONJG(gkl(k, a)) * cavsig3_ss(j, l, bta, eg) + &
+                              & -CONJG(gkl(k, a)) * xi * cavsig3_ss(j, l, bta, fe) + &
+                              & -gkl(l, a) * cavsig3_ss(k, j, atbt, ge) + &
+                              & -gkl(l, a) * xi * cavsig3_ss(k, j, atbt, ef)
+      cav3_ss(j, k, l, btata) = cav3_ss(j, k, l, btata) / &
+                              & ((2.d0 * kappa(a) + kappa(b)) - i * (wl(j, b) + wl(k, a) - wl(l, a)))
 
-        !--------------------------------------!
-        !     THIRD-ORDER: CAVITY AND ATOM     !
-        !--------------------------------------!
-        !------------------------!
-        ! < a_{j} a_{k} \sigma > !
-        !------------------------!
-        ! Set the diagonal matrix elements for M
-        Mat = Mat_OG
-        DO x = 1, N_mat
-          Mat(x, x) = Mat(x, x) - (((kappa(cj) + kappa(ck))) + i * (wl(j, cj) + wl(k, ck)))
-        END DO
+      !-------------------------------------------!
+      ! < a^{\dagger}_{j} b^{\dagger}_{k} b_{l} > !
+      !-------------------------------------------!
+      cav3_ss(j, k, l, atbtb) = -CONJG(gkl(j, a)) * cavsig3_ss(k, l, btb, eg) + &
+                              & -CONJG(gkl(j, a)) * xi * cavsig3_ss(k, l, btb, fe) + &
+                              & -CONJG(gkl(k, b)) * cavsig3_ss(j, l, atb, eg) + &
+                              & -CONJG(gkl(k, b)) * xi * cavsig3_ss(j, l, atb, fe) + &
+                              & -gkl(l, b) * cavsig3_ss(j, k, atbt, ge) + &
+                              & -gkl(l, b) * xi * cavsig3_ss(j, k, atbt, ef)
+      cav3_ss(j, k, l, atbtb) = cav3_ss(j, k, l, atbtb) / &
+                              & ((kappa(a) + 2.0d0 * kappa(b)) - i * (wl(j, a) + wl(k, b) - wl(l, b)))
 
-        ! Set the non-homogeneous vector
-        B_vec = 0.0d0
-        B_vec(1) = -gkl(j, cj) * cavsig2_ss(k, a, ge, ck) + &
-                 & -gkl(k, ck) * cavsig2_ss(j, a, ge, cj)
-        B_vec(2) = -gkl(j, cj) * xi * cavsig2_ss(k, a, gf, ck) + &
-                 & -gkl(k, ck) * xi * cavsig2_ss(j, a, gf, cj)
-        B_vec(3) = -gkl(j, cj) * cavsig2_ss(k, a, ee, ck) + &
-                 & -gkl(k, ck) * cavsig2_ss(j, a, ee, cj)
-        B_vec(4) = Gamma * (xi ** 2) * cav2_ss(j, k, a, cj, ck) + &
-                 & -gkl(j, cj) * xi * cavsig2_ss(k, a, ef, ck) + &
-                 & -gkl(k, ck) * xi * cavsig2_ss(j, a, ef, cj)
-        B_vec(5) = i * xi * 0.5d0 * Omega * cav2_ss(j, k, a, cj, ck)
-        B_vec(6) = -i * xi * 0.5d0 * Omega * cav2_ss(j, k, a, cj, ck) + &
-                 & gkl(j, cj) * xi * cavsig2_ss(k, a, gg, ck) + &
-                 & gkl(j, cj) * xi * cavsig2_ss(k, a, ee, ck) + &
-                 & -gkl(j, cj) * xi * cav1_ss(k, a, ck) + &
-                 & gkl(k, ck) * xi * cavsig2_ss(j, a, gg, cj) + &
-                 & gkl(k, ck) * xi * cavsig2_ss(j, a, ee, cj) + &
-                 & -gkl(k, ck) * xi * cav1_ss(j, a, cj)
-        B_vec(7) = 0.0d0
-        B_vec(8) = -gkl(j, cj) * cavsig2_ss(k, a, fe, ck) + &
-                 & -gkl(k, ck) * cavsig2_ss(j, a, fe, cj)
-
-        ! Set inverse matrix
-        Mat_inv = Mat
-        ! Invert matrix
-        CALL SquareMatrixInverse(N_mat, Mat_inv)
-
-        ! Calculate steady state
-        cavsig3_ss(j, k, a, :, cj, ck) = -MATMUL(Mat_inv, B_vec)
-
-        !--------------------------------------------!
-        ! < a^{\dagger}_{j} a^{\dagger}_{k} \sigma > !
-        !--------------------------------------------!
-        ! Set the diagonal matrix elements for M
-        Mat = Mat_OG
-        DO x = 1, N_mat
-          Mat(x, x) = Mat(x, x) - (((kappa(cj) + kappa(ck))) - i * (wl(j, cj) + wl(k, ck)))
-        END DO
-
-        ! Set the non-homogeneous vector
-        B_vec = 0.0d0
-        B_vec(1) = -CONJG(gkl(j, cj)) * cavsig2_ss(k, at, eg, ck) + &
-                 & -CONJG(gkl(k, ck)) * cavsig2_ss(j, at, eg, cj)
-        B_vec(2) = -CONJG(gkl(j, cj)) * cavsig2_ss(k, at, ee, ck) + &
-                 & -CONJG(gkl(k, ck)) * cavsig2_ss(j, at, ee, cj)
-        B_vec(3) = -CONJG(gkl(j, cj)) * xi * cavsig2_ss(k, at, fg, ck) + &
-                 & -CONJG(gkl(k, ck)) * xi * cavsig2_ss(j, at, fg, cj)
-        B_vec(4) = Gamma * (xi ** 2) * cav2_ss(j, k, at, cj, ck) + &
-                 & -CONJG(gkl(j, cj)) * xi * cavsig2_ss(k, at, fe, ck) + &
-                 & -CONJG(gkl(k, ck)) * xi * cavsig2_ss(j, at, fe, cj)
-        B_vec(5) = i * xi * 0.5d0 * Omega * cav2_ss(j, k, at, cj, ck) + &
-                 & CONJG(gkl(j, cj)) * xi * cavsig2_ss(k, at, gg, ck) + &
-                 & CONJG(gkl(j, cj)) * xi * cavsig2_ss(k, at, ee, cj) + &
-                 & -CONJG(gkl(j, cj)) * xi * cav1_ss(k, at, ck) + &
-                 & CONJG(gkl(k, ck)) * xi * cavsig2_ss(j, at, gg, cj) + &
-                 & CONJG(gkl(k, ck)) * xi * cavsig2_ss(j, at, ee, cj) + &
-                 & -CONJG(gkl(k, ck)) * xi * cav1_ss(j, at, cj)
-        B_vec(6) = -i * xi * 0.5d0 * Omega * cav2_ss(j, k, at, cj, ck)
-        B_vec(7) = -CONJG(gkl(j, cj)) * cavsig2_ss(k, at, ef, ck) + &
-                 & -CONJG(gkl(k, ck)) * cavsig2_ss(j, at, ef, cj)
-        B_vec(8) = 0.0d0
-
-        ! Set inverse matrix
-        Mat_inv = Mat
-        ! Invert matrix
-        CALL SquareMatrixInverse(N_mat, Mat_inv)
-
-        ! Calculate steady state
-        cavsig3_ss(j, k, at, :, cj, ck) = -MATMUL(Mat_inv, B_vec)
-
-        !----------------------------------!
-        ! < a^{\dagger}_{j} a_{k} \sigma > !
-        !----------------------------------!
-        ! Set the diagonal matrix elements for M
-        Mat = Mat_OG
-        DO x = 1, N_mat
-          Mat(x, x) = Mat(x, x) - (((kappa(cj) + kappa(ck))) - i * (wl(j, cj) - wl(k, ck)))
-        END DO
-
-        ! Set the non-homogeneous vector
-        B_vec = 0.0d0
-        B_vec(1) = -CONJG(gkl(j, cj)) * cavsig2_ss(k, a, eg, ck) + &
-                 & -gkl(k, ck) * cavsig2_ss(j, at, ge, cj)
-        B_vec(2) = -CONJG(gkl(j, cj)) * cavsig2_ss(k, a, ee, ck) + &
-                 & -gkl(k, ck) * xi * cavsig2_ss(j, at, gf, cj)
-        B_vec(3) = -CONJG(gkl(j, cj)) * xi * cavsig2_ss(k, a, fg, ck) + &
-                 & -gkl(k, ck) * cavsig2_ss(j, at, ee, cj)
-        B_vec(4) = Gamma * (xi ** 2) * cav2_ss(j, k, ata, cj, ck) + &
-                 & -CONJG(gkl(j, cj)) * xi * cavsig2_ss(k, a, fe, ck) + &
-                 & -gkl(k, ck) * xi * cavsig2_ss(j, at, ef, cj)
-        B_vec(5) = i * xi * 0.5d0 * Omega * cav2_ss(j, k, ata, cj, ck) + &
-                 & CONJG(gkl(j, cj)) * xi * cavsig2_ss(k, a, gg, ck) + &
-                 & CONJG(gkl(j, cj)) * xi * cavsig2_ss(k, a, ee, ck) + &
-                 & -CONJG(gkl(j, cj)) * xi * cav1_ss(k, a, ck)
-        B_vec(6) = -i * xi * 0.5d0 * Omega * cav2_ss(j, k, ata, cj, ck) + &
-                 & gkl(k, ck) * xi * cavsig2_ss(j, at, gg, cj) + &
-                 & gkl(k, ck) * xi * cavsig2_ss(j, at, ee, cj) + &
-                 & -gkl(k, ck) * xi * cav1_ss(j, at, cj)
-        B_vec(7) = -CONJG(gkl(j, cj)) * cavsig2_ss(k, a, ef, ck)
-        B_vec(8) = - gkl(k, ck) * cavsig2_ss(j, at, fe, cj)
-
-        ! Set inverse matrix
-        Mat_inv = Mat
-        ! Invert matrix
-        CALL SquareMatrixInverse(N_mat, Mat_inv)
-
-        ! Calculate steady state
-        cavsig3_ss(j, k, ata, :, cj, ck) = -MATMUL(Mat_inv, B_vec)
-
-        ! Close j loop
+      !----------------------------------------!
+      ! < a^{\dagger}_{j} a_{k} b_{l} \sigma > !
+      !----------------------------------------!
+      ! Set the diagonal matrix elements for M
+      Mat = Mat_OG
+      DO x = 1, N_mat
+        Mat(x, x) = Mat(x, x) - ((2.d0 * kappa(a) + kappa(b)) - i * (wl(j, a) - wl(k, a) - wl(l, b)))
       END DO
-      ! Close k loop
-    END DO
-    ! Close cj loop
-  END DO
-  ! Close ck loop
-END DO
 
-! Update photon number
-photon_ss = 0.0d0
-photon_ss(a) = moment_out
-photon_ss(b) = moment_out2
+      ! Set the non-homogeneous vector
+      B_vec = 0.0d0
+      B_vec(1) = -CONJG(gkl(j, a)) * cavsig3_ss(k, l, ab, eg) + &
+               & -gkl(k, a) * cavsig3_ss(j, l, atb, ge) + &
+               & -gkl(l, b) * cavsig3_ss(j, k, ata, ge)
+      B_vec(2) = -CONJG(gkl(j, a)) * cavsig3_ss(k, l, ab, ee) + &
+               & -gkl(k, a) * xi * cavsig3_ss(j, l, atb, gf) + &
+               & -gkl(l, b) * xi * cavsig3_ss(j, k, ata, gf)
+      B_vec(3) = -CONJG(gkl(j, a)) * xi * cavsig3_ss(k, l, ab, fg) + &
+               & -gkl(k, a) * cavsig3_ss(j, l, atb, ee) + &
+               & -gkl(l, b) * cavsig3_ss(j, k, ata, ee)
+      B_vec(4) = Gamma * (xi ** 2) * cav3_ss(j, k, l, atab) + &
+               & -CONJG(gkl(j, a)) * xi * cavsig3_ss(k, l, ab, fe) + &
+               & -gkl(k, a) * xi * cavsig3_ss(j, l, atb, ef) + &
+               & -gkl(l, b) * xi * cavsig3_ss(j, k, ata, ef)
+      B_vec(5) = i * xi * 0.5d0 * Omega * cav3_ss(j, k, l, atab) + &
+               & CONJG(gkl(j, a)) * xi * cavsig3_ss(k, l, ab, gg) + &
+               & CONJG(gkl(j, a)) * xi * cavsig3_ss(k, l, ab, ee) + &
+               & -CONJG(gkl(j, a)) * xi * cav2_ss(k, l, ab)
+      B_vec(6) = -i * xi * 0.5d0 * Omega * cav3_ss(j, k, l, atab) + &
+               & gkl(k, a) * xi * cavsig3_ss(j, l, atb, gg) + &
+               & gkl(k, a) * xi * cavsig3_ss(j, l, atb, ee) + &
+               & -gkl(k, a) * xi * cav2_ss(j, l, atb) + &
+               & gkl(l, b) * xi * cavsig3_ss(j, k, ata, gg) + &
+               & gkl(l, b) * xi * cavsig3_ss(j, k, ata, ee) + &
+               & -gkl(l, b) * xi * cav2_ss(j, k, ata)
+      B_vec(7) = -CONJG(gkl(j, a)) * cavsig3_ss(k, l, ab, ef)
+      B_vec(8) = -gkl(k, a) * cavsig3_ss(j, l, atb, fe) + &
+               & -gkl(l, b) * cavsig3_ss(j, k, ata, fe)
 
-! Cycle through cavity operators
-DO cl = 1, 2
-  DO ck = 1, 2
-    DO cj = 1, 2
-      ! Cycle through modes
-      DO l = -N, N
-        DO k = -N, N
-          DO j = -N, N
-            !-----------------------------!
-            !     THIRD-ORDER: CAVITY     !
-            !-----------------------------!
-            !---------------------------------!
-            ! < a^{\dagger}_{j} a_{k} a_{l} > !
-            !---------------------------------!
-            cav3_ss(j, k, l, a, cj, ck, cl) = -CONJG(gkl(j, cj)) * cavsig3_ss(k, l, a, eg, ck, cl) + &
-                                            & -CONJG(gkl(j, cj)) * xi * cavsig3_ss(k, l, a, fe, ck, cl) + &
-                                            & -gkl(k, ck) * cavsig3_ss(j, l, ata, ge, cj, cl) + &
-                                            & -gkl(k, ck) * xi * cavsig3_ss(j, l, ata, ef, cj, cl) + &
-                                            & -gkl(l, cl) * cavsig3_ss(j, k, ata, ge, cj, ck) + &
-                                            & -gkl(l, cl) * xi * cavsig3_ss(j, k, ata, ef, cj, ck)
-            cav3_ss(j, k, l, a, cj, ck, cl) = cav3_ss(j, k, l, a, cj, ck, cl) / &
-                                            & ((kappa(cj) + kappa(ck) + kappa(cl)) - i * (wl(j, cj) - wl(k, ck) - wl(l, cl)))
+      ! Set inverse matrix
+      Mat_inv = Mat
+      ! Invert matrix
+      CALL SquareMatrixInverse(N_mat, Mat_inv)
 
-            !-------------------------------------------!
-            ! < a^{\dagger}_{j} a^{\dagger}_{k} a_{l} > !
-            !-------------------------------------------!
-            cav3_ss(j, k, l, at, cj, ck, cl) = -CONJG(gkl(j, cj)) * cavsig3_ss(k, l, ata, eg, ck, cl) + &
-                                             & -CONJG(gkl(j, cj)) * xi * cavsig3_ss(k, l, ata, fe, ck, cl) + &
-                                             & -CONJG(gkl(k, ck)) * cavsig3_ss(j, l, ata, eg, cj, cl) + &
-                                             & -CONJG(gkl(k, ck)) * xi * cavsig3_ss(j, l, ata, fe, cj, cl) + &
-                                             & -gkl(l, cl) * cavsig3_ss(j, k, at, ge, cj, ck) + &
-                                             & -gkl(l, cl) * xi * cavsig3_ss(j, k, at, ef, cj, ck)
-            cav3_ss(j, k, l, at, cj, ck, cl) = cav3_ss(j, k, l, at, cj, ck, cl) / &
-                                             & ((kappa(cj) + kappa(ck) + kappa(cl)) - i * (wl(j, cj) + wl(k, ck) - wl(l, cl)))
+      ! Calculate steady state
+      cavsig4_ss(j, k, l, atab, :) = -MATMUL(Mat_inv, B_vec)
 
-            !--------------------------------------!
-            !     FOURTH-ORDER: CAVITY AND ATOM    !
-            !--------------------------------------!
-            !----------------------------------------!
-            ! < a^{\dagger}_{j} a_{k} a_{l} \sigma > !
-            !----------------------------------------!
-            ! Set the diagonal matrix elements for M
-            Mat = Mat_OG
-            DO x = 1, N_mat
-              Mat(x, x) = Mat(x, x) - ((kappa(cj) + kappa(ck) + kappa(cl)) - i * (wl(j, cj) - wl(k, ck) - wl(l, cl)))
-            END DO
-
-            ! Set the non-homogeneous vector
-            B_vec = 0.0d0
-            B_vec(1) = -CONJG(gkl(j, cj)) * cavsig3_ss(k, l, a, eg, ck, cl) + &
-                     & -gkl(k, ck) * cavsig3_ss(j, l, ata, ge, cj, cl) + &
-                       & -gkl(l, cl) * cavsig3_ss(j, k, ata, ge, cj, ck)
-            B_vec(2) = -CONJG(gkl(j, cj)) * cavsig3_ss(k, l, a, ee, ck, cl) + &
-                     & -gkl(k, ck) * xi * cavsig3_ss(j, l, ata, gf, cj, cl) + &
-                     & -gkl(l, cl) * xi * cavsig3_ss(j, k, ata, gf, cj, ck)
-            B_vec(3) = -CONJG(gkl(j, cj)) * xi * cavsig3_ss(k, l, a, fg, ck, cl) + &
-                     & -gkl(k, ck) * cavsig3_ss(j, l, ata, ee, cj, cl) + &
-                     & -gkl(l, cl) * cavsig3_ss(j, k, ata, ee, cj, ck)
-            B_vec(4) = Gamma * (xi ** 2) * cav3_ss(j, k, l, a, cj, ck, cl) + &
-                     & -CONJG(gkl(j, cj)) * xi * cavsig3_ss(k, l, a, fe, ck, cl) + &
-                     & -gkl(k, ck) * xi * cavsig3_ss(j, l, ata, ef, cj, cl) + &
-                     & -gkl(l, cl) * xi * cavsig3_ss(j, k, ata, ef, cj, ck)
-            B_vec(5) = i * xi * 0.5d0 * Omega * cav3_ss(j, k, l, a, cj, ck, cl) + &
-                     & CONJG(gkl(j, cj)) * xi * cavsig3_ss(k, l, a, gg, ck, cl) + &
-                     & CONJG(gkl(j, cj)) * xi * cavsig3_ss(k, l, a, ee, ck, cl) + &
-                     & -CONJG(gkl(j, cj)) * xi * cav2_ss(k, l, a, ck, cl)
-            B_vec(6) = -i * xi * 0.5d0 * Omega * cav3_ss(j, k, l, a, cj, ck, cl) + &
-                     & gkl(k, ck) * xi * cavsig3_ss(j, l, ata, gg, cj, cl) + &
-                     & gkl(k, ck) * xi * cavsig3_ss(j, l, ata, ee, cj, cl) + &
-                     & -gkl(k, ck) * xi * cav2_ss(j, l, ata, cj, cl) + &
-                     & gkl(l, cl) * xi * cavsig3_ss(j, k, ata, gg, cj, ck) + &
-                     & gkl(l, cl) * xi * cavsig3_ss(j, k, ata, ee, cj, ck) + &
-                     & -gkl(l, cl) * xi * cav2_ss(j, k, ata, cj, ck)
-            B_vec(7) = -CONJG(gkl(j, cj)) * cavsig3_ss(k, l, a, ef, ck, cl)
-            B_vec(8) = -gkl(k, ck) * cavsig3_ss(j, l, ata, fe, cj, cl) + &
-                     & -gkl(l, cl) * cavsig3_ss(j, k, ata, fe, cj, ck)
-
-            ! Set inverse matrix
-            Mat_inv = Mat
-            ! Invert matrix
-            CALL SquareMatrixInverse(N_mat, Mat_inv)
-
-            ! Calculate steady state
-            cavsig4_ss(j, k, l, a, :, cj, ck, cl) = -MATMUL(Mat_inv, B_vec)
-
-            !-------------------------------------------!
-            ! < a^{\dagger}_{j} a^{\dagger}_{k} a_{l} > !
-            !-------------------------------------------!
-            ! Set the diagonal matrix elements for M
-            Mat = Mat_OG
-            DO x = 1, N_mat
-              Mat(x, x) = Mat(x, x) - ((kappa(cj) + kappa(ck) + kappa(cl)) - i * (wl(j, cj) + wl(k, ck) - wl(l, cl)))
-            END DO
-
-            ! Set the non-homogeneous vector
-            B_vec = 0.0d0
-            B_vec(1) = -CONJG(gkl(j, cj)) * cavsig3_ss(k, l, ata, eg, ck, cl) + &
-                     & -CONJG(gkl(k, ck)) * cavsig3_ss(j, l, ata, eg, cj, cl) + &
-                     & -gkl(l, cl) * cavsig3_ss(j, k, at, ge, cj, ck)
-            B_vec(2) = -CONJG(gkl(j, cj)) * cavsig3_ss(k, l, ata, ee, ck, cl) + &
-                     & -CONJG(gkl(k, ck)) * cavsig3_ss(j, l, ata, ee, cj, cl) + &
-                     & -gkl(l, cl) * xi * cavsig3_ss(j, k, at, gf, cj, ck)
-            B_vec(3) = -CONJG(gkl(j, cj)) * xi * cavsig3_ss(k, l, ata, fg, ck, cl) + &
-                     & -CONJG(gkl(k, ck)) * xi * cavsig3_ss(j, l, ata, fg, cj, cl) + &
-                     & -gkl(l, cl) * cavsig3_ss(j, k, at, ee, cj, ck)
-            B_vec(4) = Gamma * (xi ** 2) * cav3_ss(j, k, l, at, cj, ck, cl) + &
-                     & -CONJG(gkl(j, cj)) * xi * cavsig3_ss(k, l, ata, fe, ck, cl) + &
-                     & -CONJG(gkl(k, ck)) * xi * cavsig3_ss(j, l, ata, fe, cj, cl) + &
-                     & -gkl(l, cl) * xi * cavsig3_ss(j, k, at, ef, cj, ck)
-            B_vec(5) = i * xi * 0.5d0 * Omega * cav3_ss(j, k, l, at, cj, ck, cl) + &
-                     & CONJG(gkl(j, cj)) * xi * cavsig3_ss(k, l, ata, gg, ck, cl) + &
-                     & CONJG(gkl(j, cj)) * xi * cavsig3_ss(k, l, ata, ee, ck, cl) + &
-                     & -CONJG(gkl(j, cj)) * xi * cav2_ss(k, l, ata, ck, cl) + &
-                     & CONJG(gkl(k, ck)) * xi * cavsig3_ss(j, l, ata, gg, cj, cl) + &
-                     & CONJG(gkl(k, ck)) * xi * cavsig3_ss(j, l, ata, ee, cj, cl) + &
-                     & -CONJG(gkl(k, ck)) * xi * cav2_ss(j, l, ata, cj, cl)
-            B_vec(6) = -i * xi * 0.5d0 * Omega * cav3_ss(j, k, l, at, cj, ck, cl) + &
-                     & gkl(l, cl) * xi * cavsig3_ss(j, k, at, gg, cj, ck) + &
-                     & gkl(l, cl) * xi * cavsig3_ss(j, k, at, ee, cj, ck) + &
-                     & -gkl(l, cl) * xi * cav2_ss(j, k, at, cj, ck)
-            B_vec(7) = -CONJG(gkl(j, cj)) * cavsig3_ss(k, l, ata, ef, ck, cl) + &
-                     & -CONJG(gkl(k, ck)) * cavsig3_ss(j, l, ata, ef, cj, cl)
-            B_vec(8) = -gkl(l, cl) * cavsig3_ss(j, k, at, fe, cj, ck)
-
-            ! Set inverse matrix
-            Mat_inv = Mat
-            ! Invert matrix
-            CALL SquareMatrixInverse(N_mat, Mat_inv)
-
-            ! Calculate steady state
-            cavsig4_ss(j, k, l, at, :, cj, ck, cl) = -MATMUL(Mat_inv, B_vec)
-
-            ! Close j loop
-          END DO
-          ! Close k loop
-        END DO
-        ! Close l loop
+      !----------------------------------------!
+      ! < b^{\dagger}_{j} b_{k} a_{l} \sigma > !
+      !----------------------------------------!
+      ! Set the diagonal matrix elements for M
+      Mat = Mat_OG
+      DO x = 1, N_mat
+        Mat(x, x) = Mat(x, x) - ((kappa(a) + 2.0d0 * kappa(b)) - i * (wl(j, b) - wl(k, b) - wl(l, a)))
       END DO
-      ! Close cj loop
+
+      ! Set the non-homogeneous vector
+      B_vec = 0.0d0
+      B_vec(1) = -CONJG(gkl(j, b)) * cavsig3_ss(l, k, ab, eg) + &
+               & -gkl(k, b) * cavsig3_ss(j, l, bta, ge) + &
+               & -gkl(l, a) * cavsig3_ss(j, k, btb, ge)
+      B_vec(2) = -CONJG(gkl(j, b)) * cavsig3_ss(l, k, ab, ee) + &
+               & -gkl(k, b) * xi * cavsig3_ss(j, l, bta, gf) + &
+               & -gkl(l, a) * xi * cavsig3_ss(j, k, btb, gf)
+      B_vec(3) = -CONJG(gkl(j, b)) * xi * cavsig3_ss(l, k, ab, fg) + &
+               & -gkl(k, b) * cavsig3_ss(j, l, bta, ee) + &
+               & -gkl(l, a) * cavsig3_ss(j, k, btb, ee)
+      B_vec(4) = Gamma * (xi ** 2) * cav3_ss(j, k, l, btba) + &
+               & -CONJG(gkl(j, b)) * xi * cavsig3_ss(l, k, ab, fe) + &
+               & -gkl(k, b) * xi * cavsig3_ss(j, l, bta, ef) + &
+               & -gkl(l, a) * xi * cavsig3_ss(j, k, btb, ef)
+      B_vec(5) = i * xi * 0.5d0 * Omega * cav3_ss(j, k, l, btba) + &
+               & CONJG(gkl(j, b)) * xi * cavsig3_ss(l, k, ab, gg) + &
+               & CONJG(gkl(j, b)) * xi * cavsig3_ss(l, k, ab, ee) + &
+               & -CONJG(gkl(j, b)) * xi * cav2_ss(l, k, ab)
+      B_vec(6) = -i * xi * 0.5d0 * Omega * cav3_ss(j, k, l, btba) + &
+               & gkl(k, b) * xi * cavsig3_ss(j, l, bta, gg) + &
+               & gkl(k, b) * xi * cavsig3_ss(j, l, bta, ee) + &
+               & -gkl(k, b) * xi * cav2_ss(j, l, bta) + &
+               & gkl(l, a) * xi * cavsig3_ss(j, k, btb, gg) + &
+               & gkl(l, a) * xi * cavsig3_ss(j, k, btb, ee) + &
+               & -gkl(l, a) * xi * cav2_ss(j, k, btb)
+      B_vec(7) = -CONJG(gkl(j, b)) * cavsig3_ss(l, k, ab, ef)
+      B_vec(8) = -gkl(k, b) * cavsig3_ss(j, l, bta, fe) + &
+               & -gkl(l, a) * cavsig3_ss(j, k, btb, fe)
+
+      ! Set inverse matrix
+      Mat_inv = Mat
+      ! Invert matrix
+      CALL SquareMatrixInverse(N_mat, Mat_inv)
+
+      ! Calculate steady state
+      cavsig4_ss(j, k, l, btba, :) = -MATMUL(Mat_inv, B_vec) 
+
+      !--------------------------------------------------!
+      ! < b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \sigma > !
+      !--------------------------------------------------!
+      ! Set the diagonal matrix elements for M
+      Mat = Mat_OG
+      DO x = 1, N_mat
+        Mat(x, x) = Mat(x, x) - ((2.d0 * kappa(a) + kappa(b)) - i * (wl(j, b) + wl(k, a) - wl(l, a)))
+      END DO
+
+      ! Set the non-homogeneous vector
+      B_vec = 0.0d0
+      B_vec(1) = -CONJG(gkl(j, b)) * cavsig3_ss(k, l, ata, eg) + &
+               & -CONJG(gkl(k, a)) * cavsig3_ss(j, l, bta, eg) + &
+               & -gkl(l, a) * cavsig3_ss(k, j, atbt, ge)
+      B_vec(2) = -CONJG(gkl(j, b)) * cavsig3_ss(k, l, ata, ee) + &
+               & -CONJG(gkl(k, a)) * cavsig3_ss(j, l, bta, ee) + &
+               & -gkl(l, a) * xi * cavsig3_ss(k, j, atbt, gf)
+      B_vec(3) = -CONJG(gkl(j, b)) * xi * cavsig3_ss(k, l, ata, fg) + &
+               & -CONJG(gkl(k, a)) * xi * cavsig3_ss(j, l, bta, fg) + &
+               & -gkl(l, a) * cavsig3_ss(k, j, atbt, ee)
+      B_vec(4) = Gamma * (xi ** 2) * cav3_ss(j, k, l, btata) + &
+               & -CONJG(gkl(j, b)) * xi * cavsig3_ss(k, l, ata, fe) + &
+               & -CONJG(gkl(k, a)) * xi * cavsig3_ss(j, l, bta, fe) + &
+               & -gkl(l, a) * xi * cavsig3_ss(k, j, atbt, ef)
+      B_vec(5) = i * xi * 0.5d0 * Omega * cav3_ss(j, k, l, btata) + &
+               & CONJG(gkl(j, b)) * xi * cavsig3_ss(k, l, ata, gg) + &
+               & CONJG(gkl(j, b)) * xi * cavsig3_ss(k, l, ata, ee) + &
+               & -CONJG(gkl(j, b)) * xi * cav2_ss(k, l, ata) + &
+               & CONJG(gkl(k, a)) * xi * cavsig3_ss(j, l, bta, gg) + &
+               & CONJG(gkl(k, a)) * xi * cavsig3_ss(j, l, bta, ee) + &
+               & -CONJG(gkl(k, a)) * xi * cav2_ss(j, l, bta)
+      B_vec(6) = -i * xi * 0.5d0 * Omega * cav3_ss(j, k, l, btata) + &
+               & gkl(l, a) * xi * cavsig3_ss(k, j, atbt, gg) + &
+               & gkl(l, a) * xi * cavsig3_ss(k, j, atbt, ee) + &
+               & -gkl(l, a) * xi * cav2_ss(k, j, atbt)
+      B_vec(7) = -CONJG(gkl(j, b)) * cavsig3_ss(k, l, ata, ef) + &
+               & -CONJG(gkl(k, a)) * cavsig3_ss(j, l, bta, ef)
+      B_vec(8) = -gkl(l, a) * cavsig3_ss(k, j, atbt, fe)
+
+      ! Set inverse matrix
+      Mat_inv = Mat
+      ! Invert matrix
+      CALL SquareMatrixInverse(N_mat, Mat_inv)
+
+      ! Calculate steady state
+      cavsig4_ss(j, k, l, btata, :) = -MATMUL(Mat_inv, B_vec)
+
+      !--------------------------------------------------!
+      ! < a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \sigma > !
+      !--------------------------------------------------!
+      ! Set the diagonal matrix elements for M
+      Mat = Mat_OG
+      DO x = 1, N_mat
+        Mat(x, x) = Mat(x, x) - ((kappa(a) + 2.0d0 * kappa(b)) - i * (wl(j, a) + wl(k, b) - wl(l, b)))
+      END DO
+
+      ! Set the non-homogeneous vector
+      B_vec = 0.0d0
+      B_vec(1) = -CONJG(gkl(j, a)) * cavsig3_ss(k, l, btb, eg) + &
+               & -CONJG(gkl(k, b)) * cavsig3_ss(j, l, atb, eg) + &
+               & -gkl(l, b) * cavsig3_ss(j, k, atbt, ge)
+      B_vec(2) = -CONJG(gkl(j, a)) * cavsig3_ss(k, l, btb, ee) + &
+               & -CONJG(gkl(k, b)) * cavsig3_ss(j, l, atb, ee) + &
+               & -gkl(l, b) * xi * cavsig3_ss(j, k, atbt, gf)
+      B_vec(3) = -CONJG(gkl(j, a)) * xi * cavsig3_ss(k, l, btb, fg) + &
+               & -CONJG(gkl(k, b)) * xi * cavsig3_ss(j, l, atb, fg) + &
+               & -gkl(l, b) * cavsig3_ss(j, k, atbt, ee)
+      B_vec(4) = Gamma * (xi ** 2) * cav3_ss(j, k, l, atbtb) + &
+               & -CONJG(gkl(j, a)) * xi * cavsig3_ss(k, l, btb, fe) + &
+               & -CONJG(gkl(k, b)) * xi * cavsig3_ss(j, l, atb, fe) + &
+               & -gkl(l, b) * xi * cavsig3_ss(j, k, atbt, ef)
+      B_vec(5) = i * xi * 0.5d0 * Omega * cav3_ss(j, k, l, atbtb) + &
+               & CONJG(gkl(j, a)) * xi * cavsig3_ss(k, l, btb, gg) + &
+               & CONJG(gkl(j, a)) * xi * cavsig3_ss(k, l, btb, ee) + &
+               & -CONJG(gkl(j, a)) * xi * cav2_ss(k, l, btb) + &
+               & CONJG(gkl(k, b)) * xi * cavsig3_ss(j, l, atb, gg) + &
+               & CONJG(gkl(k, b)) * xi * cavsig3_ss(j, l, atb, ee) + &
+               & -CONJG(gkl(k, b)) * xi * cav2_ss(j, l, atb)
+      B_vec(6) = -i * xi * 0.5d0 * Omega * cav3_ss(j, k, l, atbtb) + &
+               & gkl(l, b) * xi * cavsig3_ss(j, k, atbt, gg) + &
+               & gkl(l, b) * xi * cavsig3_ss(j, k, atbt, ee) + &
+               & -gkl(l, b) * xi * cav2_ss(j, k, atbt)
+      B_vec(7) = -CONJG(gkl(j, a)) * cavsig3_ss(k, l, btb, ef) + &
+               & -CONJG(gkl(k, b)) * cavsig3_ss(j, l, atb, ef)
+      B_vec(8) = -gkl(l, b) * cavsig3_ss(j, k, atbt, fe)
+
+      ! Set inverse matrix
+      Mat_inv = Mat
+      ! Invert matrix
+      CALL SquareMatrixInverse(N_mat, Mat_inv)
+
+      ! Calculate steady state
+      cavsig4_ss(j, k, l, atbtb, :) = -MATMUL(Mat_inv, B_vec)
+
+      ! Set inverse matrix
+      Mat_inv = Mat
+      ! Invert matrix
+      CALL SquareMatrixInverse(N_mat, Mat_inv)
+
+      ! Calculate steady state
+      cavsig4_ss(j, k, l, atbtb, :) = -MATMUL(Mat_inv, B_vec)
+
+      ! Close j loop
     END DO
-    ! Close ck loop
+    ! Close k loop
   END DO
-  ! Close cl loop
+  ! Close l loop
 END DO
 
 ! Cycle through modes
@@ -891,18 +1200,19 @@ DO m = -N, N
         !     FOURTH-ORDER: CAVITY     !
         !------------------------------!
         !-------------------------------------------------!
-        ! < a^{\dagger}_{j} a^{\dagger}_{k} a_{l} a_{m} > !
+        ! < a^{\dagger}_{j} b^{\dagger}_{k} b_{l} a_{m} > !
         !-------------------------------------------------!
-        cav4_ss(j, k, l, m) = -CONJG(gkl(j, a)) * cavsig4_ss(k, l, m, a, eg, 2, 2, 1) + &
-                            & -CONJG(gkl(j, a)) * xi * cavsig4_ss(k, l, m, a, fe, 2, 2, 1) + &
-                            & -CONJG(gkl(k, b)) * cavsig4_ss(j, l, m, a, eg, 1, 2, 1) + &
-                            & -CONJG(gkl(k, b)) * xi * cavsig4_ss(j, l, m, a, fe, 1, 2, 1) + &
-                            & -gkl(l, b) * cavsig4_ss(j, k, m, at, ge, 1, 2, 1) + &
-                            & -gkl(l, b) * xi * cavsig4_ss(j, k, m, at, ef, 1, 2, 1) + &
-                            & -gkl(m, a) * cavsig4_ss(j, k, l, at, ge, 1, 2, 2) + &
-                            & -gkl(m, a) * xi * cavsig4_ss(j, k, l, at, ef, 1, 2, 2)
+        cav4_ss(j, k, l, m) = -CONJG(gkl(j, a)) * cavsig4_ss(k, l, m, btba, eg) + &
+                            & -CONJG(gkl(j, a)) * xi * cavsig4_ss(k, l, m, btba, fe) + &
+                            & -CONJG(gkl(k, b)) * cavsig4_ss(j, m, l, atab, eg) + &
+                            & -CONJG(gkl(k, b)) * xi * cavsig4_ss(j, m, l, atab, fe) + &
+                            & -gkl(l, b) * cavsig4_ss(k, j, m, btata, ge) + &
+                            & -gkl(l, b) * xi * cavsig4_ss(k, j, m, btata, ef) + &
+                            & -gkl(m, a) * cavsig4_ss(j, k, l, atbtb, ge) + &
+                            & -gkl(m, a) * xi * cavsig4_ss(j, k, l, atbtb, ef)
         cav4_ss(j, k, l, m) = cav4_ss(j, k, l, m) / &
-                            & ((2.0d0 * kappa(a)) + (2.0d0 * kappa(b)) - i * (wl(j, a) + wl(k, b)) + i * (wl(l, b) + wl(m, a)))
+                            & ((2.0d0 * kappa(a) + 2.0d0 * kappa(b)) - &
+                              & i * (wl(j, a) + wl(k, b)) + i * (wl(l, b) + wl(m, a)))
         ! Close j loop
       END DO
       ! Close k loop
@@ -921,41 +1231,36 @@ PRINT*, "< B^{\dagger} B >_{ss} = ", photon_ss(b)
 ! Set initial conditions and non-homogeneous vector
 ! < a^{\dagger}_{j}(0) \sigma(\tau = 0) a_{m}(0) > =
 !                         < a^{\dagger}_{j} a_{m} \sigma >_{ss},
-! < a^{\dagger}_{j}(0) a^{\dagger}_{k}(\tau = 0) a_{m}(0) > =
-!                         < a^{\dagger}_{j} a^{\dagger}_{k} a_{m} >_{ss},
-! < a^{\dagger}_{j}(0) a_{l}(\tau = 0) a_{m}(0) > =
-!                         < a^{\dagger}_{j} a_{l} a_{m} >_{ss},
-! < a^{\dagger}_{j}(0) a^{\dagger}_{k} \sigma(\tau = 0) a_{m}(0) =
-!                         < a^{\dagger}_{j} a^{\dagger}_{k} a_{m} \sigma >_{ss},
-! < a^{\dagger}_{j}(0) a_{l} \sigma(\tau = 0) a_{m}(0) =
-!                         < a^{\dagger}_{j} a_{l} a_{m} \sigma >_{ss},
+! < a^{\dagger}_{j}(0) b^{\dagger}_{k}(\tau = 0) a_{m}(0) > =
+!                         < a^{\dagger}_{j} b^{\dagger}_{k} a_{m} >_{ss},
+! < a^{\dagger}_{j}(0) b_{l}(\tau = 0) a_{m}(0) > =
+!                         < a^{\dagger}_{j} b_{l} a_{m} >_{ss},
+! < a^{\dagger}_{j}(0) b^{\dagger}_{k} \sigma(\tau = 0) a_{m}(0) =
+!                         < a^{\dagger}_{j} b^{\dagger}_{k} a_{m} \sigma >_{ss},
+! < a^{\dagger}_{j}(0) b_{l} \sigma(\tau = 0) a_{m}(0) =
+!                         < a^{\dagger}_{j} b_{l} a_{m} \sigma >_{ss},
 ! and
-! < a^{\dagger}_{j}(0) a^{\dagger}_{k} a_{l}(\tau = 0)  a_{m}(0) > =
-!                         < a^{\dagger}_{j} a^{\dagger}_{k} a_{l} a_{m} >_{ss}.
+! < a^{\dagger}_{j}(0) b^{\dagger}_{k} b_{l}(\tau = 0)  a_{m}(0) > =
+!                         < a^{\dagger}_{j} b^{\dagger}_{k} b_{l} a_{m} >_{ss}.
 
 sigma = 0.0d0
 cav1 = 0.0d0
 cavsig2 = 0.0d0
 cav2 = 0.0d0
 B_OG = 0.0d0
-! Set modes to calculate initial conditions for
-cj = 1
-ck = 2
-cl = 2
-cm = 1
 ! Cycle through modes
 DO m = -N, N
   DO j = -N, N
     ! First-order: Atom
-    sigma(:) = sigma(:) + cavsig3_ss(j, m, ata, :, cj, cm)
+    sigma(:) = sigma(:) + cavsig3_ss(j, m, ata, :)
 
     DO k = -N, N
       ! First-order: Cavity
-      cav1(k, a) = cav1(k, a) + cav3_ss(j, k, m, a, cj, ck, cm)
-      cav1(k, at) = cav1(k, at) + cav3_ss(j, k, m, at, cj, ck, cm)
+      cav1(k, a) = cav1(k, a) + cav3_ss(j, m, k, atab)
+      cav1(k, at) = cav1(k, at) + cav3_ss(k, j, m, btata)
       ! Second-order: Cavity and atom
-      cavsig2(k, a, :) = cavsig2(k, a, :) + cavsig4_ss(j, k, m, a, :, cj, ck, cm)
-      cavsig2(k, at, :) = cavsig2(k, at, :) + cavsig4_ss(j, k, m, at, :, cj, ck, cm)
+      cavsig2(k, a, :) = cavsig2(k, a, :) + cavsig4_ss(j, m, k, atab, :)
+      cavsig2(k, at, :) = cavsig2(k, at, :) + cavsig4_ss(k, j, m, btata, :)
 
       DO l = -N, N
         ! Second-order: cavity
@@ -966,9 +1271,9 @@ DO m = -N, N
       ! Close k loop
     END DO
     ! Non homogeneous vector
-    B_OG(4) = B_OG(4) + Gamma * (xi ** 2) * cav2_ss(j, m, ata, cj, cm)
-    B_OG(5) = B_OG(5) + i * xi * 0.5d0 * Omega * cav2_ss(j, m, ata, cj, cm)
-    B_OG(6) = B_OG(6) - i * xi * 0.5d0 * Omega * cav2_ss(j, m, ata, cj, cm)
+    B_OG(4) = B_OG(4) + Gamma * (xi ** 2) * cav2_ss(j, m, ata)
+    B_OG(5) = B_OG(5) + i * xi * 0.5d0 * Omega * cav2_ss(j, m, ata)
+    B_OG(6) = B_OG(6) - i * xi * 0.5d0 * Omega * cav2_ss(j, m, ata)
 
     ! Close j loop
   END DO
@@ -980,10 +1285,6 @@ tau_steps = NINT(tau2_max / DBLE(dt))
 
 ! Open file to write time and data to
 OPEN(UNIT=4, FILE=filename_g2, STATUS='REPLACE', ACTION='WRITE', RECL=4000)
-
-! Set modes to calculate correlation for
-cj = 2
-ck = 2
 
 ! Cycle through time steps
 DO t = 0, tau_steps
@@ -1098,12 +1399,12 @@ DO t = 0, tau_steps
     B_vec(2) = -gkl(j, b) * xi * sigma(gf)
     B_vec(3) = -gkl(j, b) * sigma(ee)
     B_vec(4) = Gamma * (xi ** 2) * cav1(j, a) + &
-         & -gkl(j, b) * xi * sigma(ef)
+             & -gkl(j, b) * xi * sigma(ef)
     B_vec(5) = i * xi * 0.5d0 * Omega * cav1(j, a)
     B_vec(6) = -i * xi * 0.5d0 * Omega * cav1(j, a) + &
-         & gkl(j, b) * xi * sigma(gg) + &
-         & gkl(j, b) * xi * sigma(ee) + &
-         & -gkl(j, b) * xi * photon_ss(a)
+             & gkl(j, b) * xi * sigma(gg) + &
+             & gkl(j, b) * xi * sigma(ee) + &
+             & -gkl(j, b) * xi * photon_ss(a)
     B_vec(7) = 0.0d0
     B_vec(8) = -gkl(j, b) * sigma(fe)
     ! Calculate k1
@@ -1115,12 +1416,12 @@ DO t = 0, tau_steps
     B_vec(2) = -gkl(j, b) * xi * (sigma(gf) + 0.5d0 * k1_sigma(gf))
     B_vec(3) = -gkl(j, b) * (sigma(ee) + 0.5d0 * k1_sigma(ee))
     B_vec(4) = Gamma * (xi ** 2) * (cav1(j, a) + 0.5d0 * k1_cav1(j, a)) + &
-         & -gkl(j, b) * xi * (sigma(ef) + 0.5d0 * k1_sigma(ef))
+             & -gkl(j, b) * xi * (sigma(ef) + 0.5d0 * k1_sigma(ef))
     B_vec(5) = i * xi * 0.5d0 * Omega * (cav1(j, a) + 0.5d0 * k1_cav1(j, a))
     B_vec(6) = -i * xi * 0.5d0 * Omega * (cav1(j, a) + 0.5d0 * k1_cav1(j, a)) + &
-         & gkl(j, b) * xi * (sigma(gg) + 0.5d0 * k1_sigma(gg)) + &
-         & gkl(j, b) * xi * (sigma(ee) + 0.5d0 * k1_sigma(ee)) + &
-         & -gkl(j, b) * xi * photon_ss(a)
+             & gkl(j, b) * xi * (sigma(gg) + 0.5d0 * k1_sigma(gg)) + &
+             & gkl(j, b) * xi * (sigma(ee) + 0.5d0 * k1_sigma(ee)) + &
+             & -gkl(j, b) * xi * photon_ss(a)
     B_vec(7) = 0.0d0
     B_vec(8) = -gkl(j, b) * (sigma(fe) + 0.5d0 * k1_sigma(fe))
     ! Calculate k2
@@ -1132,12 +1433,12 @@ DO t = 0, tau_steps
     B_vec(2) = -gkl(j, b) * xi * (sigma(gf) + 0.5d0 * k2_sigma(gf))
     B_vec(3) = -gkl(j, b) * (sigma(ee) + 0.5d0 * k2_sigma(ee))
     B_vec(4) = Gamma * (xi ** 2) * (cav1(j, a) + 0.5d0 * k2_cav1(j, a)) + &
-         & -gkl(j, b) * xi * (sigma(ef) + 0.5d0 * k2_sigma(ef))
+             & -gkl(j, b) * xi * (sigma(ef) + 0.5d0 * k2_sigma(ef))
     B_vec(5) = i * xi * 0.5d0 * Omega * (cav1(j, a) + 0.5d0 * k2_cav1(j, a))
     B_vec(6) = -i * xi * 0.5d0 * Omega * (cav1(j, a) + 0.5d0 * k2_cav1(j, a)) + &
-         & gkl(j, b) * xi * (sigma(gg) + 0.5d0 * k2_sigma(gg)) + &
-         & gkl(j, b) * xi * (sigma(ee) + 0.5d0 * k2_sigma(ee)) + &
-         & -gkl(j, b) * xi * photon_ss(a)
+             & gkl(j, b) * xi * (sigma(gg) + 0.5d0 * k2_sigma(gg)) + &
+             & gkl(j, b) * xi * (sigma(ee) + 0.5d0 * k2_sigma(ee)) + &
+             & -gkl(j, b) * xi * photon_ss(a)
     B_vec(7) = 0.0d0
     B_vec(8) = -gkl(j, b) * (sigma(fe) + 0.5d0 * k2_sigma(fe))
     ! Calculate k3
@@ -1149,12 +1450,12 @@ DO t = 0, tau_steps
     B_vec(2) = -gkl(j, b) * xi * (sigma(gf) + k3_sigma(gf))
     B_vec(3) = -gkl(j, b) * (sigma(ee) + k3_sigma(ee))
     B_vec(4) = Gamma * (xi ** 2) * (cav1(j, a) + k3_cav1(j, a)) + &
-         & -gkl(j, b) * xi * (sigma(ef) + k3_sigma(ef))
+             & -gkl(j, b) * xi * (sigma(ef) + k3_sigma(ef))
     B_vec(5) = i * xi * 0.5d0 * Omega * (cav1(j, a) + k3_cav1(j, a))
     B_vec(6) = -i * xi * 0.5d0 * Omega * (cav1(j, a) + k3_cav1(j, a)) + &
-         & gkl(j, b) * xi * (sigma(gg) + k3_sigma(gg)) + &
-         & gkl(j, b) * xi * (sigma(ee) + k3_sigma(ee)) + &
-         & -gkl(j, b) * xi * photon_ss(a)
+             & gkl(j, b) * xi * (sigma(gg) + k3_sigma(gg)) + &
+             & gkl(j, b) * xi * (sigma(ee) + k3_sigma(ee)) + &
+             & -gkl(j, b) * xi * photon_ss(a)
     B_vec(7) = 0.0d0
     B_vec(8) = -gkl(j, b) * (sigma(fe) + k3_sigma(fe))
     ! Calculate k4
@@ -1175,11 +1476,11 @@ DO t = 0, tau_steps
     B_vec(2) = -CONJG(gkl(j, b)) * sigma(ee)
     B_vec(3) = -CONJG(gkl(j, b)) * xi * sigma(fg)
     B_vec(4) = Gamma * (xi ** 2) * cav1(j, at) + &
-         & -CONJG(gkl(j, b)) * xi * sigma(fe)
+             & -CONJG(gkl(j, b)) * xi * sigma(fe)
     B_vec(5) = i * xi * 0.5d0 * Omega * cav1(j, at) + &
-         & CONJG(gkl(j, b)) * xi * sigma(gg) + &
-         & CONJG(gkl(j, b)) * xi * sigma(ee) + &
-         & -CONJG(gkl(j, b)) * xi * photon_ss(a)
+             & CONJG(gkl(j, b)) * xi * sigma(gg) + &
+             & CONJG(gkl(j, b)) * xi * sigma(ee) + &
+             & -CONJG(gkl(j, b)) * xi * photon_ss(a)
     B_vec(6) = -i * xi * 0.5d0 * Omega * cav1(j, at)
     B_vec(7) = -CONJG(gkl(j, b)) * sigma(ef)
     B_vec(8) = 0.0d0
@@ -1192,11 +1493,11 @@ DO t = 0, tau_steps
     B_vec(2) = -CONJG(gkl(j, b)) * (sigma(ee) + 0.5d0 * k1_sigma(ee))
     B_vec(3) = -CONJG(gkl(j, b)) * xi * (sigma(fg) + 0.5d0 * k1_sigma(fg))
     B_vec(4) = Gamma * (xi ** 2) * (cav1(j, at) + 0.5d0 * k1_cav1(j, at)) + &
-         & -CONJG(gkl(j, b)) * xi * (sigma(fe) + 0.5d0 * k1_sigma(fe))
+             & -CONJG(gkl(j, b)) * xi * (sigma(fe) + 0.5d0 * k1_sigma(fe))
     B_vec(5) = i * xi * 0.5d0 * Omega * (cav1(j, at) + 0.5d0 * k1_cav1(j, at)) + &
-         & CONJG(gkl(j, b)) * xi * (sigma(gg) + 0.5d0 * k1_sigma(gg)) + &
-         & CONJG(gkl(j, b)) * xi * (sigma(ee) + 0.5d0 * k1_sigma(ee)) + &
-         & -CONJG(gkl(j, b)) * xi * photon_ss(a)
+             & CONJG(gkl(j, b)) * xi * (sigma(gg) + 0.5d0 * k1_sigma(gg)) + &
+             & CONJG(gkl(j, b)) * xi * (sigma(ee) + 0.5d0 * k1_sigma(ee)) + &
+             & -CONJG(gkl(j, b)) * xi * photon_ss(a)
     B_vec(6) = -i * xi * 0.5d0 * Omega * (cav1(j, at) + 0.5d0 * k1_cav1(j, at))
     B_vec(7) = -CONJG(gkl(j, b)) * (sigma(ef) + 0.5d0 * k1_sigma(ef))
     B_vec(8) = 0.0d0
@@ -1209,11 +1510,11 @@ DO t = 0, tau_steps
     B_vec(2) = -CONJG(gkl(j, b)) * (sigma(ee) + 0.5d0 * k2_sigma(ee))
     B_vec(3) = -CONJG(gkl(j, b)) * xi * (sigma(fg) + 0.5d0 * k2_sigma(fg))
     B_vec(4) = Gamma * (xi ** 2) * (cav1(j, at) + 0.5d0 * k2_cav1(j, at)) + &
-         & -CONJG(gkl(j, b)) * xi * (sigma(fe) + 0.5d0 * k2_sigma(fe))
+             & -CONJG(gkl(j, b)) * xi * (sigma(fe) + 0.5d0 * k2_sigma(fe))
     B_vec(5) = i * xi * 0.5d0 * Omega * (cav1(j, at) + 0.5d0 * k2_cav1(j, at)) + &
-         & CONJG(gkl(j, b)) * xi * (sigma(gg) + 0.5d0 * k2_sigma(gg)) + &
-         & CONJG(gkl(j, b)) * xi * (sigma(ee) + 0.5d0 * k2_sigma(ee)) + &
-         & -CONJG(gkl(j, b)) * xi * photon_ss(a)
+             & CONJG(gkl(j, b)) * xi * (sigma(gg) + 0.5d0 * k2_sigma(gg)) + &
+             & CONJG(gkl(j, b)) * xi * (sigma(ee) + 0.5d0 * k2_sigma(ee)) + &
+             & -CONJG(gkl(j, b)) * xi * photon_ss(a)
     B_vec(6) = -i * xi * 0.5d0 * Omega * (cav1(j, at) + 0.5d0 * k2_cav1(j, at))
     B_vec(7) = -CONJG(gkl(j, b)) * (sigma(ef) + 0.5d0 * k2_sigma(ef))
     B_vec(8) = 0.0d0
@@ -1226,11 +1527,11 @@ DO t = 0, tau_steps
     B_vec(2) = -CONJG(gkl(j, b)) * (sigma(ee) + k3_sigma(ee))
     B_vec(3) = -CONJG(gkl(j, b)) * xi * (sigma(fg) + k3_sigma(fg))
     B_vec(4) = Gamma * (xi ** 2) * (cav1(j, at) + k3_cav1(j, at)) + &
-         & -CONJG(gkl(j, b)) * xi * (sigma(fe) + k3_sigma(fe))
+             & -CONJG(gkl(j, b)) * xi * (sigma(fe) + k3_sigma(fe))
     B_vec(5) = i * xi * 0.5d0 * Omega * (cav1(j, at) + k3_cav1(j, at)) + &
-         & CONJG(gkl(j, b)) * xi * (sigma(gg) + k3_sigma(gg)) + &
-         & CONJG(gkl(j, b)) * xi * (sigma(ee) + k3_sigma(ee)) + &
-         & -CONJG(gkl(j, b)) * xi * photon_ss(a)
+             & CONJG(gkl(j, b)) * xi * (sigma(gg) + k3_sigma(gg)) + &
+             & CONJG(gkl(j, b)) * xi * (sigma(ee) + k3_sigma(ee)) + &
+             & -CONJG(gkl(j, b)) * xi * photon_ss(a)
     B_vec(6) = -i * xi * 0.5d0 * Omega * (cav1(j, at) + k3_cav1(j, at))
     B_vec(7) = -CONJG(gkl(j, b)) * (sigma(ef) + k3_sigma(ef))
     B_vec(8) = 0.0d0

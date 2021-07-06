@@ -793,9 +793,9 @@ DO l = -N, N
       ! Calculate steady state
       cavsig4_ss(j, k, l, a, :) = -MATMUL(Mat_inv, B_vec)
 
-      !-------------------------------------------!
-      ! < a^{\dagger}_{j} a^{\dagger}_{k} a_{l} > !
-      !-------------------------------------------!
+      !--------------------------------------------------!
+      ! < a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \sigma > !
+      !--------------------------------------------------!
       ! Set the diagonal matrix elements for M
       Mat = Mat_OG
       DO x = 1, N_mat

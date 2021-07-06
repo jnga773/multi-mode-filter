@@ -1358,9 +1358,9 @@ DO t = 0, t_steps
         ! Calculate k4
         k4_cavsig4(j, k, l, a, :) = dt * (MATMUL(Mat, (cavsig4(j, k, l, a, :) + k3_cavsig4(j, k, l, a, :))) + B_vec)
 
-        !-------------------------------------------!
-        ! < a^{\dagger}_{j} a^{\dagger}_{k} a_{l} > !
-        !-------------------------------------------!
+        !--------------------------------------------------!
+        ! < a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \sigma > !
+        !--------------------------------------------------!
         ! Set the diagonal matrix elements for M
         Mat = Mat_OG
         DO x = 1, N_mat

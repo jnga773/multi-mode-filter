@@ -5,16 +5,13 @@ Created on Sat Sep 28 10:27:11 2019
 @author: Jacob
 """
 
+from _my_functions import *
+
 import numpy as np
 import matplotlib.pyplot as plt
+
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
-# from scipy.signal import find_peaks
-import sys
-# Append path to add Jacobs_Function
-sys.path.append("/home/jnga773/Documents/898-PhD/test/")
-# sys.path.append("E:/Google Drive/University/Physics/898 PhD/test")
-from Jacobs_Functions import filename, spectrum
 
 plt.close('all')
 
@@ -35,33 +32,6 @@ def mollow_triplet(tau_in, gamma_in, Omega_in):
     print("Mean Im[g1_atom] = {}".format(np.mean(np.imag(g1_f))))
     return g1_f
 
-# Normalisation function
-def norm_spectra(Omega_in, atom_spec_in, filtered_spec_in, w0_in):
-    """
-    Depending on where the filter is centred, normalise the filtered spectrum
-    to the relevant peak.
-    """
-    from numpy import array
-    # Calculate where the peaks are located in the UNfiltered spectrum
-    from scipy.signal import find_peaks
-    peaks = find_peaks(atom_spec_in, height=0.1)[1]["peak_heights"]
-    
-    # Calculate where the peaks should fall from eigenvalues
-    peaks_calculated = array([-Omega_in, 0.0, Omega_in])
-    # print(peaks_calculated)
-    
-    # Cycle through peaks_calculated and compare with w0
-    norm_peak_value = 1.0
-    for place, item in enumerate(peaks_calculated):
-        if round(item, 2) == round(w0_in, 2):
-            # save the peak value
-            norm_peak_value = peaks[place]
-            # Leave loop
-            break
-    # Renormalise spectra
-    spec_out = filtered_spec_in * norm_peak_value
-    return spec_out
-
 #------------------------------------------------------------------------------#
 #                                FILENAME THINGS                               #
 #------------------------------------------------------------------------------#
@@ -70,14 +40,15 @@ gamma, Omega, w0, kappa, dw, epsilon, N, phase, dt, tau1_max = \
     np.genfromtxt(filename("parameters"), delimiter="=", skip_header=1, usecols=1)
 N = int(N)
 phase = int(phase)
-Omega = round(Omega, 2)
-w0 = round(w0, 2)
+Omega_str = pi_int(Omega)
+w0_str = pi_int(w0)
 
 # Pull data from file
 tau = np.genfromtxt(filename("g1_corr"), usecols=0)
 corr = np.genfromtxt(filename("g1_corr"), usecols=1) + 1j * \
         np.genfromtxt(filename("g1_corr"), usecols=2)
 # tau = np.genfromtxt(filename("me_g1_corr"), usecols=0)
+
 corr_atom = mollow_triplet(tau, gamma, Omega)
 
 # Calculate Fourier transform
@@ -140,7 +111,7 @@ ax[0].set_xlim(-0.1, 10.1)
 
 ax[0].set_xlabel(r'$\gamma \tau$', fontsize=12)
 ax[0].set_ylabel(r'$G^{(1)}(\tau)$', fontsize=12)
-ax[0].set_title(r'$\Omega = {} \gamma$'.format(Omega), fontsize=12)
+ax[0].set_title(r'$\Omega = {} \gamma$'.format(Omega_str), fontsize=12)
 ax[0].legend(loc='best', fontsize=12)
 
 # Spectra
@@ -150,7 +121,8 @@ ax[1].plot(wlist, spec_atom, color='k', ls='dashed', lw=1.0, alpha=0.5, label='U
 ax[1].set_xlim(-1.2 * Omega, 1.2 * Omega)
 ax[1].set_xlabel(r'$\left( \omega - \omega_{d} \right) / \gamma$', fontsize=12)
 ax[1].set_ylabel('Power Spectrum (a.u.)', fontsize=12)
-ax[1].set_title(r'$N = {}, \delta\omega = {} \gamma, \kappa = {} \gamma, \omega_{{0}} = {} \gamma$'.format(N, dw, kappa, w0), fontsize=12)
+ax[1].set_title(r'$N = {}, \delta\omega = {} \gamma, \kappa = {} \gamma, \omega_{{0}} = {} \gamma$'.format(N, dw, kappa, w0_str),
+                fontsize=12)
 ax[1].legend(loc='best', fontsize=12)
 
 fig.tight_layout()

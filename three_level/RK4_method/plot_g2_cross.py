@@ -5,33 +5,16 @@ Created on Sat Sep 28 10:27:11 2019
 @author: Jacob
 """
 
+from _my_functions import filename
+from _dressed_state_correlations import three_level_eig
+
 import numpy as np
 import matplotlib.pyplot as plt
+
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
-import sys
-# Append path to add Jacobs_Function
-sys.path.append("/home/jnga773/Documents/898-PhD/test/")
-# sys.path.append("D:/Jacob/Google Drive/University/Physics/898 PhD/test")
-from Jacobs_Functions import filename
 
 plt.close('all')
-
-def g2_dressed_states(tau_in, Omega_in, gamma_in, w0_in, auto_or_cross='auto'):
-    """
-    Analytic expression for the normalised second-order correlation function
-    of the dressed state transitions.
-    """
-    from numpy import exp, ones
-    # If auto-correlation, calculate straight or anti-bunched
-    if auto_or_cross == 'auto':
-        if abs(w0_in) == abs(Omega_in):
-            g2_f = 1.0 - exp(-0.5 * gamma_in * tau_in)
-        elif abs(w0_in) == 0.0:
-            g2_f = ones(len(tau_in))
-    elif auto_or_cross == 'cross':
-        g2_f = 1 + exp(-0.5 * gamma_in * tau_in)
-    return g2_f
 
 #-----------------------------------------------------------------------------#
 #                               FILENAME THINGS                               #
@@ -52,9 +35,9 @@ tau = np.genfromtxt(filename("cross_g2_corr"), usecols=0)
 corr_auto = np.genfromtxt(filename("g2_corr"), usecols=1)
 corr_cross = np.genfromtxt(filename("cross_g2_corr"), usecols=1)
 
------------------------------------------------------------------------------#
-                        PLOT AUTO AND CROSS g^{(2)}                         #
------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
+#                        PLOT AUTO AND CROSS g^{(2)}                          #
+#-----------------------------------------------------------------------------#
 fig, ax = plt.subplots(1, 2, figsize=[15, 6])
 
 # Auto-correlation

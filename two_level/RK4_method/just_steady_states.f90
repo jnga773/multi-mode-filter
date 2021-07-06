@@ -83,32 +83,6 @@ COMPLEX(KIND=8), DIMENSION(N_mat, N_mat)               :: Mat, Mat_OG, Mat_inv
 ! Non-homogeneous vector
 COMPLEX(KIND=8), DIMENSION(N_mat)                      :: B_vec, B_OG
 
-! ! Time integration arrays
-! First-order moments: Atomic equations (< \sigma >)
-! COMPLEX(KIND=8), DIMENSION(N_mat)                      :: sigma
-! COMPLEX(KIND=8), DIMENSION(N_mat)                      :: k1_sigma, k2_sigma, k3_sigma, k4_sigma
-! ! First-order moments: Cavity (< a >, < a^{\dagger} >)
-! COMPLEX(KIND=8), DIMENSION(:, :), ALLOCATABLE          :: cav1
-! COMPLEX(KIND=8), DIMENSION(:, :), ALLOCATABLE          :: k1_cav1, k2_cav1, k3_cav1, k4_cav1
-! ! Second-order moments: Cavity and atom (< a \sigma >, < a^{\dagger} \sigma >)
-! COMPLEX(KIND=8), DIMENSION(:, :, :), ALLOCATABLE       :: cavsig2
-! COMPLEX(KIND=8), DIMENSION(:, :, :), ALLOCATABLE       :: k1_cavsig2, k2_cavsig2, k3_cavsig2, k4_cavsig2
-! ! Second-order moments: Cavity (< a^{\dagger} a >)
-! COMPLEX(KIND=8), DIMENSION(:, :, :), ALLOCATABLE       :: cav2
-! COMPLEX(KIND=8), DIMENSION(:, :, :), ALLOCATABLE       :: k1_cav2, k2_cav2, k3_cav2, k4_cav2
-! ! Third-order moments: Cavity and atom (< a^{2} \sigma >, < a^{\dagger 2} \sigma >, < a^{\dagger} a \sigma >)
-! COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: cavsig3
-! COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: k1_cavsig3, k2_cavsig3, k3_cavsig3, k4_cavsig3
-! ! Third-order moments: Cavity (< a^{2} a^{\dagger} >, < a^{\dagger 2} a >)
-! COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: cav3
-! COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: k1_cav3, k2_cav3, k3_cav3, k4_cav3
-! ! Fourth-order moments: Cavity and atom ( < a^{\dagger} a^{2} \sigma >, < a^{\dagger 2} a \sigma >)
-! COMPLEX(KIND=8), DIMENSION(:, :, :, :, :), ALLOCATABLE :: cavsig4
-! COMPLEX(KIND=8), DIMENSION(:, :, :, :, :), ALLOCATABLE :: k1_cavsig4, k2_cavsig4, k3_cavsig4, k4_cavsig4
-! ! Fourth-order moments: Cavity (< a^{\dagger 2} a^{2} >)
-! COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: cav4
-! COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: k1_cav4, k2_cav4, k3_cav4, k4_cav4
-
 ! Steady state arrays
 ! First-order moments: Atomic equations (< \sigma >)
 COMPLEX(KIND=8), DIMENSION(N_mat)                      :: sigma_ss
@@ -281,49 +255,6 @@ END DO
 !------------------------------------------!
 !     INITALISE OPERATOR MOMENT ARRAYS     !
 !------------------------------------------!
-! ! First-order: Cavity
-! ALLOCATE(cav1(-N:N, 2)); cav1 = 0.0d0
-! ALLOCATE(k1_cav1(-N:N, 2)); k1_cav1 = 0.0d0
-! ALLOCATE(k2_cav1(-N:N, 2)); k2_cav1 = 0.0d0
-! ALLOCATE(k3_cav1(-N:N, 2)); k3_cav1 = 0.0d0
-! ALLOCATE(k4_cav1(-N:N, 2)); k4_cav1 = 0.0d0
-! ! Second-order: Cavity and Atom
-! ALLOCATE(cavsig2(-N:N, 2, N_mat)); cavsig2 = 0.0d0
-! ALLOCATE(k1_cavsig2(-N:N, 2, N_mat)); k1_cavsig2 = 0.0d0
-! ALLOCATE(k2_cavsig2(-N:N, 2, N_mat)); k2_cavsig2 = 0.0d0
-! ALLOCATE(k3_cavsig2(-N:N, 2, N_mat)); k3_cavsig2 = 0.0d0
-! ALLOCATE(k4_cavsig2(-N:N, 2, N_mat)); k4_cavsig2 = 0.0d0
-! ! Second-order: Cavity
-! ALLOCATE(cav2(-N:N, -N:N, 3)); cav2 = 0.0d0
-! ALLOCATE(k1_cav2(-N:N, -N:N, 3)); k1_cav2 = 0.0d0
-! ALLOCATE(k2_cav2(-N:N, -N:N, 3)); k2_cav2 = 0.0d0
-! ALLOCATE(k3_cav2(-N:N, -N:N, 3)); k3_cav2 = 0.0d0
-! ALLOCATE(k4_cav2(-N:N, -N:N, 3)); k4_cav2 = 0.0d0
-! ! Third-order: Cavity and Atom
-! ALLOCATE(cavsig3(-N:N, -N:N, 3, N_mat)); cavsig3 = 0.0d0
-! ALLOCATE(k1_cavsig3(-N:N, -N:N, 3, N_mat)); k1_cavsig3 = 0.0d0
-! ALLOCATE(k2_cavsig3(-N:N, -N:N, 3, N_mat)); k2_cavsig3 = 0.0d0
-! ALLOCATE(k3_cavsig3(-N:N, -N:N, 3, N_mat)); k3_cavsig3 = 0.0d0
-! ALLOCATE(k4_cavsig3(-N:N, -N:N, 3, N_mat)); k4_cavsig3 = 0.0d0
-! ! Third-order: Cavity
-! ALLOCATE(cav3(-N:N, -N:N, -N:N, 2)); cav3 = 0.0d0
-! ALLOCATE(k1_cav3(-N:N, -N:N, -N:N, 2)); k1_cav3 = 0.0d0
-! ALLOCATE(k2_cav3(-N:N, -N:N, -N:N, 2)); k2_cav3 = 0.0d0
-! ALLOCATE(k3_cav3(-N:N, -N:N, -N:N, 2)); k3_cav3 = 0.0d0
-! ALLOCATE(k4_cav3(-N:N, -N:N, -N:N, 2)); k4_cav3 = 0.0d0
-! ! Fourth-order: Cavity and atom
-! ALLOCATE(cavsig4(-N:N, -N:N, -N:N, 2, N_mat)); cavsig4 = 0.0d0
-! ALLOCATE(k1_cavsig4(-N:N, -N:N, -N:N, 2, N_mat)); k1_cavsig4 = 0.0d0
-! ALLOCATE(k2_cavsig4(-N:N, -N:N, -N:N, 2, N_mat)); k2_cavsig4 = 0.0d0
-! ALLOCATE(k3_cavsig4(-N:N, -N:N, -N:N, 2, N_mat)); k3_cavsig4 = 0.0d0
-! ALLOCATE(k4_cavsig4(-N:N, -N:N, -N:N, 2, N_mat)); k4_cavsig4 = 0.0d0
-! ! Fourth-order: Cavity
-! ALLOCATE(cav4(-N:N, -N:N, -N:N, -N:N)); cav4 = 0.0d0
-! ALLOCATE(k1_cav4(-N:N, -N:N, -N:N, -N:N)); k1_cav4 = 0.0d0
-! ALLOCATE(k2_cav4(-N:N, -N:N, -N:N, -N:N)); k2_cav4 = 0.0d0
-! ALLOCATE(k3_cav4(-N:N, -N:N, -N:N, -N:N)); k3_cav4 = 0.0d0
-! ALLOCATE(k4_cav4(-N:N, -N:N, -N:N, -N:N)); k4_cav4 = 0.0d0
-
 ! Steady states
 ! First-order: Cavity
 ALLOCATE(cav1_ss(-N:N, 2)); cav1_ss = 0.0d0
@@ -417,7 +348,7 @@ DO j = -N, N
   B_vec(1) = 0.0d0
   B_vec(2) = -0.5d0 * gkl(j) * (sigma_ss(sz) + 1.0d0)
   B_vec(3) = -gamma * cav1_ss(j, a) + &
-       & gkl(j) * sigma_ss(sm)
+           & gkl(j) * sigma_ss(sm)
 
   ! Set inverse matrix
   Mat_inv = Mat
@@ -441,7 +372,7 @@ DO j = -N, N
   B_vec(1) = -0.5d0 * CONJG(gkl(j)) * (sigma_ss(sz) + 1.0d0)
   B_vec(2) = 0.0d0
   B_vec(3) = -gamma * cav1_ss(j, at) + &
-       & CONJG(gkl(j)) * sigma_ss(sp)
+           & CONJG(gkl(j)) * sigma_ss(sp)
 
   ! Set inverse matrix
   Mat_inv = Mat
@@ -637,9 +568,9 @@ DO l = -N, N
       ! Calculate steady state
       cavsig4_ss(j, k, l, a, :) = -MATMUL(Mat_inv, B_vec)
 
-      !-------------------------------------------!
-      ! < a^{\dagger}_{j} a^{\dagger}_{k} a_{l} > !
-      !-------------------------------------------!
+      !--------------------------------------------------!
+      ! < a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \sigma > !
+      !--------------------------------------------------!
       ! Set the diagonal matrix elements for M
       Mat = Mat_OG
       DO x = 1, N_mat
@@ -710,11 +641,11 @@ END DO
 ! WRITE(*, '(A12,ES18.11E2,A3,ES18.11E2,A2)') "< sz >_ss = ", REAL(sigma_ss(sz)), " + ", IMAG(sigma_ss(sz)), "i"
 ! WRITE(*, *) "=============================================="
 !
-! WRITE(*, *) "=============================================="
-! WRITE(*, *) "FIRST-ORDER: CAVITY"
-! WRITE(*, '(A14,ES18.11E2 A3,ES18.11E2,A2)') " < a_0 >_ss = ", REAL(cav1_ss(0, a)), " + ", IMAG(cav1_ss(0, a)), "i"
-! WRITE(*, '(A14,ES18.11E2 A3,ES18.11E2,A2)') "< at_0 >_ss = ", REAL(cav1_ss(0, at)), " + ", IMAG(cav1_ss(0, at)), "i"
-! WRITE(*, *) "=============================================="
+WRITE(*, *) "=============================================="
+WRITE(*, *) "FIRST-ORDER: CAVITY"
+WRITE(*, '(A14,ES18.11E2 A3,ES18.11E2,A2)') " < a_0 >_ss = ", REAL(cav1_ss(0, a)), " + ", IMAG(cav1_ss(0, a)), "i"
+WRITE(*, '(A14,ES18.11E2 A3,ES18.11E2,A2)') "< at_0 >_ss = ", REAL(cav1_ss(0, at)), " + ", IMAG(cav1_ss(0, at)), "i"
+WRITE(*, *) "=============================================="
 !
 ! WRITE(*, *) "=============================================="
 ! WRITE(*, *) "SECOND-ORDER: CAVITY AND ATOM"
@@ -750,14 +681,14 @@ END DO
 ! WRITE(*, '(A26,ES18.11E2,A3,ES18.11E2,A1)') "< at_0 at_0 a_0 sm >_ss = ", REAL(cavsig4_ss(0, 0, 0, at, sm)), " + ", AIMAG(cavsig4_ss(0, 0, 0, at, sm)), "i"
 ! WRITE(*, *) "=============================================="
 !
-! WRITE(*, *) "=============================================="
-! WRITE(*, *) "FOURTH-ORDER: CAVITY"
-! WRITE(*, '(A27,ES18.11E2,A3,ES18.11E2,A1)') "< at_0 at_0 a_0 a_0 >_ss = ", REAL(cav4_ss(0, 0, 0, 0)), " + ", AIMAG(cav4_ss(0, 0, 0, 0)), "i"
-! WRITE(*, *) "=============================================="
+WRITE(*, *) "=============================================="
+WRITE(*, *) "FOURTH-ORDER: CAVITY"
+WRITE(*, '(A27,ES18.11E2,A3,ES18.11E2,A1)') "< at_0 at_0 a_0 a_0 >_ss = ", REAL(cav4_ss(0, 0, 0, 0)), " + ", AIMAG(cav4_ss(0, 0, 0, 0)), "i"
+WRITE(*, *) "=============================================="
 
-! PRINT*, " "
+PRINT*, " "
 PRINT*, "Mean photon number =", photon_ss
-! PRINT*, " "
+PRINT*, " "
 
 !==============================================================================!
 !                                END OF PROGRAM                                !

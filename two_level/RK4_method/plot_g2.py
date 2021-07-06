@@ -5,15 +5,13 @@ Created on Sat Sep 28 10:27:11 2019
 @author: Jacob
 """
 
+from _my_functions import filename, pi_int
+
 import numpy as np
 import matplotlib.pyplot as plt
+
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
-import sys
-# Append path to add Jacobs_Function
-sys.path.append("/home/jnga773/Documents/898-PhD/test/")
-# sys.path.append("D:/Jacob/Google Drive/University/Physics/898 PhD/test")
-from Jacobs_Functions import filename
 
 plt.close('all')
 
@@ -50,8 +48,8 @@ gamma, Omega, w0, kappa, dw, epsilon, N, phase = \
     np.genfromtxt(filename("parameters"), delimiter="=", skip_header=1, usecols=1)
 N = int(N)
 phase = int(phase)
-Omega = round(Omega, 2)
-w0 = round(w0, 2)
+Omega_str = pi_int(Omega)
+w0_str = pi_int(w0)
 
 # Pull data from file
 # tau
@@ -82,7 +80,10 @@ plt.plot(tau, corr_dressed, color='k', ls='dashed', alpha=0.5, label='Dressed-St
 plt.xlabel(r'$\gamma \tau$', fontsize=15)
 plt.ylabel(r'$g^{(2)}(\tau)$', fontsize=15)
 plt.legend(loc='best', fontsize=15)
-plt.title(r'$g^{{(2)}}_{{\mathrm{{Auto}}}}(\tau)$ with $\left( \Omega = {} \gamma, N = {}, \delta\omega = {} \gamma, \kappa = {} \gamma, \omega_{{0}} = {} \gamma \right)$'.format(Omega, N, dw, kappa, w0), fontsize=15)
+plt.title((r'$g^{{(2)}}_{{\mathrm{{Auto}}}}(\tau)$ with $\left( \Omega = {} \gamma,'
+           r'N = {}, \delta\omega = {} \gamma, \kappa = {} \gamma, \omega_{{0}} = {}'
+           r'\gamma \right)$').format(Omega_str, N, dw, kappa, w0_str),
+          fontsize=15)
 
 plt.tight_layout()
 plt.show()

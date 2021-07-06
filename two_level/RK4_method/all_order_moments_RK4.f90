@@ -521,7 +521,7 @@ DO t = 0, t_steps
     B_vec(1) = 0.0d0
     B_vec(2) = -0.5d0 * gkl(j) * (sigma(sz) + 1.0d0)
     B_vec(3) = -gamma * cav1(j, a) + &
-         & gkl(j) * sigma(sm)
+             & gkl(j) * sigma(sm)
     ! Calculate k1
     k1_cavsig2(j, a, :) = dt * (MATMUL(Mat, cavsig2(j, a, :)) + B_vec)
 
@@ -530,7 +530,7 @@ DO t = 0, t_steps
     B_vec(1) = 0.0d0
     B_vec(2) = -0.5d0 * gkl(j) * ((sigma(sz) + 0.5d0 * k1_sigma(sz)) + 1.0d0)
     B_vec(3) = -gamma * (cav1(j, a) + 0.5d0 * k1_cav1(j, a)) + &
-         & gkl(j) * (sigma(sm) + 0.5d0 * k1_sigma(sm))
+             & gkl(j) * (sigma(sm) + 0.5d0 * k1_sigma(sm))
     ! Calculate k2
     k2_cavsig2(j, a, :) = dt * (MATMUL(Mat, (cavsig2(j, a, :) + 0.5d0 * k1_cavsig2(j, a, :))) + B_vec)
 
@@ -539,7 +539,7 @@ DO t = 0, t_steps
     B_vec(1) = 0.0d0
     B_vec(2) = -0.5d0 * gkl(j) * ((sigma(sz) + 0.5d0 * k2_sigma(sz)) + 1.0d0)
     B_vec(3) = -gamma * (cav1(j, a) + 0.5d0 * k2_cav1(j, a)) + &
-         & gkl(j) * (sigma(sm) + 0.5d0 * k2_sigma(sm))
+             & gkl(j) * (sigma(sm) + 0.5d0 * k2_sigma(sm))
     ! Calculate k3
     k3_cavsig2(j, a, :) = dt * (MATMUL(Mat, (cavsig2(j, a, :) + 0.5d0 * k2_cavsig2(j, a, :))) + B_vec)
 
@@ -548,7 +548,7 @@ DO t = 0, t_steps
     B_vec(1) = 0.0d0
     B_vec(2) = -0.5d0 * gkl(j) * ((sigma(sz) + k3_sigma(sz)) + 1.0d0)
     B_vec(3) = -gamma * (cav1(j, a) + k3_cav1(j, a)) + &
-         & gkl(j) * (sigma(sm) + k3_sigma(sm))
+             & gkl(j) * (sigma(sm) + k3_sigma(sm))
     ! Calculate k4
     k4_cavsig2(j, a, :) = dt * (MATMUL(Mat, (cavsig2(j, a, :) + k3_cavsig2(j, a, :))) + B_vec)
 
@@ -566,7 +566,7 @@ DO t = 0, t_steps
     B_vec(1) = -0.5d0 * CONJG(gkl(j)) * (sigma(sz) + 1.0d0)
     B_vec(2) = 0.0d0
     B_vec(3) = -gamma * cav1(j, at) + &
-         & CONJG(gkl(j)) * sigma(sp)
+             & CONJG(gkl(j)) * sigma(sp)
     ! Calculate k1
     k1_cavsig2(j, at, :) = dt * (MATMUL(Mat, cavsig2(j, at, :)) + B_vec)
 
@@ -575,7 +575,7 @@ DO t = 0, t_steps
     B_vec(1) = -0.5d0 * CONJG(gkl(j)) * ((sigma(sz) + 0.5d0 * k1_sigma(sz)) + 1.0d0)
     B_vec(2) = 0.0d0
     B_vec(3) = -gamma * (cav1(j, at) + 0.5d0 * k1_cav1(j, at)) + &
-         & CONJG(gkl(j)) * (sigma(sp) + 0.5d0 * k1_sigma(sp))
+             & CONJG(gkl(j)) * (sigma(sp) + 0.5d0 * k1_sigma(sp))
     ! Calculate k2
     k2_cavsig2(j, at, :) = dt * (MATMUL(Mat, (cavsig2(j, at, :) + 0.5d0 * k1_cavsig2(j, at, :))) + B_vec)
 
@@ -584,7 +584,7 @@ DO t = 0, t_steps
     B_vec(1) = -0.5d0 * CONJG(gkl(j)) * ((sigma(sz) + 0.5d0 * k2_sigma(sz)) + 1.0d0)
     B_vec(2) = 0.0d0
     B_vec(3) = -gamma * (cav1(j, at) + 0.5d0 * k2_cav1(j, at)) + &
-         & CONJG(gkl(j)) * (sigma(sp) + 0.5d0 * k2_sigma(sp))
+             & CONJG(gkl(j)) * (sigma(sp) + 0.5d0 * k2_sigma(sp))
     ! Calculate k3
     k3_cavsig2(j, at, :) = dt * (MATMUL(Mat, (cavsig2(j, at, :) + 0.5d0 * k2_cavsig2(j, at, :))) + B_vec)
 
@@ -593,7 +593,7 @@ DO t = 0, t_steps
     B_vec(1) = -0.5d0 * CONJG(gkl(j)) * ((sigma(sz) + k3_sigma(sz)) + 1.0d0)
     B_vec(2) = 0.0d0
     B_vec(3) = -gamma * (cav1(j, at) + k3_cav1(j, at)) + &
-         & CONJG(gkl(j)) * (sigma(sp) + k3_sigma(sp))
+             & CONJG(gkl(j)) * (sigma(sp) + k3_sigma(sp))
     ! Calculate k4
     k4_cavsig2(j, at, :) = dt * (MATMUL(Mat, (cavsig2(j, at, :) + k3_cavsig2(j, at, :))) + B_vec)
 
@@ -670,12 +670,12 @@ DO t = 0, t_steps
       B_vec = 0.0d0
       B_vec(1) = 0.0d0
       B_vec(2) = -0.5d0 * gkl(j) * cavsig2(k, a, sz) + &
-           & -0.5d0 * gkl(j) * cav1(k, a) + &
-           & -0.5d0 * gkl(k) * cavsig2(j, a, sz) + &
-           & -0.5d0 * gkl(k) * cav1(j, a)
+               & -0.5d0 * gkl(j) * cav1(k, a) + &
+               & -0.5d0 * gkl(k) * cavsig2(j, a, sz) + &
+               & -0.5d0 * gkl(k) * cav1(j, a)
       B_vec(3) = -gamma * cav2(j, k, a) + &
-           & gkl(j) * cavsig2(k, a, sm) + &
-           & gkl(k) * cavsig2(j, a, sm)
+               & gkl(j) * cavsig2(k, a, sm) + &
+               & gkl(k) * cavsig2(j, a, sm)
       ! Calculate k1
       k1_cavsig3(j, k, a, :) = dt * (MATMUL(Mat, cavsig3(j, k, a, :)) + B_vec)
 
@@ -683,12 +683,12 @@ DO t = 0, t_steps
       B_vec = 0.0d0
       B_vec(1) = 0.0d0
       B_vec(2) = -0.5d0 * gkl(j) * (cavsig2(k, a, sz) + 0.5d0 * k1_cavsig2(k, a, sz)) + &
-           & -0.5d0 * gkl(j) * (cav1(k, a) + 0.5d0 * k1_cav1(k, a)) + &
-           & -0.5d0 * gkl(k) * (cavsig2(j, a, sz) + 0.5d0 * k1_cavsig2(j, a, sz)) + &
-           & -0.5d0 * gkl(k) * (cav1(j, a) + 0.5d0 * k1_cav1(j, a))
+               & -0.5d0 * gkl(j) * (cav1(k, a) + 0.5d0 * k1_cav1(k, a)) + &
+               & -0.5d0 * gkl(k) * (cavsig2(j, a, sz) + 0.5d0 * k1_cavsig2(j, a, sz)) + &
+               & -0.5d0 * gkl(k) * (cav1(j, a) + 0.5d0 * k1_cav1(j, a))
       B_vec(3) = -gamma * (cav2(j, k, a) + 0.5d0 * k1_cav2(j, k, a)) + &
-           & gkl(j) * (cavsig2(k, a, sm) + 0.5d0 * k1_cavsig2(k, a, sm)) + &
-           & gkl(k) * (cavsig2(j, a, sm) + 0.5d0 * k1_cavsig2(j, a, sm))
+               & gkl(j) * (cavsig2(k, a, sm) + 0.5d0 * k1_cavsig2(k, a, sm)) + &
+               & gkl(k) * (cavsig2(j, a, sm) + 0.5d0 * k1_cavsig2(j, a, sm))
       ! Calculate k2
       k2_cavsig3(j, k, a, :) = dt * (MATMUL(Mat, (cavsig3(j, k, a, :) + 0.5d0 * k1_cavsig3(j, k, a, :))) + B_vec)
 
@@ -696,12 +696,12 @@ DO t = 0, t_steps
       B_vec = 0.0d0
       B_vec(1) = 0.0d0
       B_vec(2) = -0.5d0 * gkl(j) * (cavsig2(k, a, sz) + 0.5d0 * k2_cavsig2(k, a, sz)) + &
-           & -0.5d0 * gkl(j) * (cav1(k, a) + 0.5d0 * k2_cav1(k, a)) + &
-           & -0.5d0 * gkl(k) * (cavsig2(j, a, sz) + 0.5d0 * k2_cavsig2(j, a, sz)) + &
-           & -0.5d0 * gkl(k) * (cav1(j, a) + 0.5d0 * k2_cav1(j, a))
+               & -0.5d0 * gkl(j) * (cav1(k, a) + 0.5d0 * k2_cav1(k, a)) + &
+               & -0.5d0 * gkl(k) * (cavsig2(j, a, sz) + 0.5d0 * k2_cavsig2(j, a, sz)) + &
+               & -0.5d0 * gkl(k) * (cav1(j, a) + 0.5d0 * k2_cav1(j, a))
       B_vec(3) = -gamma * (cav2(j, k, a) + 0.5d0 * k2_cav2(j, k, a)) + &
-           & gkl(j) * (cavsig2(k, a, sm) + 0.5d0 * k2_cavsig2(k, a, sm)) + &
-           & gkl(k) * (cavsig2(j, a, sm) + 0.5d0 * k2_cavsig2(j, a, sm))
+               & gkl(j) * (cavsig2(k, a, sm) + 0.5d0 * k2_cavsig2(k, a, sm)) + &
+               & gkl(k) * (cavsig2(j, a, sm) + 0.5d0 * k2_cavsig2(j, a, sm))
       ! Calculate k3
       k3_cavsig3(j, k, a, :) = dt * (MATMUL(Mat, (cavsig3(j, k, a, :) + 0.5d0 * k2_cavsig3(j, k, a, :))) + B_vec)
 
@@ -709,12 +709,12 @@ DO t = 0, t_steps
       B_vec = 0.0d0
       B_vec(1) = 0.0d0
       B_vec(2) = -0.5d0 * gkl(j) * (cavsig2(k, a, sz) + k3_cavsig2(k, a, sz)) + &
-           & -0.5d0 * gkl(j) * (cav1(k, a) + k3_cav1(k, a)) + &
-           & -0.5d0 * gkl(k) * (cavsig2(j, a, sz) + k3_cavsig2(j, a, sz)) + &
-           & -0.5d0 * gkl(k) * (cav1(j, a) + k3_cav1(j, a))
+               & -0.5d0 * gkl(j) * (cav1(k, a) + k3_cav1(k, a)) + &
+               & -0.5d0 * gkl(k) * (cavsig2(j, a, sz) + k3_cavsig2(j, a, sz)) + &
+               & -0.5d0 * gkl(k) * (cav1(j, a) + k3_cav1(j, a))
       B_vec(3) = -gamma * (cav2(j, k, a) + k3_cav2(j, k, a)) + &
-           & gkl(j) * (cavsig2(k, a, sm) + k3_cavsig2(k, a, sm)) + &
-           & gkl(k) * (cavsig2(j, a, sm) + k3_cavsig2(j, a, sm))
+               & gkl(j) * (cavsig2(k, a, sm) + k3_cavsig2(k, a, sm)) + &
+               & gkl(k) * (cavsig2(j, a, sm) + k3_cavsig2(j, a, sm))
       ! Calculate k4
       k4_cavsig3(j, k, a, :) = dt * (MATMUL(Mat, (cavsig3(j, k, a, :) + k3_cavsig3(j, k, a, :))) + B_vec)
 
@@ -730,52 +730,52 @@ DO t = 0, t_steps
       ! Set the non-homogeneous vector
       B_vec = 0.0d0
       B_vec(1) = -0.5d0 * CONJG(gkl(j)) * cavsig2(k, at, sz) + &
-           & -0.5d0 * CONJG(gkl(j)) * cav1(k, at) + &
-           & -0.5d0 * CONJG(gkl(k)) * cavsig2(j, at, sz) + &
-           & -0.5d0 * CONJG(gkl(k)) * cav1(j, at)
+               & -0.5d0 * CONJG(gkl(j)) * cav1(k, at) + &
+               & -0.5d0 * CONJG(gkl(k)) * cavsig2(j, at, sz) + &
+               & -0.5d0 * CONJG(gkl(k)) * cav1(j, at)
       B_vec(2) = 0.0d0
       B_vec(3) = -gamma * cav2(j, k, at) + &
-           & CONJG(gkl(j)) * cavsig2(k, at, sp) + &
-           & CONJG(gkl(k)) * cavsig2(j, at, sp)
+               & CONJG(gkl(j)) * cavsig2(k, at, sp) + &
+               & CONJG(gkl(k)) * cavsig2(j, at, sp)
       ! Calculate k1
       k1_cavsig3(j, k, at, :) = dt * (MATMUL(Mat, cavsig3(j, k, at, :)) + B_vec)
 
       ! Set the non-homogeneous vector
       B_vec = 0.0d0
       B_vec(1) = -0.5d0 * CONJG(gkl(j)) * (cavsig2(k, at, sz) + 0.5d0 * k1_cavsig2(k, at, sz)) + &
-           & -0.5d0 * CONJG(gkl(j)) * (cav1(k, at) + 0.5d0 * k1_cav1(k, at)) + &
-           & -0.5d0 * CONJG(gkl(k)) * (cavsig2(j, at, sz) + 0.5d0 * k1_cavsig2(j, at, sz)) + &
-           & -0.5d0 * CONJG(gkl(k)) * (cav1(j, at) + 0.5d0 * k1_cav1(j, at))
+               & -0.5d0 * CONJG(gkl(j)) * (cav1(k, at) + 0.5d0 * k1_cav1(k, at)) + &
+               & -0.5d0 * CONJG(gkl(k)) * (cavsig2(j, at, sz) + 0.5d0 * k1_cavsig2(j, at, sz)) + &
+               & -0.5d0 * CONJG(gkl(k)) * (cav1(j, at) + 0.5d0 * k1_cav1(j, at))
       B_vec(2) = 0.0d0
       B_vec(3) = -gamma * (cav2(j, k, at) + 0.5d0 * k1_cav2(j, k, at)) + &
-           & CONJG(gkl(j)) * (cavsig2(k, at, sp) + 0.5d0 * k1_cavsig2(k, at, sp)) + &
-           & CONJG(gkl(k)) * (cavsig2(j, at, sp) + 0.5d0 * k1_cavsig2(j, at, sp))
+               & CONJG(gkl(j)) * (cavsig2(k, at, sp) + 0.5d0 * k1_cavsig2(k, at, sp)) + &
+               & CONJG(gkl(k)) * (cavsig2(j, at, sp) + 0.5d0 * k1_cavsig2(j, at, sp))
       ! Calculate k2
       k2_cavsig3(j, k, at, :) = dt * (MATMUL(Mat, (cavsig3(j, k, at, :) + 0.5d0 * k1_cavsig3(j, k, at, :))) + B_vec)
 
       ! Set the non-homogeneous vector
       B_vec = 0.0d0
       B_vec(1) = -0.5d0 * CONJG(gkl(j)) * (cavsig2(k, at, sz) + 0.5d0 * k2_cavsig2(k, at, sz)) + &
-           & -0.5d0 * CONJG(gkl(j)) * (cav1(k, at) + 0.5d0 * k2_cav1(k, at)) + &
-           & -0.5d0 * CONJG(gkl(k)) * (cavsig2(j, at, sz) + 0.5d0 * k2_cavsig2(j, at, sz)) + &
-           & -0.5d0 * CONJG(gkl(k)) * (cav1(j, at) + 0.5d0 * k2_cav1(j, at))
+               & -0.5d0 * CONJG(gkl(j)) * (cav1(k, at) + 0.5d0 * k2_cav1(k, at)) + &
+               & -0.5d0 * CONJG(gkl(k)) * (cavsig2(j, at, sz) + 0.5d0 * k2_cavsig2(j, at, sz)) + &
+               & -0.5d0 * CONJG(gkl(k)) * (cav1(j, at) + 0.5d0 * k2_cav1(j, at))
       B_vec(2) = 0.0d0
       B_vec(3) = -gamma * (cav2(j, k, at) + 0.5d0 * k2_cav2(j, k, at)) + &
-           & CONJG(gkl(j)) * (cavsig2(k, at, sp) + 0.5d0 * k2_cavsig2(k, at, sp)) + &
-           & CONJG(gkl(k)) * (cavsig2(j, at, sp) + 0.5d0 * k2_cavsig2(j, at, sp))
+               & CONJG(gkl(j)) * (cavsig2(k, at, sp) + 0.5d0 * k2_cavsig2(k, at, sp)) + &
+               & CONJG(gkl(k)) * (cavsig2(j, at, sp) + 0.5d0 * k2_cavsig2(j, at, sp))
       ! Calculate k3
       k3_cavsig3(j, k, at, :) = dt * (MATMUL(Mat, (cavsig3(j, k, at, :) + 0.5d0 * k2_cavsig3(j, k, at, :))) + B_vec)
 
       ! Set the non-homogeneous vector
       B_vec = 0.0d0
       B_vec(1) = -0.5d0 * CONJG(gkl(j)) * (cavsig2(k, at, sz) + k3_cavsig2(k, at, sz)) + &
-           & -0.5d0 * CONJG(gkl(j)) * (cav1(k, at) + k3_cav1(k, at)) + &
-           & -0.5d0 * CONJG(gkl(k)) * (cavsig2(j, at, sz) + k3_cavsig2(j, at, sz)) + &
-           & -0.5d0 * CONJG(gkl(k)) * (cav1(j, at) + k3_cav1(j, at))
+               & -0.5d0 * CONJG(gkl(j)) * (cav1(k, at) + k3_cav1(k, at)) + &
+               & -0.5d0 * CONJG(gkl(k)) * (cavsig2(j, at, sz) + k3_cavsig2(j, at, sz)) + &
+               & -0.5d0 * CONJG(gkl(k)) * (cav1(j, at) + k3_cav1(j, at))
       B_vec(2) = 0.0d0
       B_vec(3) = -gamma * (cav2(j, k, at) + k3_cav2(j, k, at)) + &
-           & CONJG(gkl(j)) * (cavsig2(k, at, sp) + k3_cavsig2(k, at, sp)) + &
-           & CONJG(gkl(k)) * (cavsig2(j, at, sp) + k3_cavsig2(j, at, sp))
+               & CONJG(gkl(j)) * (cavsig2(k, at, sp) + k3_cavsig2(k, at, sp)) + &
+               & CONJG(gkl(k)) * (cavsig2(j, at, sp) + k3_cavsig2(j, at, sp))
       ! Calculate k4
       k4_cavsig3(j, k, at, :) = dt * (MATMUL(Mat, (cavsig3(j, k, at, :) + k3_cavsig3(j, k, at, :))) + B_vec)
 
@@ -791,48 +791,48 @@ DO t = 0, t_steps
       ! Set the non-homogeneous vector
       B_vec = 0.0d0
       B_vec(1) = -0.5d0 * CONJG(gkl(j)) * cavsig2(k, a, sz) + &
-           & -0.5d0 * CONJG(gkl(j)) * cav1(k, a)
+               & -0.5d0 * CONJG(gkl(j)) * cav1(k, a)
       B_vec(2) = -0.5d0 * gkl(k) * cavsig2(j, at, sz) + &
-           & -0.5d0 * gkl(k) * cav1(j, at)
+               & -0.5d0 * gkl(k) * cav1(j, at)
       B_vec(3) = -gamma * cav2(j, k, ata) + &
-           & CONJG(gkl(j)) * cavsig2(k, a, sp) + &
-           & gkl(k) * cavsig2(j, at, sm)
+               & CONJG(gkl(j)) * cavsig2(k, a, sp) + &
+               & gkl(k) * cavsig2(j, at, sm)
       ! Calculate k1
       k1_cavsig3(j, k, ata, :) = dt * (MATMUL(Mat, cavsig3(j, k, ata, :)) + B_vec)
 
       ! Set the non-homogeneous vector
       B_vec = 0.0d0
       B_vec(1) = -0.5d0 * CONJG(gkl(j)) * (cavsig2(k, a, sz) + 0.5d0 * k1_cavsig2(k, a, sz)) + &
-           & -0.5d0 * CONJG(gkl(j)) * (cav1(k, a) + 0.5d0 * k1_cav1(k, a))
+               & -0.5d0 * CONJG(gkl(j)) * (cav1(k, a) + 0.5d0 * k1_cav1(k, a))
       B_vec(2) = -0.5d0 * gkl(k) * (cavsig2(j, at, sz) + 0.5d0 * k1_cavsig2(j, at, sz)) + &
-           & -0.5d0 * gkl(k) * (cav1(j, at) + 0.5d0 * k1_cav1(j, at))
+               & -0.5d0 * gkl(k) * (cav1(j, at) + 0.5d0 * k1_cav1(j, at))
       B_vec(3) = -gamma * (cav2(j, k, ata) + 0.5d0 * k1_cav2(j, k, ata)) + &
-           & CONJG(gkl(j)) * (cavsig2(k, a, sp) + 0.5d0 * k1_cavsig2(k, a, sp)) + &
-           & gkl(k) * (cavsig2(j, at, sm) + 0.5d0 * k1_cavsig2(j, at, sm))
+               & CONJG(gkl(j)) * (cavsig2(k, a, sp) + 0.5d0 * k1_cavsig2(k, a, sp)) + &
+               & gkl(k) * (cavsig2(j, at, sm) + 0.5d0 * k1_cavsig2(j, at, sm))
       ! Calculate k2
       k2_cavsig3(j, k, ata, :) = dt * (MATMUL(Mat, (cavsig3(j, k, ata, :) + 0.5d0 * k1_cavsig3(j, k, ata, :))) + B_vec)
 
       ! Set the non-homogeneous vector
       B_vec = 0.0d0
       B_vec(1) = -0.5d0 * CONJG(gkl(j)) * (cavsig2(k, a, sz) + 0.5d0 * k2_cavsig2(k, a, sz)) + &
-           & -0.5d0 * CONJG(gkl(j)) * (cav1(k, a) + 0.5d0 * k2_cav1(k, a))
+               & -0.5d0 * CONJG(gkl(j)) * (cav1(k, a) + 0.5d0 * k2_cav1(k, a))
       B_vec(2) = -0.5d0 * gkl(k) * (cavsig2(j, at, sz) + 0.5d0 * k2_cavsig2(j, at, sz)) + &
-           & -0.5d0 * gkl(k) * (cav1(j, at) + 0.5d0 * k2_cav1(j, at))
+               & -0.5d0 * gkl(k) * (cav1(j, at) + 0.5d0 * k2_cav1(j, at))
       B_vec(3) = -gamma * (cav2(j, k, ata) + 0.5d0 * k2_cav2(j, k, ata)) + &
-           & CONJG(gkl(j)) * (cavsig2(k, a, sp) + 0.5d0 * k2_cavsig2(k, a, sp)) + &
-           & gkl(k) * (cavsig2(j, at, sm) + 0.5d0 * k2_cavsig2(j, at, sm))
+               & CONJG(gkl(j)) * (cavsig2(k, a, sp) + 0.5d0 * k2_cavsig2(k, a, sp)) + &
+               & gkl(k) * (cavsig2(j, at, sm) + 0.5d0 * k2_cavsig2(j, at, sm))
       ! Calculate k3
       k3_cavsig3(j, k, ata, :) = dt * (MATMUL(Mat, (cavsig3(j, k, ata, :) + 0.5d0 * k2_cavsig3(j, k, ata, :))) + B_vec)
 
       ! Set the non-homogeneous vector
       B_vec = 0.0d0
       B_vec(1) = -0.5d0 * CONJG(gkl(j)) * (cavsig2(k, a, sz) + k3_cavsig2(k, a, sz)) + &
-           & -0.5d0 * CONJG(gkl(j)) * (cav1(k, a) + k3_cav1(k, a))
+               & -0.5d0 * CONJG(gkl(j)) * (cav1(k, a) + k3_cav1(k, a))
       B_vec(2) = -0.5d0 * gkl(k) * (cavsig2(j, at, sz) + k3_cavsig2(j, at, sz)) + &
-           & -0.5d0 * gkl(k) * (cav1(j, at) + k3_cav1(j, at))
+               & -0.5d0 * gkl(k) * (cav1(j, at) + k3_cav1(j, at))
       B_vec(3) = -gamma * (cav2(j, k, ata) + k3_cav2(j, k, ata)) + &
-           & CONJG(gkl(j)) * (cavsig2(k, a, sp) + k3_cavsig2(k, a, sp)) + &
-           & gkl(k) * (cavsig2(j, at, sm) + k3_cavsig2(j, at, sm))
+               & CONJG(gkl(j)) * (cavsig2(k, a, sp) + k3_cavsig2(k, a, sp)) + &
+               & gkl(k) * (cavsig2(j, at, sm) + k3_cavsig2(j, at, sm))
       ! Calculate k4
       k4_cavsig3(j, k, ata, :) = dt * (MATMUL(Mat, (cavsig3(j, k, ata, :) + k3_cavsig3(j, k, ata, :))) + B_vec)
 
@@ -903,66 +903,66 @@ DO t = 0, t_steps
         ! Set the non-homogeneous vector
         B_vec = 0.0d0
         B_vec(1) = -0.5d0 * CONJG(gkl(j)) * cavsig3(k, l, a, sz) + &
-             & -0.5d0 * CONJG(gkl(j)) * cav2(k, l, a)
+                 & -0.5d0 * CONJG(gkl(j)) * cav2(k, l, a)
         B_vec(2) = -0.5d0 * gkl(k) * cavsig3(j, l, ata, sz) + &
-             & -0.5d0 * gkl(k) * cav2(j, l, ata) + &
-             & -0.5d0 * gkl(l) * cavsig3(j, k, ata, sz) + &
-             & -0.5d0 * gkl(l) * cav2(j, k, ata)
+                 & -0.5d0 * gkl(k) * cav2(j, l, ata) + &
+                 & -0.5d0 * gkl(l) * cavsig3(j, k, ata, sz) + &
+                 & -0.5d0 * gkl(l) * cav2(j, k, ata)
         B_vec(3) = -gamma * cav3(j, k, l, a) + &
-             & CONJG(gkl(j)) * cavsig3(k, l, a, sp) + &
-             & gkl(k) * cavsig3(j, l, ata, sm) + &
-             & gkl(l) * cavsig3(j, k, ata, sm)
+                 & CONJG(gkl(j)) * cavsig3(k, l, a, sp) + &
+                 & gkl(k) * cavsig3(j, l, ata, sm) + &
+                 & gkl(l) * cavsig3(j, k, ata, sm)
         ! Calculate k1
         k1_cavsig4(j, k, l, a, :) = dt * (MATMUL(Mat, cavsig4(j, k, l, a, :)) + B_vec)
 
         ! Set the non-homogeneous vector
         B_vec = 0.0d0
         B_vec(1) = -0.5d0 * CONJG(gkl(j)) * (cavsig3(k, l, a, sz) + 0.5d0 * k1_cavsig3(k, l, a, sz)) + &
-             & -0.5d0 * CONJG(gkl(j)) * (cav2(k, l, a) + 0.5d0 * k1_cav2(k, l, a))
+                 & -0.5d0 * CONJG(gkl(j)) * (cav2(k, l, a) + 0.5d0 * k1_cav2(k, l, a))
         B_vec(2) = -0.5d0 * gkl(k) * (cavsig3(j, l, ata, sz) + 0.5d0 * k1_cavsig3(j, l, ata, sz)) + &
-             & -0.5d0 * gkl(k) * (cav2(j, l, ata) + 0.5d0 * k1_cav2(j, l, ata)) + &
-             & -0.5d0 * gkl(l) * (cavsig3(j, k, ata, sz) + 0.5d0 * k1_cavsig3(j, k, ata, sz)) + &
-             & -0.5d0 * gkl(l) * (cav2(j, k, ata) + 0.5d0 * k1_cav2(j, k, ata))
+                 & -0.5d0 * gkl(k) * (cav2(j, l, ata) + 0.5d0 * k1_cav2(j, l, ata)) + &
+                 & -0.5d0 * gkl(l) * (cavsig3(j, k, ata, sz) + 0.5d0 * k1_cavsig3(j, k, ata, sz)) + &
+                 & -0.5d0 * gkl(l) * (cav2(j, k, ata) + 0.5d0 * k1_cav2(j, k, ata))
         B_vec(3) = -gamma * (cav3(j, k, l, a) + 0.5d0 * k1_cav3(j, k, l, a)) + &
-             & CONJG(gkl(j)) * (cavsig3(k, l, a, sp) + 0.5d0 * k1_cavsig3(k, l, a, sp)) + &
-             & gkl(k) * (cavsig3(j, l, ata, sm) + 0.5d0 * k1_cavsig3(j, l, ata, sm)) + &
-             & gkl(l) * (cavsig3(j, k, ata, sm) + 0.5d0 * k1_cavsig3(j, k, ata, sm))
+                 & CONJG(gkl(j)) * (cavsig3(k, l, a, sp) + 0.5d0 * k1_cavsig3(k, l, a, sp)) + &
+                 & gkl(k) * (cavsig3(j, l, ata, sm) + 0.5d0 * k1_cavsig3(j, l, ata, sm)) + &
+                 & gkl(l) * (cavsig3(j, k, ata, sm) + 0.5d0 * k1_cavsig3(j, k, ata, sm))
         ! Calculate k2
         k2_cavsig4(j, k, l, a, :) = dt * (MATMUL(Mat, (cavsig4(j, k, l, a, :) + 0.5d0 * k1_cavsig4(j, k, l, a, :))) + B_vec)
 
         ! Set the non-homogeneous vector
         B_vec = 0.0d0
         B_vec(1) = -0.5d0 * CONJG(gkl(j)) * (cavsig3(k, l, a, sz) + 0.5d0 * k2_cavsig3(k, l, a, sz)) + &
-             & -0.5d0 * CONJG(gkl(j)) * (cav2(k, l, a) + 0.5d0 * k2_cav2(k, l, a))
+                 & -0.5d0 * CONJG(gkl(j)) * (cav2(k, l, a) + 0.5d0 * k2_cav2(k, l, a))
         B_vec(2) = -0.5d0 * gkl(k) * (cavsig3(j, l, ata, sz) + 0.5d0 * k2_cavsig3(j, l, ata, sz)) + &
-             & -0.5d0 * gkl(k) * (cav2(j, l, ata) + 0.5d0 * k2_cav2(j, l, ata)) + &
-             & -0.5d0 * gkl(l) * (cavsig3(j, k, ata, sz) + 0.5d0 * k2_cavsig3(j, k, ata, sz)) + &
-             & -0.5d0 * gkl(l) * (cav2(j, k, ata) + 0.5d0 * k2_cav2(j, k, ata))
+                 & -0.5d0 * gkl(k) * (cav2(j, l, ata) + 0.5d0 * k2_cav2(j, l, ata)) + &
+                 & -0.5d0 * gkl(l) * (cavsig3(j, k, ata, sz) + 0.5d0 * k2_cavsig3(j, k, ata, sz)) + &
+                 & -0.5d0 * gkl(l) * (cav2(j, k, ata) + 0.5d0 * k2_cav2(j, k, ata))
         B_vec(3) = -gamma * (cav3(j, k, l, a) + 0.5d0 * k2_cav3(j, k, l, a)) + &
-             & CONJG(gkl(j)) * (cavsig3(k, l, a, sp) + 0.5d0 * k2_cavsig3(k, l, a, sp)) + &
-             & gkl(k) * (cavsig3(j, l, ata, sm) + 0.5d0 * k2_cavsig3(j, l, ata, sm)) + &
-             & gkl(l) * (cavsig3(j, k, ata, sm) + 0.5d0 * k2_cavsig3(j, k, ata, sm))
+                 & CONJG(gkl(j)) * (cavsig3(k, l, a, sp) + 0.5d0 * k2_cavsig3(k, l, a, sp)) + &
+                 & gkl(k) * (cavsig3(j, l, ata, sm) + 0.5d0 * k2_cavsig3(j, l, ata, sm)) + &
+                 & gkl(l) * (cavsig3(j, k, ata, sm) + 0.5d0 * k2_cavsig3(j, k, ata, sm))
         ! Calculate k3
         k3_cavsig4(j, k, l, a, :) = dt * (MATMUL(Mat, (cavsig4(j, k, l, a, :) + 0.5d0 * k2_cavsig4(j, k, l, a, :))) + B_vec)
 
         ! Set the non-homogeneous vector
         B_vec = 0.0d0
         B_vec(1) = -0.5d0 * CONJG(gkl(j)) * (cavsig3(k, l, a, sz) + k3_cavsig3(k, l, a, sz)) + &
-             & -0.5d0 * CONJG(gkl(j)) * (cav2(k, l, a) + k3_cav2(k, l, a))
+                 & -0.5d0 * CONJG(gkl(j)) * (cav2(k, l, a) + k3_cav2(k, l, a))
         B_vec(2) = -0.5d0 * gkl(k) * (cavsig3(j, l, ata, sz) + k3_cavsig3(j, l, ata, sz)) + &
-             & -0.5d0 * gkl(k) * (cav2(j, l, ata) + k3_cav2(j, l, ata)) + &
-             & -0.5d0 * gkl(l) * (cavsig3(j, k, ata, sz) + k3_cavsig3(j, k, ata, sz)) + &
-             & -0.5d0 * gkl(l) * (cav2(j, k, ata) + k3_cav2(j, k, ata))
+                 & -0.5d0 * gkl(k) * (cav2(j, l, ata) + k3_cav2(j, l, ata)) + &
+                 & -0.5d0 * gkl(l) * (cavsig3(j, k, ata, sz) + k3_cavsig3(j, k, ata, sz)) + &
+                 & -0.5d0 * gkl(l) * (cav2(j, k, ata) + k3_cav2(j, k, ata))
         B_vec(3) = -gamma * (cav3(j, k, l, a) + k3_cav3(j, k, l, a)) + &
-             & CONJG(gkl(j)) * (cavsig3(k, l, a, sp) + k3_cavsig3(k, l, a, sp)) + &
-             & gkl(k) * (cavsig3(j, l, ata, sm) + k3_cavsig3(j, l, ata, sm)) + &
-             & gkl(l) * (cavsig3(j, k, ata, sm) + k3_cavsig3(j, k, ata, sm))
+                 & CONJG(gkl(j)) * (cavsig3(k, l, a, sp) + k3_cavsig3(k, l, a, sp)) + &
+                 & gkl(k) * (cavsig3(j, l, ata, sm) + k3_cavsig3(j, l, ata, sm)) + &
+                 & gkl(l) * (cavsig3(j, k, ata, sm) + k3_cavsig3(j, k, ata, sm))
         ! Calculate k4
         k4_cavsig4(j, k, l, a, :) = dt * (MATMUL(Mat, (cavsig4(j, k, l, a, :) + k3_cavsig4(j, k, l, a, :))) + B_vec)
 
-        !-------------------------------------------!
-        ! < a^{\dagger}_{j} a^{\dagger}_{k} a_{l} > !
-        !-------------------------------------------!
+        !--------------------------------------------------!
+        ! < a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \sigma > !
+        !--------------------------------------------------!
         ! Set the diagonal matrix elements for M
         Mat = Mat_OG
         DO x = 1, N_mat
@@ -972,60 +972,60 @@ DO t = 0, t_steps
         ! Set the non-homogeneous vector
         B_vec = 0.0d0
         B_vec(1) = -0.5d0 * CONJG(gkl(j)) * cavsig3(k, l, ata, sz) + &
-             & -0.5d0 * CONJG(gkl(j)) * cav2(k, l, ata) + &
-             & -0.5d0 * CONJG(gkl(k)) * cavsig3(j, l, ata, sz) + &
-             & -0.5d0 * CONJG(gkl(k)) * cav2(j, l, ata)
+                 & -0.5d0 * CONJG(gkl(j)) * cav2(k, l, ata) + &
+                 & -0.5d0 * CONJG(gkl(k)) * cavsig3(j, l, ata, sz) + &
+                 & -0.5d0 * CONJG(gkl(k)) * cav2(j, l, ata)
         B_vec(2) = -0.5d0 * gkl(l) * cavsig3(j, k, at, sz) + &
-             & -0.5d0 * gkl(l) * cav2(j, k, at)
+                 & -0.5d0 * gkl(l) * cav2(j, k, at)
         B_vec(3) = -gamma * cav3(j, k, l, at) + &
-             & CONJG(gkl(j)) * cavsig3(k, l, ata, sp) + &
-             & CONJG(gkl(k)) * cavsig3(j, l, ata, sp) + &
-             & gkl(l) * cavsig3(j, k, at, sm)
+                 & CONJG(gkl(j)) * cavsig3(k, l, ata, sp) + &
+                 & CONJG(gkl(k)) * cavsig3(j, l, ata, sp) + &
+                 & gkl(l) * cavsig3(j, k, at, sm)
         ! Calculate k1
         k1_cavsig4(j, k, l, at, :) = dt * (MATMUL(Mat, cavsig4(j, k, l, at, :)) + B_vec)
 
         ! Set the non-homogeneous vector
         B_vec = 0.0d0
         B_vec(1) = -0.5d0 * CONJG(gkl(j)) * (cavsig3(k, l, ata, sz) + 0.5d0 * k1_cavsig3(k, l, ata, sz)) + &
-             & -0.5d0 * CONJG(gkl(j)) * (cav2(k, l, ata) + 0.5d0 * k1_cav2(k, l, ata)) + &
-             & -0.5d0 * CONJG(gkl(k)) * (cavsig3(j, l, ata, sz) + 0.5d0 * k1_cavsig3(j, l, ata, sz)) + &
-             & -0.5d0 * CONJG(gkl(k)) * (cav2(j, l, ata) + 0.5d0 * k1_cav2(j, l, ata))
+                 & -0.5d0 * CONJG(gkl(j)) * (cav2(k, l, ata) + 0.5d0 * k1_cav2(k, l, ata)) + &
+                 & -0.5d0 * CONJG(gkl(k)) * (cavsig3(j, l, ata, sz) + 0.5d0 * k1_cavsig3(j, l, ata, sz)) + &
+                 & -0.5d0 * CONJG(gkl(k)) * (cav2(j, l, ata) + 0.5d0 * k1_cav2(j, l, ata))
         B_vec(2) = -0.5d0 * gkl(l) * (cavsig3(j, k, at, sz) + 0.5d0 * k1_cavsig3(j, k, at, sz)) + &
-             & -0.5d0 * gkl(l) * (cav2(j, k, at) + 0.5d0 * k1_cav2(j, k, at))
+                 & -0.5d0 * gkl(l) * (cav2(j, k, at) + 0.5d0 * k1_cav2(j, k, at))
         B_vec(3) = -gamma * (cav3(j, k, l, at) + 0.5d0 * k1_cav3(j, k, l, at)) + &
-             & CONJG(gkl(j)) * (cavsig3(k, l, ata, sp) + 0.5d0 * k1_cavsig3(k, l, ata, sp)) + &
-             & CONJG(gkl(k)) * (cavsig3(j, l, ata, sp) + 0.5d0 * k1_cavsig3(j, l, ata, sp)) + &
-             & gkl(l) * (cavsig3(j, k, at, sm) + 0.5d0 * k1_cavsig3(j, k, at, sm))
+                 & CONJG(gkl(j)) * (cavsig3(k, l, ata, sp) + 0.5d0 * k1_cavsig3(k, l, ata, sp)) + &
+                 & CONJG(gkl(k)) * (cavsig3(j, l, ata, sp) + 0.5d0 * k1_cavsig3(j, l, ata, sp)) + &
+                 & gkl(l) * (cavsig3(j, k, at, sm) + 0.5d0 * k1_cavsig3(j, k, at, sm))
         ! Calculate k2
         k2_cavsig4(j, k, l, at, :) = dt * (MATMUL(Mat, (cavsig4(j, k, l, at, :) + 0.5d0 * k1_cavsig4(j, k, l, at, :))) + B_vec)
 
         ! Set the non-homogeneous vector
         B_vec = 0.0d0
         B_vec(1) = -0.5d0 * CONJG(gkl(j)) * (cavsig3(k, l, ata, sz) + 0.5d0 * k2_cavsig3(k, l, ata, sz)) + &
-             & -0.5d0 * CONJG(gkl(j)) * (cav2(k, l, ata) + 0.5d0 * k2_cav2(k, l, ata)) + &
-             & -0.5d0 * CONJG(gkl(k)) * (cavsig3(j, l, ata, sz) + 0.5d0 * k2_cavsig3(j, l, ata, sz)) + &
-             & -0.5d0 * CONJG(gkl(k)) * (cav2(j, l, ata) + 0.5d0 * k2_cav2(j, l, ata))
+                 & -0.5d0 * CONJG(gkl(j)) * (cav2(k, l, ata) + 0.5d0 * k2_cav2(k, l, ata)) + &
+                 & -0.5d0 * CONJG(gkl(k)) * (cavsig3(j, l, ata, sz) + 0.5d0 * k2_cavsig3(j, l, ata, sz)) + &
+                 & -0.5d0 * CONJG(gkl(k)) * (cav2(j, l, ata) + 0.5d0 * k2_cav2(j, l, ata))
         B_vec(2) = -0.5d0 * gkl(l) * (cavsig3(j, k, at, sz) + 0.5d0 * k2_cavsig3(j, k, at, sz)) + &
-             & -0.5d0 * gkl(l) * (cav2(j, k, at) + 0.5d0 * k2_cav2(j, k, at))
+                 & -0.5d0 * gkl(l) * (cav2(j, k, at) + 0.5d0 * k2_cav2(j, k, at))
         B_vec(3) = -gamma * (cav3(j, k, l, at) + 0.5d0 * k2_cav3(j, k, l, at)) + &
-             & CONJG(gkl(j)) * (cavsig3(k, l, ata, sp) + 0.5d0 * k2_cavsig3(k, l, ata, sp)) + &
-             & CONJG(gkl(k)) * (cavsig3(j, l, ata, sp) + 0.5d0 * k2_cavsig3(j, l, ata, sp)) + &
-             & gkl(l) * (cavsig3(j, k, at, sm) + 0.5d0 * k2_cavsig3(j, k, at, sm))
+                 & CONJG(gkl(j)) * (cavsig3(k, l, ata, sp) + 0.5d0 * k2_cavsig3(k, l, ata, sp)) + &
+                 & CONJG(gkl(k)) * (cavsig3(j, l, ata, sp) + 0.5d0 * k2_cavsig3(j, l, ata, sp)) + &
+                 & gkl(l) * (cavsig3(j, k, at, sm) + 0.5d0 * k2_cavsig3(j, k, at, sm))
         ! Calculate k3
         k3_cavsig4(j, k, l, at, :) = dt * (MATMUL(Mat, (cavsig4(j, k, l, at, :) + 0.5d0 * k2_cavsig4(j, k, l, at, :))) + B_vec)
 
         ! Set the non-homogeneous vector
         B_vec = 0.0d0
         B_vec(1) = -0.5d0 * CONJG(gkl(j)) * (cavsig3(k, l, ata, sz) + k3_cavsig3(k, l, ata, sz)) + &
-             & -0.5d0 * CONJG(gkl(j)) * (cav2(k, l, ata) + k3_cav2(k, l, ata)) + &
-             & -0.5d0 * CONJG(gkl(k)) * (cavsig3(j, l, ata, sz) + k3_cavsig3(j, l, ata, sz)) + &
-             & -0.5d0 * CONJG(gkl(k)) * (cav2(j, l, ata) + k3_cav2(j, l, ata))
+                 & -0.5d0 * CONJG(gkl(j)) * (cav2(k, l, ata) + k3_cav2(k, l, ata)) + &
+                 & -0.5d0 * CONJG(gkl(k)) * (cavsig3(j, l, ata, sz) + k3_cavsig3(j, l, ata, sz)) + &
+                 & -0.5d0 * CONJG(gkl(k)) * (cav2(j, l, ata) + k3_cav2(j, l, ata))
         B_vec(2) = -0.5d0 * gkl(l) * (cavsig3(j, k, at, sz) + k3_cavsig3(j, k, at, sz)) + &
-             & -0.5d0 * gkl(l) * (cav2(j, k, at) + k3_cav2(j, k, at))
+                 & -0.5d0 * gkl(l) * (cav2(j, k, at) + k3_cav2(j, k, at))
         B_vec(3) = -gamma * (cav3(j, k, l, at) + k3_cav3(j, k, l, at)) + &
-             & CONJG(gkl(j)) * (cavsig3(k, l, ata, sp) + k3_cavsig3(k, l, ata, sp)) + &
-             & CONJG(gkl(k)) * (cavsig3(j, l, ata, sp) + k3_cavsig3(j, l, ata, sp)) + &
-             & gkl(l) * (cavsig3(j, k, at, sm) + k3_cavsig3(j, k, at, sm))
+                 & CONJG(gkl(j)) * (cavsig3(k, l, ata, sp) + k3_cavsig3(k, l, ata, sp)) + &
+                 & CONJG(gkl(k)) * (cavsig3(j, l, ata, sp) + k3_cavsig3(j, l, ata, sp)) + &
+                 & gkl(l) * (cavsig3(j, k, at, sm) + k3_cavsig3(j, k, at, sm))
         ! Calculate k4
         k4_cavsig4(j, k, l, at, :) = dt * (MATMUL(Mat, (cavsig4(j, k, l, at, :) + k3_cavsig4(j, k, l, at, :))) + B_vec)
 
@@ -1103,6 +1103,9 @@ cav3_ss = cav3
 cavsig4_ss = cavsig4
 cav4_ss = cav4
 
+! Save steady state photon number
+photon_ss = photon
+
 !==============================================================================!
 !                      TEST PRINT SOME STEADY STATE VALUES                     !
 !==============================================================================!
@@ -1113,11 +1116,11 @@ cav4_ss = cav4
 ! WRITE(*, '(A12,ES18.11E2,A3,ES18.11E2,A2)') "< sz >_ss = ", REAL(sigma_ss(sz)), " + ", IMAG(sigma_ss(sz)), "i"
 ! WRITE(*, *) "=============================================="
 !
-! WRITE(*, *) "=============================================="
-! WRITE(*, *) "FIRST-ORDER: CAVITY"
-! WRITE(*, '(A14,ES18.11E2 A3,ES18.11E2,A2)') " < a_0 >_ss = ", REAL(cav1_ss(0, a)), " + ", IMAG(cav1_ss(0, a)), "i"
-! WRITE(*, '(A14,ES18.11E2 A3,ES18.11E2,A2)') "< at_0 >_ss = ", REAL(cav1_ss(0, at)), " + ", IMAG(cav1_ss(0, at)), "i"
-! WRITE(*, *) "=============================================="
+WRITE(*, *) "=============================================="
+WRITE(*, *) "FIRST-ORDER: CAVITY"
+WRITE(*, '(A14,ES18.11E2 A3,ES18.11E2,A2)') " < a_0 >_ss = ", REAL(cav1_ss(0, a)), " + ", IMAG(cav1_ss(0, a)), "i"
+WRITE(*, '(A14,ES18.11E2 A3,ES18.11E2,A2)') "< at_0 >_ss = ", REAL(cav1_ss(0, at)), " + ", IMAG(cav1_ss(0, at)), "i"
+WRITE(*, *) "=============================================="
 !
 ! WRITE(*, *) "=============================================="
 ! WRITE(*, *) "SECOND-ORDER: CAVITY AND ATOM"
@@ -1153,13 +1156,13 @@ cav4_ss = cav4
 ! WRITE(*, '(A26,ES18.11E2,A3,ES18.11E2,A1)') "< at_0 at_0 a_0 sm >_ss = ", REAL(cavsig4_ss(0, 0, 0, at, sm)), " + ", AIMAG(cavsig4_ss(0, 0, 0, at, sm)), "i"
 ! WRITE(*, *) "=============================================="
 !
-! WRITE(*, *) "=============================================="
-! WRITE(*, *) "FOURTH-ORDER: CAVITY"
-! WRITE(*, '(A27,ES18.11E2,A3,ES18.11E2,A1)') "< at_0 at_0 a_0 a_0 >_ss = ", REAL(cav4_ss(0, 0, 0, 0)), " + ", AIMAG(cav4_ss(0, 0, 0, 0)), "i"
-! WRITE(*, *) "=============================================="
+WRITE(*, *) "=============================================="
+WRITE(*, *) "FOURTH-ORDER: CAVITY"
+WRITE(*, '(A27,ES18.11E2,A3,ES18.11E2,A1)') "< at_0 at_0 a_0 a_0 >_ss = ", REAL(cav4_ss(0, 0, 0, 0)), " + ", AIMAG(cav4_ss(0, 0, 0, 0)), "i"
+WRITE(*, *) "=============================================="
 
 PRINT*, " "
-PRINT*, "Mean photon number in cavity A =", photon
+PRINT*, "Mean photon number in cavity A =", photon_ss
 PRINT*, " "
 
 !==============================================================================!

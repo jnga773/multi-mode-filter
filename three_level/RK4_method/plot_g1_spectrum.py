@@ -5,71 +5,17 @@ Created on Sat Sep 28 10:27:11 2019
 @author: Jacob
 """
 
+from _my_functions import filename, spectrum, norm_spectra
+from _dressed_state_correlations import three_level_eig
+
 import numpy as np
 import matplotlib.pyplot as plt
+
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
-import sys
-# Append path to add Jacobs_Function
-sys.path.append("/home/jnga773/Documents/898-PhD/test/")
-# sys.path.append("D:/Jacob/Google Drive/University/Physics/898 PhD/test")
-from Jacobs_Functions import filename, spectrum
 
 plt.close('all')
 
-# Three-level Hamiltonian eigenvalues
-def three_level_eigval(Omega_in, alpha_in, delta_in, xi_in):
-    """
-    Calculates the dressed/eigenvalues of the Hamiltonian in matrix form.
-    """
-    from numpy.linalg import eigvals
-    from numpy import matrix, sort
-    # Set up matrix
-    H = matrix([[0, 0.5 * Omega_in, 0],
-                [0.5 * Omega_in, -(0.5 * alpha_in) - delta_in, 0.5 * xi_in * Omega_in],
-                [0, 0.5 * xi_in * Omega_in, -2 * delta_in]])
-    # Calculate eigenvalues
-    eig_out = eigvals(H)
-    # Order them from big to small
-    eig_out = sort(eig_out)
-    return eig_out
-
-# Normalisation function
-def norm_spectra(Omega_in, alpha_in, delta_in, xi_in,
-                 spec_atom_in, spec_in, w0_in):
-    """
-    Depending on where the filter is centred, normalise the filtered spectrum
-    to the relevant peak.
-    """
-    from numpy import array
-    # Calculate where the peaks are located in the UNfiltered spectrum
-    from scipy.signal import find_peaks
-
-    # Calculate eigenvalues of Three-Level Hamiltonian
-    if 2 * delta_in == -alpha_in:
-        peaks = find_peaks(spec_atom_in, height=0.1)[1]["peak_heights"]
-        # Effectively a two-level atom so find the three-Mollow peaks
-        peaks_calculated = [-Omega_in, 0.0, Omega_in]
-    else:
-        peaks = find_peaks(spec_atom_in, height=0.01)[1]["peak_heights"]
-        # Usual three-level atom
-        wm, w0, wp = three_level_eigval(Omega_in, alpha_in, delta_in, xi_in)
-
-        # Calculate where the peaks should fall from eigenvalues
-        peaks_calculated = array([-(wp - wm), -wp, wm, 0, -wm, wp, (wp - wm)])
-        print("Calculated eigenvalue peaks are: ", peaks_calculated)
-
-    # Cycle through peaks_calculated and compare with w0
-    norm_peak_value = 1.0
-    for place, item in enumerate(peaks_calculated):
-        if round(item, 2) == round(w0_in, 2):
-            # save the peak value
-            norm_peak_value = peaks[place]
-            # Leave loop
-            break
-    # Renormalise spectra
-    spec_out = spec_in * norm_peak_value
-    return spec_out
 #------------------------------------------------------------------------------#
 #                                FILENAME THINGS                               #
 #------------------------------------------------------------------------------#
@@ -141,11 +87,14 @@ if 2 * delta == -alpha:
     plt.xlim(-1.5 * Omega, 1.5 * Omega)
 else:
     plt.xlim(-abs(alpha), abs(alpha))
+    
 plt.xlabel(r'$\left( \omega - \omega_{d} \right) / \gamma$', fontsize=15)
 plt.ylabel(r'Power Spectrum (a.u.)', fontsize=15)
 
 plt.legend(loc='best', fontsize=15)
-plt.title(r'$\Omega = {} \gamma, \alpha = {} \gamma, \delta = {} \gamma, \xi = {}, N = {}, \delta\omega = {} \gamma, \kappa = {} \gamma, \omega_{{0}} = {} \gamma$'.format(Omega, alpha, delta, xi, N, dw, kappa, w0))
+plt.title((r'$\Omega = {} \gamma, \alpha = {} \gamma, \delta = {} \gamma, \xi = {}, N = {},'
+           r'\delta\omega = {} \gamma, \kappa = {} \gamma, \omega_{{0}} = {} \gamma$').format(Omega, alpha, delta, xi, N, dw, kappa, w0),
+          fontsize=15)
 
 plt.tight_layout()
 plt.show()

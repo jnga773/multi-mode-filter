@@ -5,15 +5,13 @@ Created on Sat Sep 28 10:27:11 2019
 @author: Jacob
 """
 
+from _my_functions import filename, pi_int
+
 import numpy as np
 import matplotlib.pyplot as plt
+
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
-import sys
-# Append path to add Jacobs_Function
-sys.path.append("/home/jnga773/Documents/898-PhD/test/")
-# sys.path.append("D:/Jacob/Google Drive/University/Physics/898 PhD/test")
-from Jacobs_Functions import filename
 
 plt.close('all')
 
@@ -54,9 +52,9 @@ gamma, Omega, w0a, kappaa, dwa, w0b, kappab, dwb, epsilon, N, phase = \
     np.genfromtxt(filename("cross_parameters"), delimiter="=", skip_header=1, usecols=1)
 N = int(N)
 phase = int(phase)
-Omega = round(Omega, 2)
-w0a = round(w0a, 2)
-w0b = round(w0b, 2)
+Omega_str = pi_int(Omega)
+w0a_str = pi_int(w0a)
+w0b_str = pi_int(w0b)
 
 # Pull data from file
 # tau
@@ -83,7 +81,10 @@ plt.plot(tau, corr_cross)
 
 plt.xlabel(r'$\gamma \tau$', fontsize=12)
 plt.ylabel(r'$g^{(2)}_{\mathrm{cross}}(\tau)$', fontsize=12)
-plt.title(r'$\Omega = {}, \omega_{{0}}^{{(a)}} = {}, \omega_{{0}}^{{(b)}} = {}, \kappa_{{a}} = {}, \kappa_{{b}} = {}, N = {}, \delta\omega^{{(a)}} = {}, \delta\omega^{{(b)}} = {}$'.format(Omega, w0a, w0b, kappaa, kappab, N, dwa, dwb), fontsize=12)
+plt.title((r'$\Omega = {}, \omega_{{0}}^{{(a)}} = {}, \omega_{{0}}^{{(b)}} = {}'
+           r', \kappa_{{a}} = {}, \kappa_{{b}} = {}, N = {}, \delta\omega^{{(a)}}'
+           r'= {}, \delta\omega^{{(b)}} = {}$').format(Omega_str, w0a_str, w0b_str, kappaa, kappab, N, dwa, dwb),
+          fontsize=12)
 
 plt.tight_layout()
 plt.show()

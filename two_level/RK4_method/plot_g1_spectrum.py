@@ -56,7 +56,7 @@ spec, wlist = spectrum(tau, corr, norm='peak')
 spec_atom, wlist = spectrum(tau, corr_atom, norm='peak')
 
 # Renormalise filtered spectra
-spec = norm_spectra(Omega, spec_atom, spec, w0)
+spec = norm_spectra(spec_atom, spec, wlist)
 
 #-----------------------------------------------------------------------------#
 #                               PLOT G^{(1)}                                  #

@@ -144,28 +144,62 @@ def spectrum(tau_input, corr_input, pos=None, norm="integral"):
         spec_output = spec_output
     return spec_output, wlist_output
 
-def norm_spectra(Omega_in, atom_spec_in, filtered_spec_in, w0_in):
+
+def norm_spectra(atom_spectra_in, filtered_spectra_in, wlist_in,
+                 height_in=0.01):
     """
-    Depending on where the filter is centred, normalise the filtered spectrum
-    to the relevant peak.
+    Normalises the filtered spectrum [filtered_spectra_in] to the relevant
+    peak in the atomic spectrum [atom_spectra_in] depending on where
+    the max filtered peak is.
+
+    Parameters
+    ----------
+    atom_spectra_in : float, array
+          Unfiltered atomic spectrum.
+    filtered_spectra_in : float, array
+          Filtered spectrum.
+    wlist_in : float, array
+          List of frequencies from the FFT process.
+    height_in : float
+          Minimum height to detect peaks from scipy.signal.find_peaks()
+
+    Returns
+    -------
+    norm_spec_out : float, array
+          Normalised filtered spectrum to the relevant peak in the atomic
+          spectrum.
     """
-    from numpy import array
+    from numpy import where
     # Calculate where the peaks are located in the UNfiltered spectrum
     from scipy.signal import find_peaks
-    peaks = find_peaks(atom_spec_in, height=0.1)[1]["peak_heights"]
 
-    # Calculate where the peaks should fall from eigenvalues
-    peaks_calculated = array([-Omega_in, 0.0, Omega_in])
-    # print(peaks_calculated)
+    # Calculate where the peaks in the atomic spectrum are and their heights
+    atom_peak_where, atom_peak_heights = find_peaks(
+        atom_spectra_in, height=height_in)
+    atom_peak_heights = atom_peak_heights["peak_heights"]
+
+    # Calculate where the maximum peak in the filtered spectrum is
+    filtered_peak_where, filtered_peak_heights = find_peaks(
+        filtered_spectra_in, height=height_in)
+    filtered_peak_heights = filtered_peak_heights["peak_heights"]
+
+    # Grab index for where the max filtered peak is
+    where_filtered_max = where(
+        filtered_peak_heights == max(filtered_peak_heights))[0][0]
+    where_filtered_max = filtered_peak_where[where_filtered_max]
+
+    # Turn indices into frequencies so we can round a little bit, just in case :)
+    w_filtered_max = round(wlist_in[where_filtered_max], 3)
 
     # Cycle through peaks_calculated and compare with w0
     norm_peak_value = 1.0
-    for place, item in enumerate(peaks_calculated):
-        if round(item, 2) == round(w0_in, 2):
-            # save the peak value
-            norm_peak_value = peaks[place]
+    for place, item in enumerate(atom_peak_where):
+        if round(wlist_in[item], 3) == w_filtered_max:
+            # Save the peak_value
+            norm_peak_value = atom_peak_heights[place]
             # Leave loop
             break
+
     # Renormalise spectra
-    spec_out = filtered_spec_in * norm_peak_value
+    spec_out = filtered_spectra_in * norm_peak_value
     return spec_out

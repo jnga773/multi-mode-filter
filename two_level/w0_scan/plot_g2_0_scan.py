@@ -5,18 +5,14 @@ Created on Sat Sep 28 10:27:11 2019
 @author: Jacob
 """
 
+from _my_functions import filename, pi_int
+
 import numpy as np
 import matplotlib.pyplot as plt
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
 
 plt.close('all')
-
-def filename(file_in):
-    direct_f = "./data_files/"
-    ext_f = ".txt"
-    filename_out = direct_f + file_in + ext_f
-    return filename_out
 
 #------------------------------------------------------------------------------#
 #                                FILENAME THINGS                               #
@@ -26,7 +22,7 @@ gamma, Omega, kappa, dw, epsilon, N, phase = \
     np.genfromtxt(filename("parameters"), delimiter="=", skip_header=1, usecols=1)
 N = int(N)
 phase = int(phase)
-Omega = round(Omega, 2)
+Omega_str = pi_int(Omega)
 
 # Pull data from file
 # Central frequencies
@@ -49,9 +45,9 @@ plt.ylabel(r'$ \langle A^{\dagger} A^{\dagger} A A \rangle_{ss} / \langle A^{\da
 plt.xlabel(r'$ \omega_{0} / \gamma $', fontsize=15)
 
 if N > 0:
-    plt.title(r'$g^{{(2)}}(\tau=0)$ with $\left( \Omega = {}, \kappa = {} \gamma, \delta\omega = {} \gamma, N = {} \right)$'.format(Omega, kappa, dw, N), fontsize=12)
+    plt.title(r'$g^{{(2)}}(\tau=0)$ with $\left( \Omega = {}, \kappa = {} \gamma, \delta\omega = {} \gamma, N = {} \right)$'.format(Omega_str, kappa, dw, N), fontsize=12)
 else:
-    plt.title(r'$g^{{(2)}}(\tau=0)$ with $\left( \Omega = {} \gamma, \kappa = {} \gamma \right)$'.format(Omega, kappa), fontsize=12)
+    plt.title(r'$g^{{(2)}}(\tau=0)$ with $\left( \Omega = {} \gamma, \kappa = {} \gamma \right)$'.format(Omega_str, kappa), fontsize=12)
     # plt.title(r'$\langle a^{{\dagger}} a^{{\dagger}} a a \rangle_{{ss}}$ with $\left( \Omega = {} \gamma, \kappa = {} \gamma \right)$'.format(Omega, kappa), fontsize=12)
    
 plt.tight_layout()

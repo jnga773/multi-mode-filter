@@ -8,7 +8,6 @@ Created on Sat Sep 28 10:27:11 2019
 import numpy as np
 import matplotlib.pyplot as plt
 
-from Jacobs_Functions import filename
 from analytic_functions._dressed_state_correlations import print_transition_frequencies, dressed_g2_calc
 
 plt.rcParams['text.usetex'] = True
@@ -20,13 +19,13 @@ plt.close('all')
 #-----------------------------------------------------------------------------#
 # Read parameters
 Gamma, Omega, alpha, delta, xi, N, halfwidth, kappa, dw, w0 = \
-    np.genfromtxt(filename("g2_auto_parameters"), delimiter="=", usecols=1)
+    np.genfromtxt("./data_files/g2_auto_parameters.txt", delimiter="=", usecols=1)
 xi = round(xi, 2)
 N = int(N)
 
 # Read the data
-tau = np.genfromtxt(filename("g2_auto_corr"), usecols=0)
-g2 = np.genfromtxt(filename("g2_auto_corr"), usecols=1)
+tau = np.genfromtxt("./data_files/g2_auto_corr.txt", usecols=0)
+g2 = np.genfromtxt("./data_files/g2_auto_corr.txt", usecols=1)
 
 # Print transition frequencies
 print_transition_frequencies(Omega, alpha, delta, xi)

@@ -5,7 +5,7 @@ Created on Sat Sep 28 10:27:11 2019
 @author: Jacob
 """
 
-from Jacobs_Functions import filename, spectrum, norm_spectra
+from _my_functions import spectrum, norm_spectra
 from analytic_functions._three_level_moments import g1_calc
 from analytic_functions._dressed_state_correlations import three_level_eig, print_transition_frequencies, dressed_g1_calc
 
@@ -21,7 +21,7 @@ plt.close('all')
 #------------------------------------------------------------------------------#
 # Read parameters
 Gamma, Omega, alpha, delta, xi, N, halfwidth, kappa, dw, w0 = \
-    np.genfromtxt(filename("g1_parameters"), delimiter="=", usecols=1)
+    np.genfromtxt("./data_files/g1_parameters.txt", delimiter="=", usecols=1)
 N = int(N)
 # Omega = round(Omega, 2)
 # w0 = round(w0, 2)
@@ -31,9 +31,9 @@ N = int(N)
 print_transition_frequencies(Omega, alpha, delta, xi)
 
 # Read data
-tau = np.genfromtxt(filename("g1_corr"), usecols=0)
-g1 = np.genfromtxt(filename("g1_corr"), usecols=1) + 1j * \
-     np.genfromtxt(filename("g1_corr"), usecols=2)
+tau = np.genfromtxt("./data_files/g1_corr.txt", usecols=0)
+g1 = np.genfromtxt("./data_files/g1_corr.txt", usecols=1) + 1j * \
+     np.genfromtxt("./data_files/g1_corr.txt", usecols=2)
 
 # Atomic/unfiltered correlation
 g1_atom = g1_calc(tau, Gamma, Omega, alpha, delta, xi)

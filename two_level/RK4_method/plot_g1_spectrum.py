@@ -11,7 +11,7 @@ plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
 # from scipy.signal import find_peaks
 
-from Jacobs_Functions import filename, spectrum, norm_spectra, pi_int
+from _my_functions import spectrum, norm_spectra, pi_int
 
 plt.close('all')
 
@@ -37,16 +37,16 @@ def mollow_triplet(tau_in, gamma_in, Omega_in):
 #------------------------------------------------------------------------------#
 # Read parameters
 gamma, Omega, N, halfwidth, kappa, dw, w0 = \
-    np.genfromtxt(filename("g1_parameters"), delimiter="=", usecols=1)
+    np.genfromtxt("./data_files/g1_parameters.txt", delimiter="=", usecols=1)
 N = int(N)
 
 Omega_str = pi_int(Omega)
 w0_str = pi_int(w0)
 
 # Pull data from file
-tau = np.genfromtxt(filename("g1_corr"), usecols=0)
-corr = np.genfromtxt(filename("g1_corr"), usecols=1) + 1j * \
-        np.genfromtxt(filename("g1_corr"), usecols=2)
+tau = np.genfromtxt("./data_files/g1_corr.txt", usecols=0)
+corr = np.genfromtxt("./data_files/g1_corr.txt", usecols=1) + 1j * \
+       np.genfromtxt("./data_files/g1_corr.txt", usecols=2)
 
 # Unfiltered atomic correlation
 corr_atom = mollow_triplet(tau, gamma, Omega)

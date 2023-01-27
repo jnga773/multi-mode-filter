@@ -10,8 +10,6 @@ import matplotlib.pyplot as plt
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
 
-from Jacobs_Functions import filename
-
 plt.close('all')
 
 def g2_analytic(tau_in, Omega_in, gamma_in):
@@ -48,7 +46,7 @@ def g2_dressed_states(tau_in, Omega_in, gamma_in, w0_in, auto_or_cross='auto'):
 #-----------------------------------------------------------------------------#
 # Read parameters
 gamma, Omega, N, halfwidth, kappa, dw, w0a, w0b = \
-    np.genfromtxt(filename("g2_cross_parameters"), delimiter="=", usecols=1)
+    np.genfromtxt("./data_files/g2_cross_parameters.txt", delimiter="=", usecols=1)
 N = int(N)
 phase = 1
 # Omega = round(Omega, 2)
@@ -64,10 +62,10 @@ if w0b == -5 * np.pi:
 
 # Pull data from file
 # tau
-tau = np.genfromtxt(filename("g2_cross_corr"), usecols=0)
+tau = np.genfromtxt("./data_files/g2_cross_corr.txt", usecols=0)
 # g2
-# corr_auto = np.genfromtxt(filename("g2_auto_corr"), usecols=1)
-corr_cross = np.genfromtxt(filename("g2_cross_corr"), usecols=1)
+# corr_auto = np.genfromtxt("./data_files/g2_auto_corr.txt", usecols=1)
+corr_cross = np.genfromtxt("./data_files/g2_cross_corr.txt", usecols=1)
 
 # analytic
 corr_atom = g2_analytic(tau, Omega, gamma)

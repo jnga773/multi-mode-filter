@@ -10,8 +10,6 @@ import matplotlib.pyplot as plt
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
 
-from Jacobs_Functions import filename
-
 plt.close('all')
 
 def g2_analytic(tau_in, Omega_in, gamma_in):
@@ -76,7 +74,7 @@ def pi_int(number_in):
 #-----------------------------------------------------------------------------#
 # Read parameters
 gamma, Omega, N, halfwidth, kappa, dw, w0 = \
-    np.genfromtxt(filename("g2_auto_parameters"), delimiter="=", usecols=1)
+    np.genfromtxt("./data_files/g2_auto_parameters.txt", delimiter="=", usecols=1)
 N = int(N)
 phase = 1
 # Omega = round(Omega, 2)
@@ -87,9 +85,9 @@ w0_str = pi_int(w0)
 
 # Pull data from file
 # tau
-tau = np.genfromtxt(filename("g2_auto_corr"), usecols=0)
+tau = np.genfromtxt("./data_files/g2_auto_corr.txt", usecols=0)
 # g2
-corr_filter = np.genfromtxt(filename("g2_auto_corr"), usecols=1)
+corr_filter = np.genfromtxt("./data_files/g2_auto_corr.txt", usecols=1)
 
 # analytic
 corr_atom = g2_analytic(tau, Omega, gamma)

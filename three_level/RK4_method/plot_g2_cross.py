@@ -5,7 +5,6 @@ Created on Sat Sep 28 10:27:11 2019
 @author: Jacob
 """
 
-from Jacobs_Functions import filename
 from analytic_functions._dressed_state_correlations import dressed_g2_calc, three_level_eig
 
 import numpy as np
@@ -20,14 +19,14 @@ plt.close('all')
 #-----------------------------------------------------------------------------#
 # Read parameters
 Gamma, Omega, alpha, delta, xi, N, halfwidth, kappa, dw, w0a, w0b = \
-    np.genfromtxt(filename("g2_cross_parameters"), delimiter="=", usecols=1)
+    np.genfromtxt("./data_files/g2_cross_parameters.txt", delimiter="=", usecols=1)
 N = int(N)
 
 # Pull data from file
-tau = np.genfromtxt(filename("g2_cross_multi"), usecols=0)
-g2 = np.genfromtxt(filename("g2_cross_multi"), usecols=1)
+tau = np.genfromtxt("./data_files/g2_cross_corr_multi.txt", usecols=0)
+g2 = np.genfromtxt("./data_files/g2_cross_corr_multi.txt", usecols=1)
 
-g2_single = np.genfromtxt(filename("g2_cross_single"), usecols=1)
+g2_single = np.genfromtxt("./data_files/g2_cross_corr_single.txt", usecols=1)
 
 dt = 0.001
 tau_half = np.arange(0, tau[-1] + dt, dt)

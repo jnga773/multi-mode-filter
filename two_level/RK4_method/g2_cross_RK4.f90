@@ -1,12 +1,12 @@
-! The system in this program is a resonantly driven two-level atom that is
-! coupled into a multi-mode array of filter cavities, as described in some notes
-! somewhere (or with this program if this goes to anyone).
+! The system in this program is a resonantly driven three-level ladder-type atom
+! that is coupled into a multi-mode array of filter cavities, as described in
+! some notes somewhere (or with this program if this goes to anyone).
 
 ! The operator moment steady states are calculated using the inverse matrix/
 ! analytical method. Using quantum regression theorem, we then use Runge-Kutta
-! fourth-order to numerically integrate the moment equations, suing the steady
+! fourth-order to numerically integrate the moment equations, using the steady
 ! states and initial conditions, to calculate the normalised second-order
-! correlation function.
+! cross correlation function between filters A and B.
 
 ! The input parameters are taken from a NameList file [filename_ParamList] which,
 ! by default, points to "./ParamList.nml". The code can thus be compiled once,
@@ -57,9 +57,15 @@ IMPLICIT NONE
 !     SYSTEM PARAMETERS STUFF     !
 !---------------------------------!
 ! Atomic decay rate
-REAL(KIND=8)                                           :: gamma
+REAL(KIND=8)                                           :: Gamma
 ! Driving amplitude
 REAL(KIND=8)                                           :: Omega
+! Atomic anharmonicity
+REAL(KIND=8)                                           :: alpha
+! Drive detuning from two-photon resonance
+REAL(KIND=8)                                           :: delta
+! Dipole moment ratio
+REAL(KIND=8)                                           :: xi
 
 ! Filter parameter stuff
 ! Number of mode either side of w0, 2N + 1 total mode
@@ -110,7 +116,7 @@ CHARACTER(LEN=99), PARAMETER :: filename_g2 = "./data_files/g2_cross_corr.txt"
 !==============================================================================!
 ! NameList things
 ! Status and unit integers
-INTEGER            :: ISTAT, IUNIT
+INTEGER :: ISTAT, IUNIT
 ! Line to be read from file
 CHARACTER(LEN=512) :: LINE
 ! Namelist parameters

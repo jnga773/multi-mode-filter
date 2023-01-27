@@ -5,15 +5,12 @@ Created on Sat Sep 28 10:27:11 2019
 @author: Jacob
 """
 
+from _my_functions import filename, spectrum
+
 import numpy as np
 import matplotlib.pyplot as plt
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
-import sys
-# Append path to add Jacobs_Function
-sys.path.append("/home/jnga773/Documents/898-PhD/test/")
-# sys.path.append("D:/Jacob/Google Drive/University/Physics/898 PhD/test")
-from Jacobs_Functions import filename, spectrum
 
 plt.close('all')
 

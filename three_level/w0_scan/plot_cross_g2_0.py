@@ -5,18 +5,14 @@ Created on Sat Sep 28 10:27:11 2019
 @author: Jacob
 """
 
+from _my_functions import filename
+
 import numpy as np
 import matplotlib.pyplot as plt
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
 
 plt.close('all')
-
-def filename(file_in):
-    direct_f = "./data_files/"
-    ext_f = ".txt"
-    filename_out = direct_f + file_in + ext_f
-    return filename_out
 
 #-----------------------------------------------------------------------------#
 #                                FILENAME THINGS                              #
@@ -34,7 +30,7 @@ w0_list = np.genfromtxt(filename("w0_cross"), usecols=0)
 # Steady state photon number
 g2_0 = np.genfromtxt(filename("cross_corr"))
 
-X, Y =np.meshgrid(w0_list, w0_list)
+X, Y = np.meshgrid(w0_list, w0_list)
 
 #-----------------------------------------------------------------------------#
 #                             PLOT G2 SCAN: LINEAR                            #

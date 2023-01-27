@@ -5,18 +5,14 @@ Created on Sat Sep 28 10:27:11 2019
 @author: Jacob
 """
 
+from _my_functions import filename, pi_int
+
 import numpy as np
 import matplotlib.pyplot as plt
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
 
 plt.close('all')
-
-def filename(file_in):
-    direct_f = "./data_files/"
-    ext_f = ".txt"
-    filename_out = direct_f + file_in + ext_f
-    return filename_out
 
 def mollow_triplet(Omega_in, gamma_in):
     """
@@ -60,7 +56,7 @@ gamma, Omega, kappa, dw, epsilon, N, phase = \
     np.genfromtxt(filename("parameters"), delimiter="=", skip_header=1, usecols=1)
 N = int(N)
 phase = int(phase)
-Omega = round(Omega, 2)
+Omega_str = pi_int(Omega)
 
 # Pull data from file
 # Central frequencies
@@ -92,9 +88,9 @@ plt.xlim(-1.5 * Omega, 1.5 * Omega)
 plt.ylabel(r'$ \langle A^{\dagger} A \rangle_{ss} $', fontsize=12)
 plt.xlabel(r'$ \omega_{0} / \gamma $', fontsize=12)
 if N > 0:
-    plt.title(r'Photon Number Scan $\left( \Omega = {}, \kappa = {} \gamma, \delta\omega = {} \gamma, N = {} \right)$'.format(Omega, kappa, dw, N), fontsize=12)
+    plt.title(r'Photon Number Scan $\left( \Omega = {}, \kappa = {} \gamma, \delta\omega = {} \gamma, N = {} \right)$'.format(Omega_str, kappa, dw, N), fontsize=12)
 else:
-    plt.title(r'Photon Number Scan $\left( \Omega = {} \gamma, \kappa = {} \gamma \right)$'.format(Omega, kappa), fontsize=12)
+    plt.title(r'Photon Number Scan $\left( \Omega = {} \gamma, \kappa = {} \gamma \right)$'.format(Omega_str, kappa), fontsize=12)
 plt.legend(loc='best', fontsize=12)
 
 plt.tight_layout()

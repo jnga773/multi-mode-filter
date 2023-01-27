@@ -5,13 +5,13 @@ Created on Sat Sep 28 10:27:11 2019
 @author: Jacob
 """
 
+from _my_functions import *
+
 import numpy as np
 import matplotlib.pyplot as plt
+
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
-# from scipy.signal import find_peaks
-
-from Jacobs_Functions import filename, spectrum, norm_spectra, pi_int
 
 plt.close('all')
 
@@ -29,17 +29,17 @@ def mollow_triplet(tau_in, gamma_in, Omega_in):
     g1_f = (0.25 * ((Yf ** 2) / (1 + (Yf ** 2)))) * np.exp(-0.5 * gamma_in * tau_in) - \
            (0.125 * ((Yf ** 2) / ((1 + (Yf ** 2)) ** 2))) * (1 - (Yf ** 2) + ((1 - 5 * (Yf ** 2)) * (0.25 * gamma_in) / df)) * np.exp(-((0.75 * gamma_in) - df) * tau_in) - \
            (0.125 * ((Yf ** 2) / ((1 + (Yf ** 2)) ** 2))) * (1 - (Yf ** 2) - ((1 - 5 * (Yf ** 2)) * (0.25 * gamma_in) / df)) * np.exp(-((0.75 * gamma_in) + df) * tau_in)
-    # print("Mean Im[g1_atom] = {}".format(np.mean(np.imag(g1_f))))
+    print("Mean Im[g1_atom] = {}".format(np.mean(np.imag(g1_f))))
     return g1_f
 
 #------------------------------------------------------------------------------#
 #                                FILENAME THINGS                               #
 #------------------------------------------------------------------------------#
 # Read parameters
-gamma, Omega, N, halfwidth, kappa, dw, w0 = \
-    np.genfromtxt(filename("g1_parameters"), delimiter="=", usecols=1)
+gamma, Omega, w0, kappa, dw, epsilon, N, phase, dt, tau1_max = \
+    np.genfromtxt(filename("parameters"), delimiter="=", skip_header=1, usecols=1)
 N = int(N)
-
+phase = int(phase)
 Omega_str = pi_int(Omega)
 w0_str = pi_int(w0)
 
@@ -47,8 +47,8 @@ w0_str = pi_int(w0)
 tau = np.genfromtxt(filename("g1_corr"), usecols=0)
 corr = np.genfromtxt(filename("g1_corr"), usecols=1) + 1j * \
         np.genfromtxt(filename("g1_corr"), usecols=2)
+# tau = np.genfromtxt(filename("me_g1_corr"), usecols=0)
 
-# Unfiltered atomic correlation
 corr_atom = mollow_triplet(tau, gamma, Omega)
 
 # Calculate Fourier transform
@@ -56,8 +56,7 @@ spec, wlist = spectrum(tau, corr, norm='peak')
 spec_atom, wlist = spectrum(tau, corr_atom, norm='peak')
 
 # Renormalise filtered spectra
-# print(norm_spectra(spec_atom, spec, w0))
-# spec = norm_spectra(spec_atom, spec, wlist)
+spec = norm_spectra(spec_atom, spec, wlist)
 
 #-----------------------------------------------------------------------------#
 #                               PLOT G^{(1)}                                  #
@@ -106,10 +105,8 @@ spec_atom, wlist = spectrum(tau, corr_atom, norm='peak')
 fig, ax = plt.subplots(nrows=1, ncols=2, figsize=[12, 8])
 
 # First-order correlation
-ax[0].plot(tau, corr.real, color='C0', ls='solid', lw=2.0,
-           label='Real')
-ax[0].plot(tau, corr.imag, color='C1', ls='dashed', lw=1.0,
-           label='Imaginary')
+ax[0].plot(tau, corr.real, color='C0', ls='solid', lw=2.0, label='Real')
+ax[0].plot(tau, corr.imag, color='C1', ls='dashed', lw=1.0, label='Imaginary')
 ax[0].set_xlim(-0.1, 10.1)
 
 ax[0].set_xlabel(r'$\gamma \tau$', fontsize=12)
@@ -118,17 +115,14 @@ ax[0].set_title(r'$\Omega = {} \gamma$'.format(Omega_str), fontsize=12)
 ax[0].legend(loc='best', fontsize=12)
 
 # Spectra
-ax[1].plot(wlist, spec, color='C0', ls='solid', lw=2.0,
-           label='Filtered')
-ax[1].plot(wlist, spec_atom, color='k', ls='dashed', lw=1.0, alpha=0.5,
-           label='Unfiltered')
+ax[1].plot(wlist, spec, color='C0', ls='solid', lw=2.0, label='Filtered')
+ax[1].plot(wlist, spec_atom, color='k', ls='dashed', lw=1.0, alpha=0.5, label='Unfiltered')
 
 ax[1].set_xlim(-1.2 * Omega, 1.2 * Omega)
 ax[1].set_xlabel(r'$\left( \omega - \omega_{d} \right) / \gamma$', fontsize=12)
 ax[1].set_ylabel('Power Spectrum (a.u.)', fontsize=12)
-ax[1].set_title((r'$N = {}, \delta\omega = {} \gamma, \kappa = {} \gamma, '
-                 r'\omega_{{0}} = {} \gamma$'
-                 ).format(N, dw, kappa, w0_str), fontsize=12)
+ax[1].set_title(r'$N = {}, \delta\omega = {} \gamma, \kappa = {} \gamma, \omega_{{0}} = {} \gamma$'.format(N, dw, kappa, w0_str),
+                fontsize=12)
 ax[1].legend(loc='best', fontsize=12)
 
 fig.tight_layout()

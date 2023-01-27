@@ -15,19 +15,33 @@
 ! For the default filenames, the NameList file "./ParamList.nml" MUST EXIST IN
 ! THE WORKING DIRECTORY.
 
-! To compiled the code, I use the Intel Parallel Studio compiler IFORT with the
-! command:
-!       (LINUX): ifort -O3 -o ss -mkl just_steady_states.f90
-!     (WINDOWS): ifort /O3 /o ss /Qmkl just_steady_states.f90
-! where the -O3 (/O3) flag gives maximum optimisation, the -o (/o) ss flag
-! names the executable as "ss" ("ss.exe"), and the -mkl (/Qmkl) flag links
-! the program to Intel's Math Kernel Library, to make use of the LAPACK routines.
+! To compiled the code, I use the Intel oneAPI IFORT compiler with:
+!        (UNIX): ifort -O3 -qmkl -heap-arrays ./MODULE_single_filter.f90
+!                  ./just_steady_states.f90 -o [NAME]
+!     (WINDOWS): ifort /O3 /Qmkl /heap-arrays ./MODULE_single_filter.f90
+!                  ./just_steady_states.f90 -o [NAME]
+! where the -O3 (/O3) flag gives maximum optimisation, the -o (/o) [NAME] flag
+! names the executable as "[NAME]" ("[NAME].exe"), the -qmkl (/Qmkl) flag links
+! the program to Intel's Math Kernel Library, to make use of the LAPACK routines,
+! and the -heap-arrays (/heap-arrays) lets arrays to be dumped to memory, allowing
+! for larger values of N.
+
+! You can also compile it with GFORTRAN (provided you have LAPACK and BLAS
+! installed correctly) with:
+!    gfortran -O3 ./MODULE_single_filter.f90 ./just_steady_states.f90 -o [NAME]
+!               -I/path/to/LAPACK -L/path/to/LAPACK -llapack -lblas
+
+! In order for the program to compile, the module file
+! [./MODULE_single_filter.f90] must be added to the compilation BEFORE this code.
 
 PROGRAM TWO_LEVEL_ATOM_MULTI_MODE_FILTER_STEADY_STATES
 
 !==============================================================================!
 !                    DEFINING AND DECLARING VARIABLES/ARRAYS                   !
 !==============================================================================!
+
+! Import subroutines from the module file
+USE SINGLE_FILTER_SUBROUTINES
 
 IMPLICIT NONE
 
@@ -40,27 +54,22 @@ REAL(KIND=8)                                           :: gamma
 REAL(KIND=8)                                           :: Omega
 
 ! Filter parameter stuff
-! Central mode frequency of the filter cavity, with N mode frequencies either side
-REAL(KIND=8)                                           :: w0a
-! Cavity linewidth/transmission of cavity mode
-REAL(KIND=8)                                           :: kappaa
-! Percentage of fluorecence aimed at cavity
-REAL(KIND=8)                                           :: epsilon
 ! Number of mode either side of w0, 2N + 1 total mode
 INTEGER                                                :: N
+! Halfwidth of filter (\kappa if N = 0, N \delta\omega otherwise)
+REAL(KIND=8)                                           :: halfwidth
+! Cavity linewidth/transmission of cavity mode
+REAL(KIND=8)                                           :: kappa
 ! Frequency spacing of modes
-REAL(KIND=8)                                           :: dwa
+REAL(KIND=8)                                           :: dw
 ! Phase modulation of mode coupling
-INTEGER                                                :: phase
-! List of Delta values
-REAL(KIND=8), DIMENSION(:), ALLOCATABLE                :: wl
-! List of mode dependent cascade coupling values
-COMPLEX(KIND=8), DIMENSION(:), ALLOCATABLE             :: gkl
-! Blackman window coefficient
-REAL(KIND=8)                                           :: blackman
-! kappa, w0, and dw values
-REAL(KIND=8)                                           :: kappa, w0, dw
+REAL(KIND=8)                                           :: phase
 
+! Central mode frequency of the filter cavity, with N mode frequencies either side
+REAL(KIND=8)                                           :: w0a
+
+! Percentage of fluorecence aimed at cavity
+REAL(KIND=8), PARAMETER                                :: epsilon = 1.0d0
 ! Time stuff
 ! Time step
 REAL(KIND=8)                                           :: dt
@@ -86,25 +95,27 @@ COMPLEX(KIND=8), DIMENSION(N_mat)                      :: B_vec, B_OG
 ! Steady state arrays
 ! First-order moments: Atomic equations (< \sigma >)
 COMPLEX(KIND=8), DIMENSION(N_mat)                      :: sigma_ss
-! First-order moments: Cavity (< a >, < a^{\dagger} >)
-COMPLEX(KIND=8), DIMENSION(:, :), ALLOCATABLE          :: cav1_ss
-! Second-order moments: Cavity and atom (< a \sigma >, < a^{\dagger} \sigma >
-COMPLEX(KIND=8), DIMENSION(:, :, :), ALLOCATABLE       :: cavsig2_ss
-! Second-order moments: Cavity (< a^{\dagger} a >)
-COMPLEX(KIND=8), DIMENSION(:, :, :), ALLOCATABLE       :: cav2_ss
-! Third-order moments: Cavity and atom (< a^{2} \sigma >, < a^{\dagger 2} \sigma >, < a^{\dagger} a \sigma >)
-COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: cavsig3_ss
-! Third-order moments: Cavity (< a^{2} a^{\dagger} >, < a^{\dagger 2} a >)
-COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: cav3_ss
-! Fourth-order moments: Cavity and atom ( < a^{\dagger} a^{2} \sigma >, < a^{\dagger 2} a \sigma >)
-COMPLEX(KIND=8), DIMENSION(:, :, :, :, :), ALLOCATABLE :: cavsig4_ss
+! First-order moments: Cavity (< a >, < f^{\dagger} >)
+COMPLEX(KIND=8), DIMENSION(:, :), ALLOCATABLE          :: f1_ss
+! Second-order moments: Cavity and atom (< a \sigma >, < f^{\dagger} \sigma >
+COMPLEX(KIND=8), DIMENSION(:, :, :), ALLOCATABLE       :: f1sig_ss
+! Second-order moments: Cavity (< f^{\dagger} a >)
+COMPLEX(KIND=8), DIMENSION(:, :, :), ALLOCATABLE       :: f2_ss
+! Third-order moments: Cavity and atom (< a^{2} \sigma >, < a^{\dagger 2} \sigma >, < f^{\dagger} a \sigma >)
+COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: f2sig_ss
+! Third-order moments: Cavity (< a^{2} f^{\dagger} >, < a^{\dagger 2} a >)
+COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: f3_ss
+! Fourth-order moments: Cavity and atom ( < f^{\dagger} a^{2} \sigma >, < a^{\dagger 2} a \sigma >)
+COMPLEX(KIND=8), DIMENSION(:, :, :, :, :), ALLOCATABLE :: f3sig_ss
 ! Fourth-order moments: Cavity (< a^{\dagger 2} a^{2} >)
-COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: cav4_ss
+COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE    :: f4_ss
 
 ! Integer indices for sigma operators
 INTEGER, PARAMETER                                     :: sm = 1, sp = 2, sz = 3
-! Integer indices for: a, a^{\dagger}, a^{\dagger} a
-INTEGER, PARAMETER                                     :: a = 1, at = 2, ata = 3
+! Integer indices for: f, f^{\dagger}, f^{2}, f^{\dagger}^{2} ... etc
+INTEGER, PARAMETER                                     :: f = 1, ft = 2
+INTEGER, PARAMETER                                     :: ff = 1, ftf = 2, ft2 = 3
+INTEGER, PARAMETER                                     :: ftf2 = 1, ft2f = 2
 
 !----------------------------!
 !     OTHER USEFUL STUFF     !
@@ -129,12 +140,12 @@ COMPLEX(KIND=8)                                        :: moment_out
 !------------------------!
 ! Paramert Name List
 CHARACTER(LEN=15), PARAMETER :: filename_ParamList = "./ParamList.nml"
-! Filename of parameters
-CHARACTER(LEN=27), PARAMETER :: filename_parameters = "./data_files/parameters.txt"
-! Filename for state population
-CHARACTER(LEN=23), PARAMETER :: filename_states = "./data_files/states.txt"
-! Filename for operators
-CHARACTER(LEN=26), PARAMETER :: filename_cavity = "./data_files/operators.txt"
+! ! Filename of parameters
+! CHARACTER(LEN=27), PARAMETER :: filename_parameters = "./data_files/parameters.txt"
+! ! Filename for state population
+! CHARACTER(LEN=23), PARAMETER :: filename_states = "./data_files/states.txt"
+! ! Filename for operators
+! CHARACTER(LEN=26), PARAMETER :: filename_cavity = "./data_files/operators.txt"
 
 !==============================================================================!
 !                 NAMELIST AND PARAMETERS TO BE READ FROM FILE                 !
@@ -146,8 +157,8 @@ INTEGER            :: ISTAT, IUNIT
 CHARACTER(LEN=512) :: LINE
 ! Namelist parameters
 NAMELIST /ATOM/ Gamma, Omega
-NAMELIST /FILTER/ epsilon, N, phase
-NAMELIST /CAVITYA/ kappaa, w0a, dwa
+NAMELIST /FILTER/ N, halfwidth, kappa, phase
+NAMELIST /CAVITYA/ w0a
 NAMELIST /TIME/ dt, t_max, tau1_max, tau2_max
 
 ! Call start time from CPU_TIME
@@ -196,80 +207,41 @@ CLOSE(IUNIT)
 
 ! Number of time-steps
 t_steps = NINT(t_max / dt)
+
 ! Set system parameters
-kappa = kappaa
-w0 = w0a
-dw = dwa
+IF (N .EQ. 0) THEN
+  ! Single-mode
+  ! \kappa = the halfwidth
+  kappa = halfwidth
+  ! Set dw to zero
+  dw = 0.0d0
+ELSE
+  ! Multi-mode
+  ! Set dw = halfwidth / N
+  dw = halfwidth / DBLE(N)
+END IF
 
 !==============================================================================!
 !                DEFINING ANALYTIC MATRICES/EIGENVALUES/VECTORS                !
 !==============================================================================!
-!------------------------!
-!     BLOCH MATRIX M     !
-!------------------------!
-Mat_OG = 0.0d0
-! Row 1: d/dt |g><e|
-Mat_OG(1, 1) = -0.5d0 * gamma
-Mat_OG(1, 2) = 0.0d0
-Mat_OG(1, 3) = i * 0.5d0 * Omega
-! Row 2: d/dt |e><g|
-Mat_OG(2, 1) = 0.0d0
-Mat_OG(2, 2) = -0.5d0 * gamma
-Mat_OG(2, 3) = -i * 0.5d0 * Omega
-! Row 3: d/dt |e><e| - |g><g|
-Mat_OG(3, 1) = i * Omega
-Mat_OG(3, 2) = -i * Omega
-Mat_OG(3, 3) = -gamma
-
-!--------------------------------!
-!     NON-HOMOGENEOUS VECTOR     !
-!--------------------------------!
-B_OG = 0.0d0
-B_OG(1) = 0.0d0
-B_OG(2) = 0.0d0
-B_OG(3) = -gamma
-
-!---------------------------------------------!
-!     RESONANCES (wj) AND COUPLINGS (E_j)     !
-!---------------------------------------------!
-! Allocate array of Delta and gka values
-ALLOCATE(wl(-N:N))
-wl = 0.0d0
-ALLOCATE(gkl(-N:N))
-gkl = 0.0d0
-DO j = -N, N
-  IF (N == 0) THEN
-    wl(j) = w0
-    gkl(j) = DSQRT(epsilon * gamma * kappa)
-  ELSE
-    wl(j) = w0 + DBLE(j) * dw
-    ! Blackman window coefficient
-    blackman = 1.0d0
-    ! blackman = 0.42d0 - 0.5d0 * COS(2.0d0 * pi * DBLE(N + j) / (2.0d0 * DBLE(N))) + &
-    !          & 0.08d0 * COS(4.0d0 * pi * DBLE(N + j) / (2.0d0 * DBLE(N)))
-    ! Mode dependent phase difference
-    gkl(j) = DSQRT((epsilon / DBLE(2*N + 1)) * gamma * kappa) * blackman * EXP(i * DBLE(phase) * DBLE(j) * pi / DBLE(N))
-  END IF
-END DO
-
 !------------------------------------------!
 !     INITALISE OPERATOR MOMENT ARRAYS     !
 !------------------------------------------!
 ! Steady states
 ! First-order: Cavity
-ALLOCATE(cav1_ss(-N:N, 2)); cav1_ss = 0.0d0
+ALLOCATE(f1_ss(-N:N, 2)); f1_ss = 0.0d0
 ! Second-order: Cavity and Atom
-ALLOCATE(cavsig2_ss(-N:N, 2, N_mat)); cavsig2_ss = 0.0d0
+ALLOCATE(f1sig_ss(-N:N, 2, N_mat)); f1sig_ss = 0.0d0
 ! Second-order: Cavity
-ALLOCATE(cav2_ss(-N:N, -N:N, 3)); cav2_ss = 0.0d0
+ALLOCATE(f2_ss(-N:N, -N:N, 3)); f2_ss = 0.0d0
 ! Third-order: Cavity and Atom
-ALLOCATE(cavsig3_ss(-N:N, -N:N, 3, N_mat)); cavsig3_ss = 0.0d0
+ALLOCATE(f2sig_ss(-N:N, -N:N, 3, N_mat)); f2sig_ss = 0.0d0
 ! Third-order: Cavity
-ALLOCATE(cav3_ss(-N:N, -N:N, -N:N, 2)); cav3_ss = 0.0d0
+ALLOCATE(f3_ss(-N:N, -N:N, -N:N, 2)); f3_ss = 0.0d0
 ! Fourth-order: Cavity and atom
-ALLOCATE(cavsig4_ss(-N:N, -N:N, -N:N, 2, N_mat)); cavsig4_ss = 0.0d0
+ALLOCATE(f3sig_ss(-N:N, -N:N, -N:N, 2, N_mat)); f3sig_ss = 0.0d0
 ! Fourth-order: Cavity
-ALLOCATE(cav4_ss(-N:N, -N:N, -N:N, -N:N)); cav4_ss = 0.0d0
+ALLOCATE(f4_ss(-N:N, -N:N, -N:N, -N:N)); f4_ss = 0.0d0
 
 !----------------------------!
 !     INITIAL CONDITIONS     !
@@ -281,414 +253,121 @@ ALLOCATE(cav4_ss(-N:N, -N:N, -N:N, -N:N)); cav4_ss = 0.0d0
 !==============================================================================!
 !                           WRITE PARAMETERS TO FILE                           !
 !==============================================================================!
-
 ! ! Open file to write time to
 ! OPEN(UNIT=1, FILE=filename_parameters, STATUS='REPLACE', ACTION='WRITE')
-! ! Write parameter
-! WRITE(1,*) "Parameters are in the following order:"
-! WRITE(1,"(A10,F25.15)") "gamma =", gamma
-! WRITE(1,"(A10,F25.15)") "Omega =", Omega
-! WRITE(1,"(A10,F25.15)") "w0 =", w0
-! WRITE(1,"(A10,F25.15)") "kappa =", kappa
-! WRITE(1,"(A11,F25.15)") "dw = ", dw
-! WRITE(1,"(A10,F25.15)") "epsilon =", epsilon
-! WRITE(1,"(A11,I9)") "N = ", N
-! WRITE(1,"(A11,I9)") "phase = ", phase
-! WRITE(1,"(A10,F25.15)") "dt =", dt
-! WRITE(1,"(A10,F25.15)") "Max time =", t_max
+
+! ! Write parameters
+! WRITE(1,"(A15,F25.15)") "gamma =", Gamma
+! WRITE(1,"(A15,F25.15)") "Omega =", Omega
+
+! WRITE(1,"(A15,I9)") "N = ", N
+! WRITE(1,"(A15,F25.15)") "halfwidth =", halfwidth
+! WRITE(1,"(A15,F25.15)") "kappa =", kappa
+! WRITE(1,"(A15,F25.15)") "dw =", dw
+! WRITE(1,"(A15,F25.15)") "m =", phase
+
+! WRITE(1,"(A15,F25.15)") "w0a =", w0a
+
+! ! WRITE(1,"(A15,F25.15)") "dt =", dt
+! ! WRITE(1,"(A15,F25.15)") "Max t =", t_max
+! ! WRITE(1,"(A15,F25.15)") "Max tau1 =", tau1_max
+! ! WRITE(1,"(A15,F25.15)") "Max tau2 =", tau2_max
+
 ! ! Close file
 ! CLOSE(1)
 
 !==============================================================================!
 !                        CALCULATE STEADY-STATE MOMENTS                        !
 !==============================================================================!
-!---------------------------!
-!     FIRST-ORDER: ATOM     !
-!---------------------------!
-! Set matrix to be inverted
-Mat_inv = Mat_OG
-! Invert matrix
-CALL SquareMatrixInverse(N_mat, Mat_inv)
-
-! Calculate steady states
-sigma_ss = 0.0d0
-sigma_ss = -MATMUL(Mat_inv, B_OG)
-
-! Cycle through modes
-DO j = -N, N
-  !-----------------------------!
-  !     FIRST-ORDER: CAVITY     !
-  !-----------------------------!
-  !-----------!
-  ! < a_{j} > !
-  !-----------!
-  cav1_ss(j, a) = -gkl(j) * sigma_ss(sm)
-  cav1_ss(j, a) = cav1_ss(j, a) / &
-                & (kappa + i * wl(j))
-  !---------------------!
-  ! < a^{\dagger}_{j} > !
-  !---------------------!
-  cav1_ss(j, at) = -CONJG(gkl(j)) * sigma_ss(sp)
-  cav1_ss(j, at) = cav1_ss(j, at) / &
-                 & (kappa - i * wl(j))
-  !---------------------------------------!
-  !     SECOND-ORDER: CAVITY AND ATOM     !
-  !---------------------------------------!
-  !------------------!
-  ! < a_{j} \sigma > !
-  !------------------!
-  ! Set the diagonal matrix elements for M
-  Mat = Mat_OG
-  DO x = 1, N_mat
-    Mat(x, x) = Mat(x, x) - (kappa + i * wl(j))
-  END DO
-
-  ! Set the non-homogeneous vector
-  B_vec = 0.0d0
-  B_vec(1) = 0.0d0
-  B_vec(2) = -0.5d0 * gkl(j) * (sigma_ss(sz) + 1.0d0)
-  B_vec(3) = -gamma * cav1_ss(j, a) + &
-           & gkl(j) * sigma_ss(sm)
-
-  ! Set inverse matrix
-  Mat_inv = Mat
-  ! Invert matrix
-  CALL SquareMatrixInverse(N_mat, Mat_inv)
-
-  ! Calculate steady state
-  cavsig2_ss(j, a, :) = -MATMUL(Mat_inv, B_vec)
-
-  !----------------------------!
-  ! < a^{\dagger}_{j} \sigma > !
-  !----------------------------!
-  ! Set the diagonal matrix elements for M
-  Mat = Mat_OG
-  DO x = 1, N_mat
-    Mat(x, x) = Mat(x, x) - (kappa - i * wl(j))
-  END DO
-
-  ! Set the non-homogeneous vector
-  B_vec = 0.0d0
-  B_vec(1) = -0.5d0 * CONJG(gkl(j)) * (sigma_ss(sz) + 1.0d0)
-  B_vec(2) = 0.0d0
-  B_vec(3) = -gamma * cav1_ss(j, at) + &
-           & CONJG(gkl(j)) * sigma_ss(sp)
-
-  ! Set inverse matrix
-  Mat_inv = Mat
-  ! Invert matrix
-  CALL SquareMatrixInverse(N_mat, Mat_inv)
-
-  ! Calculate steady state
-  cavsig2_ss(j, at, :) = -MATMUL(Mat_inv, B_vec)
-
-  ! Close j loop
-END DO
-
-photon_ss = 0.0d0
-! Cycle through modes
-DO k = -N, N
-  DO j = -N, N
-    !------------------------------!
-    !     SECOND-ORDER: CAVITY     !
-    !------------------------------!
-    !-----------------!
-    ! < a_{j} a_{k} > !
-    !-----------------!
-    cav2_ss(j, k, a) = -gkl(j) * cavsig2_ss(k, a, sm) + &
-                     & -gkl(k) * cavsig2_ss(j, a, sm)
-    cav2_ss(j, k, a) = cav2_ss(j, k, a) / &
-                     & (2.0d0 * kappa + i * (wl(j) + wl(k)))
-
-    !-------------------------------------!
-    ! < a^{\dagger}_{j} a^{\dagger}_{k} > !
-    !-------------------------------------!
-    cav2_ss(j, k, at) = -CONJG(gkl(j)) * cavsig2_ss(k, at, sp) + &
-                      & -CONJG(gkl(k)) * cavsig2_ss(j, at, sp)
-    cav2_ss(j, k, at) = cav2_ss(j, k, at) / &
-                      & (2.0d0 * kappa - i * (wl(j) + wl(k)))
-
-    !---------------------------!
-    ! < a^{\dagger}_{j} a_{k} > !
-    !---------------------------!
-    cav2_ss(j, k, ata) = -CONJG(gkl(j)) * cavsig2_ss(k, a, sp) + &
-                       & -gkl(k) * cavsig2_ss(j, at, sm)
-    cav2_ss(j, k, ata) = cav2_ss(j, k, ata) / &
-                       & (2.0d0 * kappa - i * (wl(j) - wl(k)))
-
-    ! Update photon number
-    photon_ss = photon_ss + cav2_ss(j, k, ata)
-
-    !--------------------------------------!
-    !     THIRD-ORDER: CAVITY AND ATOM     !
-    !--------------------------------------!
-    !------------------------!
-    ! < a_{j} a_{k} \sigma > !
-    !------------------------!
-    ! Set the diagonal matrix elements for M
-    Mat = Mat_OG
-    DO x = 1, N_mat
-      Mat(x, x) = Mat(x, x) - ((2.0d0 * kappa) + i * (wl(j) + wl(k)))
-    END DO
-
-    ! Set the non-homogeneous vector
-    B_vec = 0.0d0
-    B_vec(1) = 0.0d0
-    B_vec(2) = -0.5d0 * gkl(j) * cavsig2_ss(k, a, sz) + &
-             & -0.5d0 * gkl(j) * cav1_ss(k, a) + &
-             & -0.5d0 * gkl(k) * cavsig2_ss(j, a, sz) + &
-             & -0.5d0 * gkl(k) * cav1_ss(j, a)
-    B_vec(3) = -gamma * cav2_ss(j, k, a) + &
-             & gkl(j) * cavsig2_ss(k, a, sm) + &
-             & gkl(k) * cavsig2_ss(j, a, sm)
-
-    ! Set inverse matrix
-    Mat_inv = Mat
-    ! Invert matrix
-    CALL SquareMatrixInverse(N_mat, Mat_inv)
-
-    ! Calculate steady state
-    cavsig3_ss(j, k, a, :) = -MATMUL(Mat_inv, B_vec)
-
-    !--------------------------------------------!
-    ! < a^{\dagger}_{j} a^{\dagger}_{k} \sigma > !
-    !--------------------------------------------!
-    ! Set the diagonal matrix elements for M
-    Mat = Mat_OG
-    DO x = 1, N_mat
-      Mat(x, x) = Mat(x, x) - ((2.0d0 * kappa) - i * (wl(j) + wl(k)))
-    END DO
-
-    ! Set the non-homogeneous vector
-    B_vec = 0.0d0
-    B_vec(1) = -0.5d0 * CONJG(gkl(j)) * cavsig2_ss(k, at, sz) + &
-             & -0.5d0 * CONJG(gkl(j)) * cav1_ss(k, at) + &
-             & -0.5d0 * CONJG(gkl(k)) * cavsig2_ss(j, at, sz) + &
-             & -0.5d0 * CONJG(gkl(k)) * cav1_ss(j, at)
-    B_vec(2) = 0.0d0
-    B_vec(3) = -gamma * cav2_ss(j, k, at) + &
-             & CONJG(gkl(j)) * cavsig2_ss(k, at, sp) + &
-             & CONJG(gkl(k)) * cavsig2_ss(j, at, sp)
-
-    ! Set inverse matrix
-    Mat_inv = Mat
-    ! Invert matrix
-    CALL SquareMatrixInverse(N_mat, Mat_inv)
-
-    ! Calculate steady state
-    cavsig3_ss(j, k, at, :) = -MATMUL(Mat_inv, B_vec)
-
-    !----------------------------------!
-    ! < a^{\dagger}_{j} a_{k} \sigma > !
-    !----------------------------------!
-    ! Set the diagonal matrix elements for M
-    Mat = Mat_OG
-    DO x = 1, N_mat
-      Mat(x, x) = Mat(x, x) - ((2.0d0 * kappa) - i * (wl(j) - wl(k)))
-    END DO
-
-    ! Set the non-homogeneous vector
-    B_vec = 0.0d0
-    B_vec(1) = -0.5d0 * CONJG(gkl(j)) * cavsig2_ss(k, a, sz) + &
-             & -0.5d0 * CONJG(gkl(j)) * cav1_ss(k, a)
-    B_vec(2) = -0.5d0 * gkl(k) * cavsig2_ss(j, at, sz) + &
-             & -0.5d0 * gkl(k) * cav1_ss(j, at)
-    B_vec(3) = -gamma * cav2_ss(j, k, ata) + &
-             & CONJG(gkl(j)) * cavsig2_ss(k, a, sp) + &
-             & gkl(k) * cavsig2_ss(j, at, sm)
-
-    ! Set inverse matrix
-    Mat_inv = Mat
-    ! Invert matrix
-    CALL SquareMatrixInverse(N_mat, Mat_inv)
-
-    ! Calculate steady state
-    cavsig3_ss(j, k, ata, :) = -MATMUL(Mat_inv, B_vec)
-
-    ! Close j loop
-  END DO
-  ! Close k loop
-END DO
-
-! Cycle through modes
-DO l = -N, N
-  DO k = -N, N
-    DO j = -N, N
-      !-----------------------------!
-      !     THIRD-ORDER: CAVITY     !
-      !-----------------------------!
-      !---------------------------------!
-      ! < a^{\dagger}_{j} a_{k} a_{l} > !
-      !---------------------------------!
-      cav3_ss(j, k, l, a) = -CONJG(gkl(j)) * cavsig3_ss(k, l, a, sp) + &
-                          & -gkl(k) * cavsig3_ss(j, l, ata, sm) + &
-                          & -gkl(l) * cavsig3_ss(j, k, ata, sm)
-      cav3_ss(j, k, l, a) = cav3_ss(j, k, l, a) / &
-                          & (3.0d0 * kappa - i * (wl(j) - wl(k) - wl(l)))
-
-      !-------------------------------------------!
-      ! < a^{\dagger}_{j} a^{\dagger}_{k} a_{l} > !
-      !-------------------------------------------!
-      cav3_ss(j, k, l, at) = -CONJG(gkl(j)) * cavsig3_ss(k, l, ata, sp) + &
-                           & -CONJG(gkl(k)) * cavsig3_ss(j, l, ata, sp) + &
-                           & -gkl(l) * cavsig3_ss(j, k, at, sm)
-      cav3_ss(j, k, l, at) = cav3_ss(j, k, l, at) / &
-                           & (3.0d0 * kappa - i * (wl(j) + wl(k) - wl(l)))
-
-      !--------------------------------------!
-      !     FOURTH-ORDER: CAVITY AND ATOM    !
-      !--------------------------------------!
-      !----------------------------------------!
-      ! < a^{\dagger}_{j} a_{k} a_{l} \sigma > !
-      !----------------------------------------!
-      ! Set the diagonal matrix elements for M
-      Mat = Mat_OG
-      DO x = 1, N_mat
-        Mat(x, x) = Mat(x, x) - ((3.0d0 * kappa) - i * (wl(j) - wl(k) - wl(l)))
-      END DO
-
-      ! Set the non-homogeneous vector
-      B_vec = 0.0d0
-      B_vec(1) = -0.5d0 * CONJG(gkl(j)) * cavsig3_ss(k, l, a, sz) + &
-               & -0.5d0 * CONJG(gkl(j)) * cav2_ss(k, l, a)
-      B_vec(2) = -0.5d0 * gkl(k) * cavsig3_ss(j, l, ata, sz) + &
-               & -0.5d0 * gkl(k) * cav2_ss(j, l, ata) + &
-               & -0.5d0 * gkl(l) * cavsig3_ss(j, k, ata, sz) + &
-               & -0.5d0 * gkl(l) * cav2_ss(j, k, ata)
-      B_vec(3) = -gamma * cav3_ss(j, k, l, a) + &
-               & CONJG(gkl(j)) * cavsig3_ss(k, l, a, sp) + &
-               & gkl(k) * cavsig3_ss(j, l, ata, sm) + &
-               & gkl(l) * cavsig3_ss(j, k, ata, sm)
-
-      ! Set inverse matrix
-      Mat_inv = Mat
-      ! Invert matrix
-      CALL SquareMatrixInverse(N_mat, Mat_inv)
-
-      ! Calculate steady state
-      cavsig4_ss(j, k, l, a, :) = -MATMUL(Mat_inv, B_vec)
-
-      !--------------------------------------------------!
-      ! < a^{\dagger}_{j} a^{\dagger}_{k} a_{l} \sigma > !
-      !--------------------------------------------------!
-      ! Set the diagonal matrix elements for M
-      Mat = Mat_OG
-      DO x = 1, N_mat
-        Mat(x, x) = Mat(x, x) - ((3.0d0 * kappa) - i * (wl(j) + wl(k) - wl(l)))
-      END DO
-
-      ! Set the non-homogeneous vector
-      B_vec = 0.0d0
-      B_vec(1) = -0.5d0 * CONJG(gkl(j)) * cavsig3_ss(k, l, ata, sz) + &
-               & -0.5d0 * CONJG(gkl(j)) * cav2_ss(k, l, ata) + &
-               & -0.5d0 * CONJG(gkl(k)) * cavsig3_ss(j, l, ata, sz) + &
-               & -0.5d0 * CONJG(gkl(k)) * cav2_ss(j, l, ata)
-      B_vec(2) = -0.5d0 * gkl(l) * cavsig3_ss(j, k, at, sz) + &
-               & -0.5d0 * gkl(l) * cav2_ss(j, k, at)
-      B_vec(3) = -gamma * cav3_ss(j, k, l, at) + &
-               & CONJG(gkl(j)) * cavsig3_ss(k, l, ata, sp) + &
-               & CONJG(gkl(k)) * cavsig3_ss(j, l, ata, sp) + &
-               & gkl(l) * cavsig3_ss(j, k, at, sm)
-
-      ! Set inverse matrix
-      Mat_inv = Mat
-      ! Invert matrix
-      CALL SquareMatrixInverse(N_mat, Mat_inv)
-
-      ! Calculate steady state
-      cavsig4_ss(j, k, l, at, :) = -MATMUL(Mat_inv, B_vec)
-
-      ! Close j loop
-    END DO
-    ! Close k loop
-  END DO
-  ! Close l loop
-END DO
-
-! Cycle through modes
-DO m = -N, N
-  DO l = -N, N
-    DO k = -N, N
-      DO j = -N, N
-        !------------------------------!
-        !     FOURTH-ORDER: CAVITY     !
-        !------------------------------!
-        !-------------------------------------------------!
-        ! < a^{\dagger}_{j} a^{\dagger}_{k} a_{l} a_{m} > !
-        !-------------------------------------------------!
-        cav4_ss(j, k, l, m) = -CONJG(gkl(j)) * cavsig4_ss(k, l, m, a, sp) + &
-                            & -CONJG(gkl(k)) * cavsig4_ss(j, l, m, a, sp) + &
-                            & -gkl(l) * cavsig4_ss(j, k, m, at, sm) + &
-                            & -gkl(m) * cavsig4_ss(j, k, l, at, sm)
-        cav4_ss(j, k, l, m) = cav4_ss(j, k, l, m) / &
-                            & (4.0d0 * kappa - i * (wl(j) + wl(k)) + i * (wl(l) + wl(m)))
-        ! Close j loop
-      END DO
-      ! Close k loop
-    END DO
-    ! Close l loop
-  END DO
-  ! Close m loop
-END DO
+CALL SteadyStateMoments(Gamma, Omega, &
+                      & epsilon, N, phase, &
+                      & w0a, kappa, dw, &
+                      & photon_ss, sigma_ss, .TRUE., &
+                      & f1_ss, f1sig_ss, &
+                      & f2_ss, f2sig_ss, &
+                      & f3_ss, f3sig_ss, &
+                      & f4_ss)
 
 !==============================================================================!
 !                      TEST PRINT SOME STEADY STATE VALUES                     !
 !==============================================================================!
-! WRITE(*, *) "=============================================="
-! WRITE(*, *) "FIRST-ORDER: ATOM"
-! WRITE(*, '(A12,ES18.11E2,A3,ES18.11E2,A2)') "< sm >_ss = ", REAL(sigma_ss(sm)), " + ", IMAG(sigma_ss(sm)), "i"
-! WRITE(*, '(A12,ES18.11E2,A3,ES18.11E2,A2)') "< sp >_ss = ", REAL(sigma_ss(sp)), " + ", IMAG(sigma_ss(sp)), "i"
-! WRITE(*, '(A12,ES18.11E2,A3,ES18.11E2,A2)') "< sz >_ss = ", REAL(sigma_ss(sz)), " + ", IMAG(sigma_ss(sz)), "i"
-! WRITE(*, *) "=============================================="
-!
-WRITE(*, *) "=============================================="
-WRITE(*, *) "FIRST-ORDER: CAVITY"
-WRITE(*, '(A14,ES18.11E2 A3,ES18.11E2,A2)') " < a_0 >_ss = ", REAL(cav1_ss(0, a)), " + ", IMAG(cav1_ss(0, a)), "i"
-WRITE(*, '(A14,ES18.11E2 A3,ES18.11E2,A2)') "< at_0 >_ss = ", REAL(cav1_ss(0, at)), " + ", IMAG(cav1_ss(0, at)), "i"
-WRITE(*, *) "=============================================="
-!
-! WRITE(*, *) "=============================================="
-! WRITE(*, *) "SECOND-ORDER: CAVITY AND ATOM"
-! WRITE(*, '(A17,ES18.11E2,A3,ES18.11E2,A2)') " < a_0 sm >_ss = ", REAL(cavsig2_ss(0, a, sm)), " + ", IMAG(cavsig2_ss(0, a, sm)), "i"
-! WRITE(*, '(A17,ES18.11E2,A3,ES18.11E2,A2)') " < a_0 sp >_ss = ", REAL(cavsig2_ss(0, a, sp)), " + ", IMAG(cavsig2_ss(0, a, sp)), "i"
-! WRITE(*, '(A17,ES18.11E2,A3,ES18.11E2,A2)') "< at_0 sm >_ss = ", REAL(cavsig2_ss(0, at, sm)), " + ", IMAG(cavsig2_ss(0, at, sm)), "i"
-! WRITE(*, '(A17,ES18.11E2,A3,ES18.11E2,A2)') "< at_0 sp >_ss = ", REAL(cavsig2_ss(0, at, sp)), " + ", IMAG(cavsig2_ss(0, at, sp)), "i"
-! WRITE(*, *) "=============================================="
+! Set some modes ow
+IF (N .EQ. 0) THEN
+  j = 0; k = 0; l = 0; m = 0
+ELSE
+  j = 1; k = -1; l = 0; m = 1
+END IF
 
-! WRITE(*, *) "=============================================="
-! WRITE(*, *) "SECOND-ORDER: CAVITY"
-! WRITE(*, '(A20,ES18.11E2,A3,ES18.11E2,A1)') "   < a_0 a_0 >_ss = ", REAL(cav2_ss(0, 0, a)), " + ", AIMAG(cav2_ss(0, 0, a)), "i"
-! WRITE(*, '(A20,ES18.11E2,A3,ES18.11E2,A1)') " < at_0 at_0 >_ss = ", REAL(cav2_ss(0, 0, at)), " + ", AIMAG(cav2_ss(0, 0, at)), "i"
-! WRITE(*, '(A20,ES18.11E2,A3,ES18.11E2,A1)') "  < at_0 a_0 >_ss = ", REAL(cav2_ss(0, 0, ata)), " + ", AIMAG(cav2_ss(0, 0, ata)), "i"
-! WRITE(*, *) "=============================================="
-!
-! WRITE(*, *) "=============================================="
-! WRITE(*, *) "THIRD-ORDER: CAVITY AND ATOM"
-! WRITE(*, '(A23,ES18.11E2,A3,ES18.11E2,A1)') "   < a_0 a_0 sp >_ss = ", REAL(cavsig3_ss(0, 0, a, sp)), " + ", AIMAG(cavsig3_ss(0, 0, a, sp)), "i"
-! WRITE(*, '(A23,ES18.11E2,A3,ES18.11E2,A1)') " < at_0 at_0 sp >_ss = ", REAL(cavsig3_ss(0, 0, at, sp)), " + ", AIMAG(cavsig3_ss(0, 0, at, sp)), "i"
-! WRITE(*, '(A23,ES18.11E2,A3,ES18.11E2,A1)') "  < at_0 a_0 sp >_ss = ", REAL(cavsig3_ss(0, 0, ata, sp)), " + ", AIMAG(cavsig3_ss(0, 0, ata, sp)), "i"
-! WRITE(*, *) "=============================================="
-
-! WRITE(*, *) "=============================================="
-! WRITE(*, *) "THIRD-ORDER: CAVITY"
-! WRITE(*, '(A24,ES18.11E2,A3,ES18.11E2,A1)') "  < at_0 a_0 a_0 >_ss = ", REAL(cav3_ss(0, 0, 0, a)), " + ", AIMAG(cav3_ss(0, 0, 0, a)), "i"
-! WRITE(*, '(A24,ES18.11E2,A3,ES18.11E2,A1)') " < at_0 at_0 a_0 >_ss = ", REAL(cav3_ss(0, 0, 0, at)), " + ", AIMAG(cav3_ss(0, 0, 0, at)), "i"
-! WRITE(*, *) "=============================================="
-!
-! WRITE(*, *) "=============================================="
-! WRITE(*, *) "FOURTH-ORDER: CAVITY AND ATOM"
-! WRITE(*, '(A26,ES18.11E2,A3,ES18.11E2,A1)') " < at_0 a_0 a_0 sm >_ss = ", REAL(cavsig4_ss(0, 0, 0, a, sm)), " + ", AIMAG(cavsig4_ss(0, 0, 0, a, sm)), "i"
-! WRITE(*, '(A26,ES18.11E2,A3,ES18.11E2,A1)') "< at_0 at_0 a_0 sm >_ss = ", REAL(cavsig4_ss(0, 0, 0, at, sm)), " + ", AIMAG(cavsig4_ss(0, 0, 0, at, sm)), "i"
-! WRITE(*, *) "=============================================="
-!
 WRITE(*, *) "=============================================="
-WRITE(*, *) "FOURTH-ORDER: CAVITY"
-WRITE(*, '(A27,ES18.11E2,A3,ES18.11E2,A1)') "< at_0 at_0 a_0 a_0 >_ss = ", REAL(cav4_ss(0, 0, 0, 0)), " + ", AIMAG(cav4_ss(0, 0, 0, 0)), "i"
+WRITE(*, *) "ATOM"
+WRITE(*, '(A12,ES18.11E2,A3,ES18.11E2,A2)') "< sm >_ss = ", REAL(sigma_ss(sm)), " + ", IMAG(sigma_ss(sm)), "i"
+WRITE(*, '(A12,ES18.11E2,A3,ES18.11E2,A2)') "< sp >_ss = ", REAL(sigma_ss(sp)), " + ", IMAG(sigma_ss(sp)), "i"
+WRITE(*, '(A12,ES18.11E2,A3,ES18.11E2,A2)') "< sz >_ss = ", REAL(sigma_ss(sz)), " + ", IMAG(sigma_ss(sz)), "i"
 WRITE(*, *) "=============================================="
 
-PRINT*, " "
-PRINT*, "Mean photon number =", photon_ss
-PRINT*, " "
+WRITE(*, *) "=============================================="
+WRITE(*, *) "FIRST-ORDER: FILTER"
+WRITE(*, '(A5,I2,A8,ES18.11E2 A3,ES18.11E2,A2)') " < f_", j, " >_ss = ", REAL(f1_ss(j, f)), " + ", IMAG(f1_ss(j, f)), "i"
+WRITE(*, '(A5,I2,A8,ES18.11E2 A3,ES18.11E2,A2)') "< ft_", j, " >_ss = ", REAL(f1_ss(j, ft)), " + ", IMAG(f1_ss(j, ft)), "i"
+WRITE(*, *) "=============================================="
+
+WRITE(*, *) "=============================================="
+WRITE(*, *) "FIRST-ORDER: FILTER / FIRST-ORDER: PARAMETRIC"
+WRITE(*, '(A5,I2,A11,ES18.11E2,A3,ES18.11E2,A2)') " < f_", j, " sm >_ss = ", &
+        & REAL(f1sig_ss(j, f, sm)), " + ", IMAG(f1sig_ss(j, f, sm)), "i"
+WRITE(*, '(A5,I2,A11,ES18.11E2,A3,ES18.11E2,A2)') " < f_", j, " sp >_ss = ", &
+        & REAL(f1sig_ss(j, f, sp)), " + ", IMAG(f1sig_ss(j, f, sp)), "i"
+WRITE(*, '(A5,I2,A11,ES18.11E2,A3,ES18.11E2,A2)') "< ft_", j, " sm >_ss = ", &
+        & REAL(f1sig_ss(j, ft, sm)), " + ", IMAG(f1sig_ss(j, ft, sm)), "i"
+WRITE(*, '(A5,I2,A11,ES18.11E2,A3,ES18.11E2,A2)') "< ft_", j, " sp >_ss = ", &
+        & REAL(f1sig_ss(j, ft, sp)), " + ", IMAG(f1sig_ss(j, ft, sp)), "i"
+WRITE(*, *) "=============================================="
+
+WRITE(*, *) "=============================================="
+WRITE(*, *) "SECOND-ORDER: FILTER"
+WRITE(*, '(A6,I2,A6,I2,A8,ES18.11E2,A3,ES18.11E2,A1)') "  < f2_", j, "  f2_", k, " >_ss = ", &
+        & REAL(f2_ss(j, k, ff)), " + ", AIMAG(f2_ss(j, k, ff)), "i"
+WRITE(*, '(A6,I2,A6,I2,A8,ES18.11E2,A3,ES18.11E2,A1)') " < ft2_", j, " ft2_", k, " >_ss = ", &
+        & REAL(f2_ss(j, k, ft2)), " + ", AIMAG(f2_ss(j, k, ft2)), "i"
+WRITE(*, '(A6,I2,A6,I2,A8,ES18.11E2,A3,ES18.11E2,A1)') " < ftf_", j, " ftf_", k, " >_ss = ", &
+        & REAL(f2_ss(j, k, ftf)), " + ", AIMAG(f2_ss(j, k, ftf)), "i"
+WRITE(*, *) "=============================================="
+
+WRITE(*, *) "=============================================="
+WRITE(*, *) "SECOND-ORDER: FILTER / ATOM"
+WRITE(*, '(A7,I2,A5,I2,A11,ES18.11E2,A3,ES18.11E2,A1)') "  < f2_", j, "  f2_", k, " sm >_ss = ", &
+  & REAL(f2sig_ss(j, k, ff, sm)), " + ", AIMAG(f2sig_ss(j, k, ff, sm)), "i"
+WRITE(*, '(A7,I2,A5,I2,A11,ES18.11E2,A3,ES18.11E2,A1)') " < ft2_", j, " ft2_", k, " sp >_ss = ", &
+  & REAL(f2sig_ss(j, k, ft2, sp)), " + ", AIMAG(f2sig_ss(j, k, ft2, sp)), "i"
+WRITE(*, '(A7,I2,A5,I2,A11,ES18.11E2,A3,ES18.11E2,A1)') " < ftf_", j, " ftf_", k, " sz >_ss = ", &
+  & REAL(f2sig_ss(j, k, ftf, sz)), " + ", AIMAG(f2sig_ss(j, k, ftf, sz)), "i"
+WRITE(*, *) "=============================================="
+
+WRITE(*, *) "=============================================="
+WRITE(*, *) "THIRD-ORDER: FILTER"
+WRITE(*, '(A6,I2,A4,I2,A3,I2,A8,ES18.11E2,A3,ES18.11E2,A1)') " < ft_", j, "  f_", k, " f_", l, " >_ss = ", &
+  & REAL(f3_ss(j, k, l, ftf2)), " + ", AIMAG(f3_ss(j, k, l, ftf2)), "i"
+WRITE(*, '(A6,I2,A4,I2,A3,I2,A8,ES18.11E2,A3,ES18.11E2,A1)') " < ft_", j, " ft_", k, " f_", l, " >_ss = ", &
+  & REAL(f3_ss(j, k, l, ft2f)), " + ", AIMAG(f3_ss(j, k, l, ft2f)), "i"
+WRITE(*, *) "=============================================="
+
+WRITE(*, *) "=============================================="
+WRITE(*, *) "THIRD-ORDER: FILTER / ATOM"
+WRITE(*, '(A6,I2,A4,I2,A3,I2,A11,ES18.11E2,A3,ES18.11E2,A1)') " < ft_", j, "  f_", k, " f_", l,  " sm >_ss = ", &
+  & REAL(f3sig_ss(j, k, l, ftf2, sm)), " + ", AIMAG(f3sig_ss(j, k, l, ftf2, sm)), "i"
+WRITE(*, '(A6,I2,A4,I2,A3,I2,A11,ES18.11E2,A3,ES18.11E2,A1)') " < ft_", j, " ft_", k, " f_", l, " sz >_ss = ", &
+  & REAL(f3sig_ss(j, k, l, ft2f, sz)), " + ", AIMAG(f3sig_ss(j, k, l, ft2f, sz)), "i"
+WRITE(*, *) "=============================================="
+
+WRITE(*, *) "=============================================="
+WRITE(*, *) "FOURTH-ORDER: FILTER"
+WRITE(*, '(A6,I2,A4,I2,A3,I2,A3,I2,A8,ES18.11E2,A3,ES18.11E2,A1)') " < ft_", j, " ft_", k, " f_", l, " f_", m, " >_ss = ", &
+  & REAL(f4_ss(j, k, l, m)), " + ", AIMAG(f4_ss(j, k, l, m)), "i"
+WRITE(*, *) "=============================================="
+
+! PRINT*, " "
+PRINT*, "Mean photon number in cavity A =", photon_ss
+! PRINT*, " "
 
 !==============================================================================!
 !                                END OF PROGRAM                                !
@@ -699,70 +378,3 @@ CALL CPU_TIME(end_time)
 PRINT*, "Runtime: ", end_time - start_time, "seconds"
 
 END PROGRAM TWO_LEVEL_ATOM_MULTI_MODE_FILTER_STEADY_STATES
-
-! Subroutine to calculate the inverse of a matrix USING LAPACK LIBRARY
-SUBROUTINE SquareMatrixInverse(N_in, MatrixInv_out)
-  ! Import the MKL Library LAPACK95, from which the eigenvalue/eigenvector and
-  ! matrix inversion subroutines come from.
-  ! MUST INCLUDE THE -mkl OR /Qmkl FLAG AS A COMPILER OPTION IF USING INTEL.
-  ! Otherwise you'll have to link it yourself and I don't know how to do that :)
-
-  USE LAPACK95
-
-  ! The subroutines used from LAPACK are:
-  ! - zGETRF - Calculates LU-factorisation of a complexmatrix so it can be
-  !            inverted by...,
-  ! - zGETRI - Calculates the inverse of a complex matrix.
-
-  IMPLICIT NONE
-
-  !-------------------------!
-  !     INPUT ARGUMENTS     !
-  !-------------------------!
-  ! Dimension of matrix (N_in x N_in)
-  INTEGER, INTENT(IN)                                   :: N_in
-
-  !--------------------------!
-  !     OUTPUT ARGUMENTS     !
-  !--------------------------!
-  ! Inverted matrix to be output
-  COMPLEX(KIND=8), DIMENSION(N_in, N_in), INTENT(INOUT) :: MatrixInv_out
-
-  !--------------------------!
-  !     SUBROUTINE STUFF     !
-  !--------------------------!
-  ! Work space dimension
-  INTEGER, PARAMETER                                    :: LWMAX = 300
-  INTEGER                                               :: LWORK
-  ! Work space array
-  COMPLEX(KIND=8), DIMENSION(LWMAX)                     :: WORK
-  REAL(KIND=8), DIMENSION(2*N_in)                       :: RWORK
-  ! LU-factorisation array
-  INTEGER, DIMENSION(N_in)                              :: IPIV
-  ! Info IO
-  INTEGER                                               :: INFO
-
-  ! Perform LU-factorization of matrix
-  CALL zGETRF(N_in, N_in, MatrixInv_out, N_in, IPIV, INFO)
-  IF (INFO .NE. 0) THEN
-    PRINT*, "zGETRF M failed :( INFO = ", INFO
-    STOP
-  END IF
-
-  ! Query optimal work space
-  ! LWORK = -1
-  ! CALL zGETRI(N_in, MatrixInv_out, N_in, IPIV, WORK, LWORK, INFO)
-  ! ! Set optimal work space and run again
-  ! LWORK = MIN(LWMAX, INT(WORK(1)))
-
-  ! Set optimal LWORK for N_in = 3 or N_in = 8
-  IF (N_in .EQ. 3) THEN
-    LWORK = 3
-  ELSE IF (N_in .EQ. 8) THEN
-    LWORK = 8
-  END IF
-
-  CALL zGETRI(N_in, MatrixInv_out, N_in, IPIV, WORK, LWORK, INFO)
-
-  ! End of subroutine
-END SUBROUTINE SquareMatrixInverse

@@ -1,47 +1,44 @@
 &ATOM
   ! Parameters in terms of decay rate gamma
-  ! Atom decay rate [Default = 1.0]
+  ! Atom decay rate
   gamma = 1.0d0
-  ! Drive strength (Rabi Frequency) [Default = 5.0]
+  ! Drive strength (Rabi Frequency)
+  ! Omega = 31.41592653589793d0
   Omega = 15.707963267948966d0
+  ! Omega = 50.0d0
 /
 
 &FILTER
-  ! Percentage of fluorescence aimed at cavities [Default = 0.5]
-  epsilon = 1.0d0
-  ! Number of modes either side of d0 (2N + 1 total modes) [Default = 5]
-  N = 20
-  ! Phase modulation of mode coupling [Default = 1]
-  phase = 1
+  ! Number of modes either side of d0 (2N + 1 total modes)
+  N = 50
+  ! Halfwidth of cavity (Either \kappa if N = 0 or N \delta\omega)
+  halfwidth = 8.0d0
+  ! Linewidth of individual cavity modes
+  kappa = 0.05d0
+  ! Phase modulation of mode coupling
+  phase = 1.0d0
 /
 
 &CAVITYA
-  ! Central resonance frequency of cavity a [Default = 0.0]
+  ! Central resonance frequency of cavity A
+  ! w0a = 31.41592653589793d0
   w0a = 15.707963267948966d0
-  ! w0a = 0.0d0
-  ! Linewidth of cavity mode a [Default = 0.001]
-  kappaa = 1.0d0
-  ! Frequency spacing of modes for cavity a [Default = 1.0]
-  dwa = 0.4d0
+  ! w0a = 50.0
 /
 
 &CAVITYB
-  ! Central resonance frequency of cavity b [Default = 0.0]
+  ! Central resonance frequency of cavity B
   w0b = -15.707963267948966d0
   ! w0b = 0.0d0
-  ! Linewidth of cavity mode b [Default = 0.001]
-  kappab = 1.0d0
-  ! Frequency spacing of modes for cavity b [Default = 1.0]
-  dwb = 0.4d0
 /
 
 &TIME
-  ! time step [Default = 0.001]
+  ! Time step
   dt = 0.001d0
-  ! maximum time to integrate for steady state [Default = 50.0]
+  ! Maximum time to integrate for steady state in units of \gamma \tau
   t_max = 10.0d0
-  ! Maximum g1 time in units of \gamma \tau [Default = 100.0]
+  ! Maximum g1 time in units of \gamma \tau
   tau1_max = 100.0d0
-  ! max g2 time in units of \gamma \tau [Default = 20.0]
+  ! max g2 time in units of \gamma \tau
   tau2_max = 10.0d0
 /

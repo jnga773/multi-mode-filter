@@ -5,13 +5,12 @@ Created on Sat Sep 28 10:27:11 2019
 @author: Jacob
 """
 
-from _my_functions import filename, pi_int
-
 import numpy as np
 import matplotlib.pyplot as plt
-
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.family'] = 'serif'
+
+from Jacobs_Functions import filename
 
 plt.close('all')
 
@@ -40,50 +39,92 @@ def g2_dressed_states(tau_in, Omega_in, gamma_in, w0_in):
         g2_f = ones(len(tau_in))
     return g2_f
 
+def pi_int(number_in):
+    """
+    Checks if the number is an integer multiple of pi and, if so, returns a 
+    string r'{} \pi'.
+    """
+    from numpy import pi
+    # If number_in is pretty much pi, set string to r'\pi'
+    if round(number_in, 5) == round(pi, 5):
+        str_out = r'\pi'
+
+    # For larger-than-pi numbers
+    if number_in > pi:
+        if round(number_in % pi, 5) == 0:
+            # Modulus is zero so number_in is an integer of pi
+            # Set string
+            str_out = r'{} \pi'.format(int(number_in // pi))
+        else:
+            # It's not an integer of pi so round it to 3dp
+            str_out = r'{} \pi'.format(round(number_in, 3))
+        
+    # For less-than-pi numbers
+    if number_in < pi:
+        if round(pi % number_in, 5) == 0:
+            # Modulus is zero so number_in is a rational of pi
+            str_out = r'\frac{{\pi}}{{{}}}'.format(int(pi // number_in))
+        else:
+            # It's not an integer of pi so round it to 3dp
+            str_out = r'{} \pi'.format(round(number_in, 3))
+            
+    # Return string
+    return str_out
+
 #-----------------------------------------------------------------------------#
 #                               FILENAME THINGS                               #
 #-----------------------------------------------------------------------------#
 # Read parameters
-gamma, Omega, w0, kappa, dw, epsilon, N, phase = \
-    np.genfromtxt(filename("parameters"), delimiter="=", skip_header=1, usecols=1)
+gamma, Omega, N, halfwidth, kappa, dw, w0 = \
+    np.genfromtxt(filename("g2_auto_parameters"), delimiter="=", usecols=1)
 N = int(N)
-phase = int(phase)
+phase = 1
+# Omega = round(Omega, 2)
+# w0 = round(w0, 2)
+
 Omega_str = pi_int(Omega)
 w0_str = pi_int(w0)
 
 # Pull data from file
 # tau
-tau = np.genfromtxt(filename("g2_corr"), usecols=0)
+tau = np.genfromtxt(filename("g2_auto_corr"), usecols=0)
 # g2
-corr_filter = np.genfromtxt(filename("g2_corr"), usecols=1)
+corr_filter = np.genfromtxt(filename("g2_auto_corr"), usecols=1)
 
 # analytic
 corr_atom = g2_analytic(tau, Omega, gamma)
 # Dressed states g2
 corr_dressed = g2_dressed_states(tau, Omega, gamma, w0)
 
-# print("Initial g2 value = {}".format(corr_filter[0]))
+print("Initial g2 value = {}".format(corr_filter[0]))
 
 #-----------------------------------------------------------------------------#
 #                               PLOT g^{(2)}                                  #
 #-----------------------------------------------------------------------------#
-plt.figure(figsize=[10, 6])
+fig = plt.figure(num='G2 Auto', figsize=[10, 6])
+ax = plt.gca()
 
-plt.plot(tau, corr_filter, color='C0', label='Filtered Correlation')
-    
-# Plot unfilterd correlation
-plt.plot(tau, corr_atom, color='k', ls='dotted', alpha=0.5, label='Full Atom Correlation')
+# Plot
+if N > 0:
+    ax.plot(tau, corr_filter, color='C0', ls='solid',
+            label=(r'$N = {}, \delta\omega = {} \gamma, \kappa = {} \gamma$'
+                   ).format(N, dw, kappa))
+else:
+    ax.plot(tau, corr_filter, color='C0', ls='solid',
+            label='$\kappa = {} \gamma$'.format(kappa))
 
-# Plot dressed_state correlation
-plt.plot(tau, corr_dressed, color='k', ls='dashed', alpha=0.5, label='Dressed-State Approximation')
+ax.plot(tau, corr_dressed, color='k', ls='dashed', alpha=0.5, label='Dressed-State Approximation')
 
-plt.xlabel(r'$\gamma \tau$', fontsize=15)
-plt.ylabel(r'$g^{(2)}(\tau)$', fontsize=15)
-plt.legend(loc='best', fontsize=15)
-plt.title((r'$g^{{(2)}}_{{\mathrm{{Auto}}}}(\tau)$ with $\left( \Omega = {} \gamma,'
-           r'N = {}, \delta\omega = {} \gamma, \kappa = {} \gamma, \omega_{{0}} = {}'
-           r'\gamma \right)$').format(Omega_str, N, dw, kappa, w0_str),
-          fontsize=15)
+# Legend
+ax.legend(loc='lower right', fontsize=12)
 
-plt.tight_layout()
-plt.show()
+# Labels
+ax.set_xlabel(r'$\gamma \tau$', fontsize=12)
+ax.set_ylabel(r'$g^{{(2)}}(\tau)$', fontsize=12)
+ax.set_title((r'$g^{{(2)}}_{{\mathrm{{Auto}}}}(\tau)$ with $\Omega = {} \gamma'
+              r', \omega_{{0}} = {} \gamma$'
+              ).format(Omega_str, w0_str), fontsize=12)
+
+# Figure stuff
+fig.tight_layout()
+fig.show()

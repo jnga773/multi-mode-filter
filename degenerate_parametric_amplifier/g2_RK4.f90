@@ -102,9 +102,9 @@ REAL(KIND=8), DIMENSION(:), ALLOCATABLE                :: g2_positive
 ! Paramert Name List
 CHARACTER(LEN=15), PARAMETER :: filename_ParamList = "./ParamList.nml"
 ! Filename of parameters
-CHARACTER(LEN=99), PARAMETER :: filename_parameters = "./data_files/g2_parameters.txt"
+CHARACTER(LEN=99), PARAMETER :: filename_parameters = "./data_files/g2_auto_parameters.txt"
 ! Filename for second-order correlation
-CHARACTER(LEN=99), PARAMETER :: filename_g2 = "./data_files/g2_auto.txt"
+CHARACTER(LEN=99), PARAMETER :: filename_g2 = "./data_files/g2_auto_corr.txt"
 
 !==============================================================================!
 !                 NAMELIST AND PARAMETERS TO BE READ FROM FILE                 !
@@ -214,7 +214,7 @@ CLOSE(1)
 !===============================================================================!
 CALL G2_CalculateRK4(kappa_p, Delta, lambda, &
                    & epsilon, N, phase, &
-                   & w0a, kappaa, dwa, &
+                   & w0a, kappa_f, dw, &
                    & dt, tau_steps, &
                    & g2_positive, .TRUE., filename_g2)
 

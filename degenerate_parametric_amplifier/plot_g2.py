@@ -19,7 +19,7 @@ plt.close('all')
 #                               FILENAME THINGS                               #
 #-----------------------------------------------------------------------------#
 # Grab parameters
-kappa_p, Delta, K, N, halfwidth, kappa_f, dw, w0 = \
+kappa_p, Delta, K, N, halfwidth, kappa_f, dw, w0a = \
     np.genfromtxt("./data_files/g2_auto_parameters.txt", usecols=1, delimiter='=')
 N = int(N)
     

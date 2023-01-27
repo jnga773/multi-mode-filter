@@ -99,9 +99,9 @@ INTEGER, PARAMETER                                       :: f = 1, g = 2
 ! Paramert Name List
 CHARACTER(LEN=99), PARAMETER :: filename_ParamList = "./ParamList.nml"
 ! Filename of parameters
-CHARACTER(LEN=99), PARAMETER :: filename_parameters = "./data_files/cross_parameters.txt"
+CHARACTER(LEN=99), PARAMETER :: filename_parameters = "./data_files/g2_cross_parameters.txt"
 ! Filename for state population
-CHARACTER(LEN=99), PARAMETER :: filename_g2 = "./data_files/g2_cross.txt"
+CHARACTER(LEN=99), PARAMETER :: filename_g2 = "./data_files/g2_cross_corr.txt"
 
 !==============================================================================!
 !                 NAMELIST AND PARAMETERS TO BE READ FROM FILE                 !
@@ -185,11 +185,6 @@ ELSE
   dw = halfwidth / DBLE(N)
 END IF
 
-! Set kappa_f, w0, and dw lists
-kappa_f(f) = kappa_f; kappa_f(g) = kappa_f
-w0(f) = w0a; w0(g) = w0b
-dw(f) = dw; dw(g) = dw
-
 !==============================================================================!
 !                           WRITE PARAMETERS TO FILE                           !
 !==============================================================================!
@@ -226,9 +221,9 @@ CLOSE(1)
 tau_steps = NINT(tau2_max / dt)
 CALL G2_CalculateRK4(kappa_p, Delta, lambda, &
                    & epsilon, N, phase, &
-                   & w0(f), kappa_f(f), dw(f), & ! Cavity F
-                   & w0(g), kappa_f(f), dw(f), & ! Cavity G (with same kappa
-                   & dt, tau_steps, &            !           and dw)
+                   & w0a, kappa_f, dw, &     ! Cavity F
+                   & w0b, kappa_f, dw, &     ! Cavity G (with same kappa
+                   & dt, tau_steps, &          !           and dw)
                    & g2_positive, .TRUE., filename_g2)
 
 !==============================================================================!

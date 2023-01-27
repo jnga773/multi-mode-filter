@@ -1,11 +1,11 @@
-! The system in this program is a resonantly driven two-level atom that is
-! coupled into a multi-mode array of filter cavities, as described in some notes
-! somewhere (or with this program if this goes to anyone).
+! The system in this program is a resonantly driven three-level ladder-type atom
+! that is coupled into a multi-mode array of filter cavities, as described in
+! some notes somewhere (or with this program if this goes to anyone).
 
 ! The operator moment steady states are calculated using the inverse matrix/
 ! analytical method. Using quantum regression theorem, we then use Runge-Kutta
 ! fourth-order to numerically integrate the moment equations, suing the steady
-! states and initial conditions, to calculate the normalised second-order
+! states and initial conditions, to calculate the normalised first-order
 ! correlation function.
 
 ! The input parameters are taken from a NameList file [filename_ParamList] which,
@@ -15,19 +15,19 @@
 ! The parameters for each run are written to [filename_parameters] which, by
 ! default, points to "./data_files/parameters.txt".
 
-! The normalised second-order cross correlation function is written to
-! [filename_g2] which, by default, points to "./data_files/g2_corr_cross.txt".
-! The file has two columns:
-!                            t     REAL(g2_cross)
+! The normalised first-order correlation function is written to [filename_g1]
+! which, by default, points to "./data_files/g1_corr.txt". The file has three
+! columns:
+!                     t     REAL(g1)     IMAG(g1)
 
 ! For the default filenames, the folder "./data_files/" and NameList file
 ! "./ParamList.nml" MUST EXIST IN THE WORKING DIRECTORY.
 
 ! To compiled the code, I use the Intel oneAPI IFORT compiler with:
-!        (UNIX): ifort -O3 -qmkl -heap-arrays ./MODULE_two_filters.f90
-!                  ./g2_cross_RK4.f90 -o [NAME]
-!     (WINDOWS): ifort /O3 /Qmkl /heap-arrays ./MODULE_two_filters.f90
-!                  ./g2_cross_RK4.f90 -o [NAME]
+!        (UNIX): ifort -O3 -qmkl -heap-arrays ./MODULE_single_filter.f90
+!                  ./g2_RK4.f90 -o [NAME]
+!     (WINDOWS): ifort /O3 /Qmkl /heap-arrays ./MODULE_single_filter.f90
+!                  ./g2_RK4.f90 -o [NAME]
 ! where the -O3 (/O3) flag gives maximum optimisation, the -o (/o) [NAME] flag
 ! names the executable as "[NAME]" ("[NAME].exe"), the -qmkl (/Qmkl) flag links
 ! the program to Intel's Math Kernel Library, to make use of the LAPACK routines,
@@ -36,16 +36,16 @@
 
 ! You can also compile it with GFORTRAN (provided you have LAPACK and BLAS
 ! installed correctly) with:
-!    gfortran -O3 ./MODULE_two_filters.f90 ./g2_cross_RK4.f90 -o [NAME]
+!    gfortran -O3 ./MODULE_single_filter.f90 ./g2_RK4.f90 -o [NAME]
 !               -I/path/to/LAPACK -L/path/to/LAPACK -llapack -lblas
 
 ! In order for the program to compile, the module file
-! [./MODULE_two_filters.f90] must be added to the compilation BEFORE this code.
+! [./MODULE_single_filter.f90] must be added to the compilation BEFORE this code.
 
-PROGRAM TWO_LEVEL_ATOM_MULTI_MODE_FILTER_MOMENTS_G2_CROSS
+PROGRAM THREE_LEVEL_ATOM_MULTI_MODE_FILTER_MOMENTS_G1
 
 ! Import subroutines from the module file
-USE TWO_FILTER_SUBROUTINES
+USE SINGLE_FILTER_SUBROUTINES
 
 !==============================================================================!
 !                    DEFINING AND DECLARING VARIABLES/ARRAYS                   !
@@ -57,9 +57,15 @@ IMPLICIT NONE
 !     SYSTEM PARAMETERS STUFF     !
 !---------------------------------!
 ! Atomic decay rate
-REAL(KIND=8)                                           :: gamma
+REAL(KIND=8)                                           :: Gamma
 ! Driving amplitude
 REAL(KIND=8)                                           :: Omega
+! Atomic anharmonicity
+REAL(KIND=8)                                           :: alpha
+! Drive detuning from two-photon resonance
+REAL(KIND=8)                                           :: delta
+! Dipole moment ratio
+REAL(KIND=8)                                           :: xi
 
 ! Filter parameter stuff
 ! Number of mode either side of w0, 2N + 1 total mode
@@ -74,7 +80,7 @@ REAL(KIND=8)                                           :: dw
 REAL(KIND=8)                                           :: phase
 
 ! Central mode frequency of the filter cavity, with N mode frequencies either side
-REAL(KIND=8)                                           :: w0a, w0b
+REAL(KIND=8)                                           :: w0a
 
 ! Percentage of fluorecence aimed at cavity
 REAL(KIND=8), PARAMETER                                :: epsilon = 1.0d0
@@ -86,14 +92,14 @@ REAL(KIND=8)                                           :: dt
 REAL(KIND=8)                                           :: t_max, tau1_max, tau2_max
 ! Maximum number of steps to integrate for
 INTEGER                                                :: tau_steps
-! Runtime varifgles
+! Runtime variables
 REAL(KIND=8)                                           :: start_time, end_time
 
 !----------------------------!
 !     OTHER USEFUL STUFF     !
 !----------------------------!
 ! Correlation data
-REAL(KIND=8), DIMENSION(:), ALLOCATABLE                :: g2_positive
+COMPLEX(KIND=8), DIMENSION(:), ALLOCATABLE             :: g1_array
 
 !------------------------!
 !     FILENAME STUFF     !
@@ -101,9 +107,9 @@ REAL(KIND=8), DIMENSION(:), ALLOCATABLE                :: g2_positive
 ! Paramert Name List
 CHARACTER(LEN=15), PARAMETER :: filename_ParamList = "./ParamList.nml"
 ! Filename of parameters
-CHARACTER(LEN=99), PARAMETER :: filename_parameters = "./data_files/g2_cross_parameters.txt"
-! Filename for second-order correlation
-CHARACTER(LEN=99), PARAMETER :: filename_g2 = "./data_files/g2_cross_corr.txt"
+CHARACTER(LEN=99), PARAMETER :: filename_parameters = "./data_files/g1_parameters.txt"
+! Filename for first-order correlation
+CHARACTER(LEN=99), PARAMETER :: filename_g1 = "./data_files/g1_corr.txt"
 
 !==============================================================================!
 !                 NAMELIST AND PARAMETERS TO BE READ FROM FILE                 !
@@ -114,10 +120,9 @@ INTEGER            :: ISTAT, IUNIT
 ! Line to be read from file
 CHARACTER(LEN=512) :: LINE
 ! Namelist parameters
-NAMELIST /ATOM/ Gamma, Omega
+NAMELIST /ATOM/ Gamma, Omega, alpha, delta, xi
 NAMELIST /FILTER/ N, halfwidth, kappa, phase
 NAMELIST /CAVITYA/ w0a
-NAMELIST /CAVITYB/ w0b
 NAMELIST /TIME/ dt, t_max, tau1_max, tau2_max
 
 ! Call start time from CPU_TIME
@@ -154,15 +159,6 @@ IF (ISTAT .NE. 0) THEN
   CALL EXIT(1)
 END IF
 
-READ(IUNIT, NML=CAVITYB, IOSTAT=ISTAT)
-IF (ISTAT .NE. 0) THEN
-  BACKSPACE(IUNIT)
-  READ(IUNIT, FMT='(A)') LINE
-  CLOSE(IUNIT)
-  PRINT *, "Invalid line in CAVITYB namelist: " // TRIM(line)
-  CALL EXIT(1)
-END IF
-
 READ(IUNIT, NML=TIME, IOSTAT=ISTAT)
 IF (ISTAT .NE. 0) THEN
   BACKSPACE(IUNIT)
@@ -171,11 +167,10 @@ IF (ISTAT .NE. 0) THEN
   PRINT *, "Invalid line in TIME namelist: " // TRIM(line)
   CALL EXIT(1)
 END IF
-
 CLOSE(IUNIT)
 
 ! Number of time-steps
-tau_steps = NINT(tau2_max / dt)
+tau_steps = NINT(tau1_max / dt)
 
 ! Set system parameters
 IF (N .EQ. 0) THEN
@@ -197,8 +192,12 @@ END IF
 OPEN(UNIT=1, FILE=filename_parameters, STATUS='REPLACE', ACTION='WRITE')
 
 ! Write parameters
-WRITE(1,"(A15,F25.15)") "gamma =", Gamma
+
+WRITE(1,"(A15,F25.15)") "Gamma =", Gamma
 WRITE(1,"(A15,F25.15)") "Omega =", Omega
+WRITE(1,"(A15,F25.15)") "alpha =", alpha
+WRITE(1,"(A15,F25.15)") "delta =", delta
+WRITE(1,"(A15,F25.15)") "xi =", xi
 
 WRITE(1,"(A15,I9)") "N = ", N
 WRITE(1,"(A15,F25.15)") "halfwidth =", halfwidth
@@ -207,7 +206,6 @@ WRITE(1,"(A15,F25.15)") "dw =", dw
 ! WRITE(1,"(A15,F25.15)") "m =", phase
 
 WRITE(1,"(A15,F25.15)") "w0a =", w0a
-WRITE(1,"(A15,F25.15)") "w0b =", w0b
 
 ! WRITE(1,"(A15,F25.15)") "dt =", dt
 ! WRITE(1,"(A15,F25.15)") "Max t =", t_max
@@ -217,15 +215,14 @@ WRITE(1,"(A15,F25.15)") "w0b =", w0b
 ! Close file
 CLOSE(1)
 
-!==============================================================================!
-!                  CALCULATE SECOND-ORDER CORRELATION FUNCTION                 !
-!==============================================================================!
-CALL G2_CalculateRK4(gamma, Omega, &
+!===============================================================================!
+!                  CALCULATE SECOND-ORDER CORRELATION FUNCTION                  !
+!===============================================================================!
+CALL G1_CalculateRK4(Gamma, Omega, alpha, delta, xi, &
                    & epsilon, N, phase, &
                    & w0a, kappa, dw, &
-                   & w0b, kappa, dw, &
                    & dt, tau_steps, &
-                   & g2_positive, .TRUE., filename_g2)
+                   & g1_array, .TRUE., filename_g1)
 
 !==============================================================================!
 !                                END OF PROGRAM                                !
@@ -235,4 +232,4 @@ CALL G2_CalculateRK4(gamma, Omega, &
 CALL CPU_TIME(end_time)
 PRINT*, "Runtime: ", end_time - start_time, "seconds"
 
-END PROGRAM TWO_LEVEL_ATOM_MULTI_MODE_FILTER_MOMENTS_G2_CROSS
+END PROGRAM THREE_LEVEL_ATOM_MULTI_MODE_FILTER_MOMENTS_G1

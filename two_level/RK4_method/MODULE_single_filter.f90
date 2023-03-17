@@ -4,14 +4,21 @@
 ! This module contains the following subroutines:
 ! - SquareMatrixInverse: Calculates the inverse of an input matrix.
 !
+! - MatrixInverseSS : Calculates the steady state for a system of coupled
+!                     differential equations using the inverse matrix method.
+!
 ! - SquareMatrixZeroEigenvalue: Calculates the eigenvector of a matrix
 !                               corresponding to the zero-valued eigenvalue.
 !
 ! - SteadyStateMoments: Calculates the steady states of the various operator
 !                       moment equations for the atom-filter coupled system.
 !
-! - MatrixInverseSS: Uses SquareMatrixInverse to return the steady state array
-!                    without having to type out the multiplication.
+! - SteadyStateMoments_G1: Calculates the steady states of the various operator
+!                          moment equations for the atom-filter coupled system,
+!                          up to the second-order (For G1 calculations etc.)
+!
+! - CalcIntensityRatio: Calculates the ratio of the intensities of the coherent
+!                       and incoherent scattering from the filter.
 !
 ! - G1_InitialConditions: Calculates the initial conditions for the first-
 !                         order correlation function.
@@ -22,17 +29,16 @@
 ! - G2_InitialConditions: Calculates the initial conditions for the second-
 !                         order correlation function.
 !
+! - G2_InitialValues : Calculates only the initial value of the second-
+!                      order correlation function.
+!
 ! - G2_CalculateRK4: Calculates the time evolution of the second-order
 !                    correlation function using Runge-Kutta 4th Order.
-!
-! - MatrixInverseSS : Calculates the steady state for a system of coupled
-!                     differential equations using the inverse matrix method.
 
 ! This file must be added to the compilation command when compiling any of the 
-! single-filter programs. Eg, with Intel oneAPI or GFORTRAN:
-!     (IFORT): ifort -qmkl ./[FILENAME].f90 ./MODULE_single_filter.f90
-!  (GFORTRAN): gfortran ./[FILENAME].f90 ./MODULE_single_filter.f90
-!                -I/path/to/LAPACK -L/path/to/LAPACK -llapack -lblas
+! single-filter programs. Eg, with Intel oneAPI:
+!     (LINUX): ifort -qmkl -O3 -o [NAME] ./[FILENAME].f90 ./MODULE_single_filter.f90
+!   (WINDOWS): ifort /Qmkl /O3 /o [NAME] ./[FILENAME].f90 ./MODULE_single_filter.f90
 MODULE SINGLE_FILTER_SUBROUTINES
 
 CONTAINS
@@ -40,7 +46,6 @@ CONTAINS
 !==============================================================================!
 !                          LAPACK MATRIX SUBROUTINES                           !
 !==============================================================================!
-
 ! Subroutine to calculate the inverse of a matrix USING LAPACK LIBRARY
 SUBROUTINE SquareMatrixInverse(N_in, MatrixInv_out)
   ! Import the MKL Library LAPACK95, from which the eigenvalue/eigenvector and
@@ -180,7 +185,6 @@ END SUBROUTINE SquareMatrixZeroEigenvalue
 !==============================================================================!
 !                            STEADY STATE SUBROUTINE                           !
 !==============================================================================!
-
 ! Subroutine to calculate steady state coupled moments using SquareMatrixInverse
 SUBROUTINE MatrixInverseSS(N_in, Matrix_in, Bvec_in, SS_out)
   ! Calculates the steady state of a system of coupled equations,
@@ -249,15 +253,15 @@ END SUBROUTINE MatrixInverseSS
 SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
                             & epsilon_in, N_in, phase_in, &
                             & w0_in, kappa_in, dw_in, &
-                            & photon_out, sigma_out, G2_SS, &
+                            & photon_out, sigma_out, &
                             & f1_out, f1sig_out, &
                             & f2_out, f2sig_out, &
                             & f3_out, f3sig_out, &
                             & f4_out)
 
-  !==============================================================================!
-  !                    DEFINING AND DECLARING VARIABLES/ARRAYS                   !
-  !==============================================================================!
+  !============================================================================!
+  !                   DEFINING AND DECLARING VARIABLES/ARRAYS                  !
+  !============================================================================!
 
   IMPLICIT NONE
 
@@ -282,9 +286,6 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
   REAL(KIND=8), INTENT(IN)                 :: kappa_in
   ! Frequency spacing of modes
   REAL(KIND=8), INTENT(IN)                 :: dw_in
-
-  ! Calculate steady states for G1 or G2
-  LOGICAL, INTENT(IN)                      :: G2_SS
 
   !------------------------------------!
   !     MOMENT EQUATION ARRAY STUFF    !
@@ -343,9 +344,9 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
   ! Blackman window coefficient
   REAL(KIND=8)                             :: blackman
 
-  !==============================================================================!
-  !                DEFINING ANALYTIC MATRICES/EIGENVALUES/VECTORS                !
-  !==============================================================================!
+  !============================================================================!
+  !               DEFINING ANALYTIC MATRICES/EIGENVALUES/VECTORS               !
+  !============================================================================!
   !------------------------!
   !     BLOCH MATRIX M     !
   !------------------------!
@@ -414,9 +415,9 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
 
   photon_out = 0.0d0
 
-  !==============================================================================!
-  !                        CALCULATE STEADY-STATE MOMENTS                        !
-  !==============================================================================!
+  !============================================================================!
+  !                       CALCULATE STEADY-STATE MOMENTS                       !
+  !============================================================================!
   !---------------------------!
   !     FIRST-ORDER: ATOM     !
   !---------------------------!
@@ -518,217 +519,464 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
       ! Update photon number
       photon_out = photon_out + f2_out(j, k, ftf)
 
-      IF (G2_SS .EQV. .TRUE.) THEN
-        !--------------------------------------!
-        !     THIRD-ORDER: CAVITY AND ATOM     !
-        !--------------------------------------!
-        !------------------------!
-        ! < f_{j} f_{k} \sigma > !
-        !------------------------!
-        ! Set the diagonal matrix elements for M
-        Mat = Mat_OG
-        DO x = 1, N_mat
-          Mat(x, x) = Mat(x, x) - ((2.0d0 * kappa_in) + i * (wl(j) + wl(k)))
-        END DO
+      !--------------------------------------!
+      !     THIRD-ORDER: CAVITY AND ATOM     !
+      !--------------------------------------!
+      !------------------------!
+      ! < f_{j} f_{k} \sigma > !
+      !------------------------!
+      ! Set the diagonal matrix elements for M
+      Mat = Mat_OG
+      DO x = 1, N_mat
+        Mat(x, x) = Mat(x, x) - ((2.0d0 * kappa_in) + i * (wl(j) + wl(k)))
+      END DO
 
-        ! Set the non-homogeneous vector
-        B_vec = 0.0d0
-        B_vec(1) = 0.0d0
-        B_vec(2) = -0.5d0 * gkl(j) * f1sig_out(k, f, sz) + &
-                 & -0.5d0 * gkl(j) * f1_out(k, f) + &
-                 & -0.5d0 * gkl(k) * f1sig_out(j, f, sz) + &
-                 & -0.5d0 * gkl(k) * f1_out(j, f)
-        B_vec(3) = -gamma_in * f2_out(j, k, ff) + &
-                 & gkl(j) * f1sig_out(k, f, sm) + &
-                 & gkl(k) * f1sig_out(j, f, sm)
+      ! Set the non-homogeneous vector
+      B_vec = 0.0d0
+      B_vec(1) = 0.0d0
+      B_vec(2) = -0.5d0 * gkl(j) * f1sig_out(k, f, sz) + &
+                & -0.5d0 * gkl(j) * f1_out(k, f) + &
+                & -0.5d0 * gkl(k) * f1sig_out(j, f, sz) + &
+                & -0.5d0 * gkl(k) * f1_out(j, f)
+      B_vec(3) = -gamma_in * f2_out(j, k, ff) + &
+                & gkl(j) * f1sig_out(k, f, sm) + &
+                & gkl(k) * f1sig_out(j, f, sm)
 
-        ! Calculate steady states
-        CALL MatrixInverseSS(N_mat, Mat, B_vec, f2sig_out(j, k, ff, :))
+      ! Calculate steady states
+      CALL MatrixInverseSS(N_mat, Mat, B_vec, f2sig_out(j, k, ff, :))
 
-        !--------------------------------------------!
-        ! < f^{\dagger}_{j} f^{\dagger}_{k} \sigma > !
-        !--------------------------------------------!
-        ! Set the diagonal matrix elements for M
-        Mat = Mat_OG
-        DO x = 1, N_mat
-          Mat(x, x) = Mat(x, x) - ((2.0d0 * kappa_in) - i * (wl(j) + wl(k)))
-        END DO
+      !--------------------------------------------!
+      ! < f^{\dagger}_{j} f^{\dagger}_{k} \sigma > !
+      !--------------------------------------------!
+      ! Set the diagonal matrix elements for M
+      Mat = Mat_OG
+      DO x = 1, N_mat
+        Mat(x, x) = Mat(x, x) - ((2.0d0 * kappa_in) - i * (wl(j) + wl(k)))
+      END DO
 
-        ! Set the non-homogeneous vector
-        B_vec = 0.0d0
-        B_vec(1) = -0.5d0 * CONJG(gkl(j)) * f1sig_out(k, ft, sz) + &
-                 & -0.5d0 * CONJG(gkl(j)) * f1_out(k, ft) + &
-                 & -0.5d0 * CONJG(gkl(k)) * f1sig_out(j, ft, sz) + &
-                 & -0.5d0 * CONJG(gkl(k)) * f1_out(j, ft)
-        B_vec(2) = 0.0d0
-        B_vec(3) = -gamma_in * f2_out(j, k, ft2) + &
-                 & CONJG(gkl(j)) * f1sig_out(k, ft, sp) + &
-                 & CONJG(gkl(k)) * f1sig_out(j, ft, sp)
+      ! Set the non-homogeneous vector
+      B_vec = 0.0d0
+      B_vec(1) = -0.5d0 * CONJG(gkl(j)) * f1sig_out(k, ft, sz) + &
+                & -0.5d0 * CONJG(gkl(j)) * f1_out(k, ft) + &
+                & -0.5d0 * CONJG(gkl(k)) * f1sig_out(j, ft, sz) + &
+                & -0.5d0 * CONJG(gkl(k)) * f1_out(j, ft)
+      B_vec(2) = 0.0d0
+      B_vec(3) = -gamma_in * f2_out(j, k, ft2) + &
+                & CONJG(gkl(j)) * f1sig_out(k, ft, sp) + &
+                & CONJG(gkl(k)) * f1sig_out(j, ft, sp)
 
-        ! Calculate steady states
-        CALL MatrixInverseSS(N_mat, Mat, B_vec, f2sig_out(j, k, ft2, :))
+      ! Calculate steady states
+      CALL MatrixInverseSS(N_mat, Mat, B_vec, f2sig_out(j, k, ft2, :))
 
-        !----------------------------------!
-        ! < f^{\dagger}_{j} f_{k} \sigma > !
-        !----------------------------------!
-        ! Set the diagonal matrix elements for M
-        Mat = Mat_OG
-        DO x = 1, N_mat
-          Mat(x, x) = Mat(x, x) - ((2.0d0 * kappa_in) - i * (wl(j) - wl(k)))
-        END DO
+      !----------------------------------!
+      ! < f^{\dagger}_{j} f_{k} \sigma > !
+      !----------------------------------!
+      ! Set the diagonal matrix elements for M
+      Mat = Mat_OG
+      DO x = 1, N_mat
+        Mat(x, x) = Mat(x, x) - ((2.0d0 * kappa_in) - i * (wl(j) - wl(k)))
+      END DO
 
-        ! Set the non-homogeneous vector
-        B_vec = 0.0d0
-        B_vec(1) = -0.5d0 * CONJG(gkl(j)) * f1sig_out(k, f, sz) + &
-                 & -0.5d0 * CONJG(gkl(j)) * f1_out(k, f)
-        B_vec(2) = -0.5d0 * gkl(k) * f1sig_out(j, ft, sz) + &
-                 & -0.5d0 * gkl(k) * f1_out(j, ft)
-        B_vec(3) = -gamma_in * f2_out(j, k, ftf) + &
-                 & CONJG(gkl(j)) * f1sig_out(k, f, sp) + &
-                 & gkl(k) * f1sig_out(j, ft, sm)
+      ! Set the non-homogeneous vector
+      B_vec = 0.0d0
+      B_vec(1) = -0.5d0 * CONJG(gkl(j)) * f1sig_out(k, f, sz) + &
+                & -0.5d0 * CONJG(gkl(j)) * f1_out(k, f)
+      B_vec(2) = -0.5d0 * gkl(k) * f1sig_out(j, ft, sz) + &
+                & -0.5d0 * gkl(k) * f1_out(j, ft)
+      B_vec(3) = -gamma_in * f2_out(j, k, ftf) + &
+                & CONJG(gkl(j)) * f1sig_out(k, f, sp) + &
+                & gkl(k) * f1sig_out(j, ft, sm)
 
-        ! Calculate steady states
-        CALL MatrixInverseSS(N_mat, Mat, B_vec, f2sig_out(j, k, ftf, :))
-      
-      END IF
+      ! Calculate steady states
+      CALL MatrixInverseSS(N_mat, Mat, B_vec, f2sig_out(j, k, ftf, :))
 
       ! Close j loop
     END DO
     ! Close k loop
   END DO
 
-  IF (G2_SS .EQV. .TRUE.) THEN
-    ! Cycle through modes
+  ! Cycle through modes
+  DO l = -N_in, N_in
+    DO k = -N_in, N_in
+      DO j = -N_in, N_in
+        !-----------------------------!
+        !     THIRD-ORDER: CAVITY     !
+        !-----------------------------!
+        !---------------------------------!
+        ! < f^{\dagger}_{j} f_{k} f_{l} > !
+        !---------------------------------!
+        f3_out(j, k, l, ftf2) = -CONJG(gkl(j)) * f2sig_out(k, l, ff, sp) + &
+                              & -gkl(k) * f2sig_out(j, l, ftf, sm) + &
+                              & -gkl(l) * f2sig_out(j, k, ftf, sm)
+        f3_out(j, k, l, ftf2) = f3_out(j, k, l, ftf2) / &
+                              & (3.0d0 * kappa_in - i * (wl(j) - wl(k) - wl(l)))
+
+        !-------------------------------------------!
+        ! < f^{\dagger}_{j} f^{\dagger}_{k} f_{l} > !
+        !-------------------------------------------!
+        f3_out(j, k, l, ft2f) = -CONJG(gkl(j)) * f2sig_out(k, l, ftf, sp) + &
+                              & -CONJG(gkl(k)) * f2sig_out(j, l, ftf, sp) + &
+                              & -gkl(l) * f2sig_out(j, k, ft2, sm)
+        f3_out(j, k, l, ft2f) = f3_out(j, k, l, ft2f) / &
+                              & (3.0d0 * kappa_in - i * (wl(j) + wl(k) - wl(l)))
+
+        !--------------------------------------!
+        !     FOURTH-ORDER: CAVITY AND ATOM    !
+        !--------------------------------------!
+        !----------------------------------------!
+        ! < f^{\dagger}_{j} f_{k} f_{l} \sigma > !
+        !----------------------------------------!
+        ! Set the diagonal matrix elements for M
+        Mat = Mat_OG
+        DO x = 1, N_mat
+          Mat(x, x) = Mat(x, x) - ((3.0d0 * kappa_in) - i * (wl(j) - wl(k) - wl(l)))
+        END DO
+
+        ! Set the non-homogeneous vector
+        B_vec = 0.0d0
+        B_vec(1) = -0.5d0 * CONJG(gkl(j)) * f2sig_out(k, l, ff, sz) + &
+                  & -0.5d0 * CONJG(gkl(j)) * f2_out(k, l, ff)
+        B_vec(2) = -0.5d0 * gkl(k) * f2sig_out(j, l, ftf, sz) + &
+                  & -0.5d0 * gkl(k) * f2_out(j, l, ftf) + &
+                  & -0.5d0 * gkl(l) * f2sig_out(j, k, ftf, sz) + &
+                  & -0.5d0 * gkl(l) * f2_out(j, k, ftf)
+        B_vec(3) = -gamma_in * f3_out(j, k, l, ftf2) + &
+                  & CONJG(gkl(j)) * f2sig_out(k, l, ff, sp) + &
+                  & gkl(k) * f2sig_out(j, l, ftf, sm) + &
+                  & gkl(l) * f2sig_out(j, k, ftf, sm)
+
+        ! Calculate steady states
+        CALL MatrixInverseSS(N_mat, Mat, B_vec, f3sig_out(j, k, l, ftf2, :))
+
+        !--------------------------------------------------!
+        ! < f^{\dagger}_{j} f^{\dagger}_{k} f_{l} \sigma > !
+        !--------------------------------------------------!
+        ! Set the diagonal matrix elements for M
+        Mat = Mat_OG
+        DO x = 1, N_mat
+          Mat(x, x) = Mat(x, x) - ((3.0d0 * kappa_in) - i * (wl(j) + wl(k) - wl(l)))
+        END DO
+
+        ! Set the non-homogeneous vector
+        B_vec = 0.0d0
+        B_vec(1) = -0.5d0 * CONJG(gkl(j)) * f2sig_out(k, l, ftf, sz) + &
+                  & -0.5d0 * CONJG(gkl(j)) * f2_out(k, l, ftf) + &
+                  & -0.5d0 * CONJG(gkl(k)) * f2sig_out(j, l, ftf, sz) + &
+                  & -0.5d0 * CONJG(gkl(k)) * f2_out(j, l, ftf)
+        B_vec(2) = -0.5d0 * gkl(l) * f2sig_out(j, k, ft2, sz) + &
+                  & -0.5d0 * gkl(l) * f2_out(j, k, ft2)
+        B_vec(3) = -gamma_in * f3_out(j, k, l, ft2f) + &
+                  & CONJG(gkl(j)) * f2sig_out(k, l, ftf, sp) + &
+                  & CONJG(gkl(k)) * f2sig_out(j, l, ftf, sp) + &
+                  & gkl(l) * f2sig_out(j, k, ft2, sm)
+
+        ! Calculate steady states
+        CALL MatrixInverseSS(N_mat, Mat, B_vec, f3sig_out(j, k, l, ft2f, :))
+
+        ! Close j loop
+      END DO
+      ! Close k loop
+    END DO
+    ! Close l loop
+  END DO
+
+  ! Cycle through modes
+  DO m = -N_in, N_in
     DO l = -N_in, N_in
       DO k = -N_in, N_in
         DO j = -N_in, N_in
-          !-----------------------------!
-          !     THIRD-ORDER: CAVITY     !
-          !-----------------------------!
-          !---------------------------------!
-          ! < f^{\dagger}_{j} f_{k} f_{l} > !
-          !---------------------------------!
-          f3_out(j, k, l, ftf2) = -CONJG(gkl(j)) * f2sig_out(k, l, ff, sp) + &
-                                & -gkl(k) * f2sig_out(j, l, ftf, sm) + &
-                                & -gkl(l) * f2sig_out(j, k, ftf, sm)
-          f3_out(j, k, l, ftf2) = f3_out(j, k, l, ftf2) / &
-                                & (3.0d0 * kappa_in - i * (wl(j) - wl(k) - wl(l)))
-
-          !-------------------------------------------!
-          ! < f^{\dagger}_{j} f^{\dagger}_{k} f_{l} > !
-          !-------------------------------------------!
-          f3_out(j, k, l, ft2f) = -CONJG(gkl(j)) * f2sig_out(k, l, ftf, sp) + &
-                                & -CONJG(gkl(k)) * f2sig_out(j, l, ftf, sp) + &
-                                & -gkl(l) * f2sig_out(j, k, ft2, sm)
-          f3_out(j, k, l, ft2f) = f3_out(j, k, l, ft2f) / &
-                                & (3.0d0 * kappa_in - i * (wl(j) + wl(k) - wl(l)))
-
-          !--------------------------------------!
-          !     FOURTH-ORDER: CAVITY AND ATOM    !
-          !--------------------------------------!
-          !----------------------------------------!
-          ! < f^{\dagger}_{j} f_{k} f_{l} \sigma > !
-          !----------------------------------------!
-          ! Set the diagonal matrix elements for M
-          Mat = Mat_OG
-          DO x = 1, N_mat
-            Mat(x, x) = Mat(x, x) - ((3.0d0 * kappa_in) - i * (wl(j) - wl(k) - wl(l)))
-          END DO
-
-          ! Set the non-homogeneous vector
-          B_vec = 0.0d0
-          B_vec(1) = -0.5d0 * CONJG(gkl(j)) * f2sig_out(k, l, ff, sz) + &
-                   & -0.5d0 * CONJG(gkl(j)) * f2_out(k, l, ff)
-          B_vec(2) = -0.5d0 * gkl(k) * f2sig_out(j, l, ftf, sz) + &
-                   & -0.5d0 * gkl(k) * f2_out(j, l, ftf) + &
-                   & -0.5d0 * gkl(l) * f2sig_out(j, k, ftf, sz) + &
-                   & -0.5d0 * gkl(l) * f2_out(j, k, ftf)
-          B_vec(3) = -gamma_in * f3_out(j, k, l, ftf2) + &
-                   & CONJG(gkl(j)) * f2sig_out(k, l, ff, sp) + &
-                   & gkl(k) * f2sig_out(j, l, ftf, sm) + &
-                   & gkl(l) * f2sig_out(j, k, ftf, sm)
-
-          ! Calculate steady states
-          CALL MatrixInverseSS(N_mat, Mat, B_vec, f3sig_out(j, k, l, ftf2, :))
-
-          !--------------------------------------------------!
-          ! < f^{\dagger}_{j} f^{\dagger}_{k} f_{l} \sigma > !
-          !--------------------------------------------------!
-          ! Set the diagonal matrix elements for M
-          Mat = Mat_OG
-          DO x = 1, N_mat
-            Mat(x, x) = Mat(x, x) - ((3.0d0 * kappa_in) - i * (wl(j) + wl(k) - wl(l)))
-          END DO
-
-          ! Set the non-homogeneous vector
-          B_vec = 0.0d0
-          B_vec(1) = -0.5d0 * CONJG(gkl(j)) * f2sig_out(k, l, ftf, sz) + &
-                   & -0.5d0 * CONJG(gkl(j)) * f2_out(k, l, ftf) + &
-                   & -0.5d0 * CONJG(gkl(k)) * f2sig_out(j, l, ftf, sz) + &
-                   & -0.5d0 * CONJG(gkl(k)) * f2_out(j, l, ftf)
-          B_vec(2) = -0.5d0 * gkl(l) * f2sig_out(j, k, ft2, sz) + &
-                   & -0.5d0 * gkl(l) * f2_out(j, k, ft2)
-          B_vec(3) = -gamma_in * f3_out(j, k, l, ft2f) + &
-                   & CONJG(gkl(j)) * f2sig_out(k, l, ftf, sp) + &
-                   & CONJG(gkl(k)) * f2sig_out(j, l, ftf, sp) + &
-                   & gkl(l) * f2sig_out(j, k, ft2, sm)
-
-          ! Calculate steady states
-          CALL MatrixInverseSS(N_mat, Mat, B_vec, f3sig_out(j, k, l, ft2f, :))
-
+          !------------------------------!
+          !     FOURTH-ORDER: CAVITY     !
+          !------------------------------!
+          !-------------------------------------------------!
+          ! < f^{\dagger}_{j} f^{\dagger}_{k} f_{l} f_{m} > !
+          !-------------------------------------------------!
+          f4_out(j, k, l, m) = -CONJG(gkl(j)) * f3sig_out(k, l, m, ftf2, sp) + &
+                              & -CONJG(gkl(k)) * f3sig_out(j, l, m, ftf2, sp) + &
+                              & -gkl(l) * f3sig_out(j, k, m, ft2f, sm) + &
+                              & -gkl(m) * f3sig_out(j, k, l, ft2f, sm)
+          f4_out(j, k, l, m) = f4_out(j, k, l, m) / &
+                              & (4.0d0 * kappa_in - i * (wl(j) + wl(k)) + i * (wl(l) + wl(m)))
           ! Close j loop
         END DO
         ! Close k loop
       END DO
       ! Close l loop
     END DO
-  END IF
-
-  IF (G2_SS .EQV. .TRUE.) THEN
-    ! Cycle through modes
-    DO m = -N_in, N_in
-      DO l = -N_in, N_in
-        DO k = -N_in, N_in
-          DO j = -N_in, N_in
-            !------------------------------!
-            !     FOURTH-ORDER: CAVITY     !
-            !------------------------------!
-            !-------------------------------------------------!
-            ! < f^{\dagger}_{j} f^{\dagger}_{k} f_{l} f_{m} > !
-            !-------------------------------------------------!
-            f4_out(j, k, l, m) = -CONJG(gkl(j)) * f3sig_out(k, l, m, ftf2, sp) + &
-                               & -CONJG(gkl(k)) * f3sig_out(j, l, m, ftf2, sp) + &
-                               & -gkl(l) * f3sig_out(j, k, m, ft2f, sm) + &
-                               & -gkl(m) * f3sig_out(j, k, l, ft2f, sm)
-            f4_out(j, k, l, m) = f4_out(j, k, l, m) / &
-                               & (4.0d0 * kappa_in - i * (wl(j) + wl(k)) + i * (wl(l) + wl(m)))
-            ! Close j loop
-          END DO
-          ! Close k loop
-        END DO
-        ! Close l loop
-      END DO
-      ! Close m loop
-    END DO
-  END IF
-
+    ! Close m loop
+  END DO
 
 END SUBROUTINE SteadyStateMoments
 
-!==============================================================================!
-!                          G1 CORRELATION SUBROUTINES                          !
-!==============================================================================!
+! Subroutine to calculate the steady states for the atom-filter operator moments
+SUBROUTINE SteadyStateMoments_G1(gamma_in, Omega_in, &
+                               & epsilon_in, N_in, phase_in, &
+                               & w0_in, kappa_in, dw_in, &
+                               & photon_out, sigma_out, &
+                               & f1_out, f1sig_out, &
+                               & f2_out)
 
-! Subroutine to calculate the initial conditions for the auto-correlations
-SUBROUTINE G1_InitialConditions(gamma_in, Omega_in, &
-                              & epsilon_in, N_in, phase_in, &
-                              & w0_in, kappa_in, dw_in, &
-                              & photon_ss_out, B_OG_out, &
-                              & sigma_out, f1_out)
+  !============================================================================!
+  !                   DEFINING AND DECLARING VARIABLES/ARRAYS                  !
+  !============================================================================!
 
-  !==============================================================================!
-  !                    DEFINING AND DECLARING VARIABLES/ARRAYS                   !
-  !==============================================================================!
+  IMPLICIT NONE
+
+  !---------------!
+  !     INPUT     !
+  !---------------!
+  ! Atomic decay rate
+  REAL(KIND=8), INTENT(IN)                 :: gamma_in
+  ! Driving amplitude
+  REAL(KIND=8), INTENT(IN)                 :: Omega_in
+
+  ! Filter parameter stuff
+  ! Percentage of fluorecence aimed at cavity
+  REAL(KIND=8), INTENT(IN)                 :: epsilon_in
+  ! Number of mode either side of w0, 2N + 1 total mode
+  INTEGER, INTENT(IN)                      :: N_in
+  ! Phase modulation of mode coupling
+  REAL(KIND=8), INTENT(IN)                 :: phase_in
+  ! Central mode frequency of the filter cavity, with N mode frequencies either side
+  REAL(KIND=8), INTENT(IN)                 :: w0_in
+  ! Cavity linewidth/transmission of cavity mode
+  REAL(KIND=8), INTENT(IN)                 :: kappa_in
+  ! Frequency spacing of modes
+  REAL(KIND=8), INTENT(IN)                 :: dw_in
+
+  !------------------------------------!
+  !     MOMENT EQUATION ARRAY STUFF    !
+  !------------------------------------!
+  ! Dimension of M matrix
+  INTEGER, PARAMETER                       :: N_mat = 3
+  ! M matrix (filled as transpose)
+  COMPLEX(KIND=8), DIMENSION(N_mat, N_mat) :: Mat, Mat_OG
+  ! Non-homogeneous vector
+  COMPLEX(KIND=8), DIMENSION(N_mat)        :: B_vec, B_OG
+
+  ! Integer indices for sigma operators
+  INTEGER, PARAMETER                       :: sm = 1, sp = 2, sz = 3
+  ! Integer indices for: a, f^{\dagger}, f^{\dagger} a
+  INTEGER, PARAMETER                       :: f = 1, ft = 2
+  INTEGER, PARAMETER                       :: ff = 1, ftf = 2, ft2 = 3
+  INTEGER, PARAMETER                       :: ftf2 = 1, ft2f = 2
+
+  !----------------!
+  !     OUTPUT     !
+  !----------------!
+  ! Steady state photon number
+  REAL(KIND=8), INTENT(OUT)                                          :: photon_out
+
+  ! Steady state arrays
+  ! First-order moments: Atomic equations (< \sigma >)
+  COMPLEX(KIND=8), DIMENSION(N_mat), INTENT(OUT)                     :: sigma_out
+  ! First-order moments: Cavity (< a >, < f^{\dagger} >)
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, 2), INTENT(OUT)             :: f1_out
+  ! Second-order moments: Cavity and atom (< a \sigma >, < f^{\dagger} \sigma >
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, 2, N_mat), INTENT(OUT)      :: f1sig_out
+  ! Second-order moments: Cavity (< f^{\dagger} a >)
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, -N_in:N_in, 3), INTENT(OUT) :: f2_out
+
+  !----------------------------!
+  !     OTHER USEFUL STUFF     !
+  !----------------------------!
+  ! Integer counter
+  INTEGER                                  :: j, k, l, m, x
+  ! Imaginary i
+  COMPLEX(KIND=8), PARAMETER               :: i = CMPLX(0.0d0, 1.0d0, 8)
+  ! pi
+  REAL(KIND=8), PARAMETER                  :: pi = 3.1415926535897932384d0
+  ! List of Delta values
+  REAL(KIND=8), DIMENSION(-N_in:N_in)      :: wl
+  ! List of mode dependent cascade coupling values
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in)   :: gkl
+  ! Blackman window coefficient
+  REAL(KIND=8)                             :: blackman
+
+  !============================================================================!
+  !               DEFINING ANALYTIC MATRICES/EIGENVALUES/VECTORS               !
+  !============================================================================!
+  !------------------------!
+  !     BLOCH MATRIX M     !
+  !------------------------!
+  Mat_OG = 0.0d0
+  ! Row 1: d/dt |g><e|
+  Mat_OG(1, 1) = -0.5d0 * gamma_in
+  Mat_OG(1, 2) = 0.0d0
+  Mat_OG(1, 3) = i * 0.5d0 * Omega_in
+  ! Row 2: d/dt |e><g|
+  Mat_OG(2, 1) = 0.0d0
+  Mat_OG(2, 2) = -0.5d0 * gamma_in
+  Mat_OG(2, 3) = -i * 0.5d0 * Omega_in
+  ! Row 3: d/dt |e><e| - |g><g|
+  Mat_OG(3, 1) = i * Omega_in
+  Mat_OG(3, 2) = -i * Omega_in
+  Mat_OG(3, 3) = -gamma_in
+
+  !--------------------------------!
+  !     NON-HOMOGENEOUS VECTOR     !
+  !--------------------------------!
+  B_OG = 0.0d0
+  B_OG(1) = 0.0d0
+  B_OG(2) = 0.0d0
+  B_OG(3) = -gamma_in
+
+  !---------------------------------------------!
+  !     RESONANCES (wj) AND COUPLINGS (E_j)     !
+  !---------------------------------------------!
+  ! Allocate array of Delta and gka values
+  wl = 0.0d0
+  gkl = 0.0d0
+  DO j = -N_in, N_in
+    IF (N_in == 0) THEN
+      wl(j) = w0_in
+      gkl(j) = DSQRT(epsilon_in * gamma_in * kappa_in)
+    ELSE
+      wl(j) = w0_in + DBLE(j) * dw_in
+      ! Blackman window coefficient
+      blackman = 1.0d0
+      ! blackman = 0.42d0 - 0.5d0 * COS(2.0d0 * pi * DBLE(N + j) / (2.0d0 * DBLE(N))) + &
+      !          & 0.08d0 * COS(4.0d0 * pi * DBLE(N + j) / (2.0d0 * DBLE(N)))
+      ! Mode dependent phase difference
+      gkl(j) = DSQRT((epsilon_in / DBLE(2*N_in + 1)) * gamma_in * kappa_in) * blackman * &
+             & EXP(i * DBLE(phase_in) * DBLE(j) * pi / DBLE(N_in))
+    END IF
+  END DO
+
+  !------------------------------------------!
+  !     INITALISE OPERATOR MOMENT ARRAYS     !
+  !------------------------------------------!
+  ! Steady states
+  ! First-order: Cavity
+  f1_out = 0.0d0
+  ! Second-order: Cavity and Atom
+  f1sig_out = 0.0d0
+  ! Second-order: Cavity
+  f2_out = 0.0d0
+
+  photon_out = 0.0d0
+
+  !============================================================================!
+  !                       CALCULATE STEADY-STATE MOMENTS                       !
+  !============================================================================!
+  !---------------------------!
+  !     FIRST-ORDER: ATOM     !
+  !---------------------------!
+  ! Calculate steady states
+  CALL MatrixInverseSS(N_mat, Mat_OG, B_OG, sigma_out)
+
+  ! Cycle through modes
+  DO j = -N_in, N_in
+    !-----------------------------!
+    !     FIRST-ORDER: CAVITY     !
+    !-----------------------------!
+    !-----------!
+    ! < f_{j} > !
+    !-----------!
+    f1_out(j, f) = -gkl(j) * sigma_out(sm)
+    f1_out(j, f) = f1_out(j, f) / &
+                 & (kappa_in + i * wl(j))
+    !---------------------!
+    ! < f^{\dagger}_{j} > !
+    !---------------------!
+    f1_out(j, ft) = -CONJG(gkl(j)) * sigma_out(sp)
+    f1_out(j, ft) = f1_out(j, ft) / &
+                  & (kappa_in - i * wl(j))
+    !---------------------------------------!
+    !     SECOND-ORDER: CAVITY AND ATOM     !
+    !---------------------------------------!
+    !------------------!
+    ! < f_{j} \sigma > !
+    !------------------!
+    ! Set the diagonal matrix elements for M
+    Mat = Mat_OG
+    DO x = 1, N_mat
+      Mat(x, x) = Mat(x, x) - (kappa_in + i * wl(j))
+    END DO
+
+    ! Set the non-homogeneous vector
+    B_vec = 0.0d0
+    B_vec(1) = 0.0d0
+    B_vec(2) = -0.5d0 * gkl(j) * (sigma_out(sz) + 1.0d0)
+    B_vec(3) = -gamma_in * f1_out(j, f) + &
+             & gkl(j) * sigma_out(sm)
+
+    ! Calculate steady states
+    CALL MatrixInverseSS(N_mat, Mat, B_vec, f1sig_out(j, f, :))
+
+    !----------------------------!
+    ! < f^{\dagger}_{j} \sigma > !
+    !----------------------------!
+    ! Set the diagonal matrix elements for M
+    Mat = Mat_OG
+    DO x = 1, N_mat
+      Mat(x, x) = Mat(x, x) - (kappa_in - i * wl(j))
+    END DO
+
+    ! Set the non-homogeneous vector
+    B_vec = 0.0d0
+    B_vec(1) = -0.5d0 * CONJG(gkl(j)) * (sigma_out(sz) + 1.0d0)
+    B_vec(2) = 0.0d0
+    B_vec(3) = -gamma_in * f1_out(j, ft) + &
+             & CONJG(gkl(j)) * sigma_out(sp)
+
+    ! Calculate steady states
+    CALL MatrixInverseSS(N_mat, Mat, B_vec, f1sig_out(j, ft, :))
+
+    ! Close j loop
+  END DO
+
+  photon_out = 0.0d0
+  ! Cycle through modes
+  DO k = -N_in, N_in
+    DO j = -N_in, N_in
+      !------------------------------!
+      !     SECOND-ORDER: CAVITY     !
+      !------------------------------!
+      !-----------------!
+      ! < f_{j} f_{k} > !
+      !-----------------!
+      f2_out(j, k, ff) = -gkl(j) * f1sig_out(k, f, sm) + &
+                       & -gkl(k) * f1sig_out(j, f, sm)
+      f2_out(j, k, ff) = f2_out(j, k, ff) / &
+                       & (2.0d0 * kappa_in + i * (wl(j) + wl(k)))
+
+      !-------------------------------------!
+      ! < f^{\dagger}_{j} f^{\dagger}_{k} > !
+      !-------------------------------------!
+      f2_out(j, k, ft2) = -CONJG(gkl(j)) * f1sig_out(k, ft, sp) + &
+                        & -CONJG(gkl(k)) * f1sig_out(j, ft, sp)
+      f2_out(j, k, ft2) = f2_out(j, k, ft2) / &
+                        & (2.0d0 * kappa_in - i * (wl(j) + wl(k)))
+
+      !---------------------------!
+      ! < f^{\dagger}_{j} f_{k} > !
+      !---------------------------!
+      f2_out(j, k, ftf) = -CONJG(gkl(j)) * f1sig_out(k, f, sp) + &
+                        & -gkl(k) * f1sig_out(j, ft, sm)
+      f2_out(j, k, ftf) = f2_out(j, k, ftf) / &
+                        & (2.0d0 * kappa_in - i * (wl(j) - wl(k)))
+
+      ! Update photon number
+      photon_out = photon_out + f2_out(j, k, ftf)
+
+      ! Close j loop
+    END DO
+    ! Close k loop
+  END DO
+
+
+END SUBROUTINE SteadyStateMoments_G1
+
+! Calculates the intensity ratio of the incoherent and coherent scattering
+SUBROUTINE CalcIntensityRatio(gamma_in, Omega_in, &
+                            & epsilon_in, N_in, phase_in, &
+                            & w0_in, kappa_in, dw_in, &
+                            & I_ratio_out)
+
+  !============================================================================!
+  !                   DEFINING AND DECLARING VARIABLES/ARRAYS                  !
+  !============================================================================!
 
   IMPLICIT NONE
 
@@ -771,35 +1019,153 @@ SUBROUTINE G1_InitialConditions(gamma_in, Omega_in, &
 
   ! Steady state arrays
   ! First-order moments: Atomic equations (< \sigma >)
-  COMPLEX(KIND=8), DIMENSION(N_mat)                                  :: sigma_ss
+  COMPLEX(KIND=8), DIMENSION(N_mat)                     :: sigma_ss
   ! First-order moments: Cavity (< a >, < f^{\dagger} >)
-  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, 2)                          :: f1_ss
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, 2)             :: f1_ss
   ! Second-order moments: Cavity and atom (< a \sigma >, < f^{\dagger} \sigma >
-  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, 2, N_mat)                   :: f1sig_ss
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, 2, N_mat)      :: f1sig_ss
   ! Second-order moments: Cavity (< f^{\dagger} a >)
-  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, -N_in:N_in, 3)              :: f2_ss
-  ! Third-order moments: Cavity and atom (< a^{2} \sigma >, < a^{\dagger 2} \sigma >, < f^{\dagger} a \sigma >)
-  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, -N_in:N_in, 3, N_mat)       :: f2sig_ss
-  ! Third-order moments: Cavity (< a^{2} f^{\dagger} >, < a^{\dagger 2} a >)
-  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, -N_in:N_in, -N_in:N_in, 2)  :: f3_ss
-  ! Fourth-order moments: Cavity and atom ( < f^{\dagger} a^{2} \sigma >, < a^{\dagger 2} a \sigma >)
-  COMPLEX(KIND=8), DIMENSION(:, :, :, :, :), ALLOCATABLE             :: f3sig_ss
-  ! Fourth-order moments: Cavity (< a^{\dagger 2} a^{2} >)
-  COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE                :: f4_ss
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, -N_in:N_in, 3) :: f2_ss
+
+  !----------------!
+  !     OUTPUT     !
+  !----------------!
+  ! Initial correlation value g^{(2)}(\tau = 0)
+  REAL(KIND=8)                                          :: photon_ss
+  ! Initial correlation value g^{(2)}(\tau = 0)
+  REAL(KIND=8), INTENT(OUT)                             :: I_ratio_out
+
+  !----------------------------!
+  !     OTHER USEFUL STUFF     !
+  !----------------------------!
+  ! Integer counter
+  INTEGER                               :: j, k, l, m
+  ! Imaginary i
+  COMPLEX(KIND=8), PARAMETER            :: i = CMPLX(0.0d0, 1.0d0, 8)
+  ! Temporary value
+  COMPLEX(KIND=8)                       :: moment_out, A_ss, At_ss
+
+  !------------------------------------------!
+  !     INITALISE OPERATOR MOMENT ARRAYS     !
+  !------------------------------------------!
+  ! Steady states
+  ! First-order: Cavity
+  f1_ss = 0.0d0
+  ! Second-order: Cavity and Atom
+  f1sig_ss = 0.0d0
+  ! Second-order: Cavity
+  f2_ss = 0.0d0
+
+  !============================================================================!
+  !                       CALCULATE STEADY-STATE MOMENTS                       !
+  !============================================================================!
+  CALL SteadyStateMoments_G1(gamma_in, Omega_in, &
+                           & epsilon_in, N_in, phase_in, &
+                           & w0_in, kappa_in, dw_in, &
+                           & photon_ss, sigma_ss, &
+                           & f1_ss, f1sig_ss, &
+                           & f2_ss)
+
+  !============================================================================!
+  !          CALCULATE SECOND-ORDER CORRELATION FUNCTION INITIAL VALUE         !
+  !============================================================================!
+  ! Initialise values
+  moment_out = 0.0d0
+  A_ss = 0.0d0
+  At_ss = 0.0d0
+  I_ratio_out = 0.0d0
+
+  ! Calculate the expectations of A and A^{\dagger}
+  DO j = -N_in, N_in
+    ! Sum over all fourth-order moments
+    A_ss = A_ss + f1_ss(j, f)
+    At_ss = At_ss + f1_ss(j, ft)
+
+    ! Close j loop
+  END DO
+
+  I_ratio_out = photon_ss / (At_ss * A_ss)
+  I_ratio_out = REAL(I_ratio_out) - 1.0d0
+
+END SUBROUTINE CalcIntensityRatio
+
+!==============================================================================!
+!                          G1 CORRELATION SUBROUTINES                          !
+!==============================================================================!
+
+! Subroutine to calculate the initial conditions for the auto-correlations
+SUBROUTINE G1_InitialConditions(gamma_in, Omega_in, &
+                              & epsilon_in, N_in, phase_in, &
+                              & w0_in, kappa_in, dw_in, &
+                              & photon_ss_out, B_OG_out, &
+                              & sigma_out, f1_out)
+
+  !============================================================================!
+  !                   DEFINING AND DECLARING VARIABLES/ARRAYS                  !
+  !============================================================================!
+
+  IMPLICIT NONE
+
+  !---------------!
+  !     INPUT     !
+  !---------------!
+  ! Atomic decay rate
+  REAL(KIND=8), INTENT(IN)                   :: gamma_in
+  ! Driving amplitude
+  REAL(KIND=8), INTENT(IN)                   :: Omega_in
+
+  ! Filter parameter stuff
+  ! Percentage of fluorecence aimed at cavity
+  REAL(KIND=8), INTENT(IN)                   :: epsilon_in
+  ! Number of mode either side of w0, 2N + 1 total mode
+  INTEGER, INTENT(IN)                        :: N_in
+  ! Phase modulation of mode coupling
+  REAL(KIND=8), INTENT(IN)                   :: phase_in
+  ! Central mode frequency of the filter cavity, with N mode frequencies either side
+  REAL(KIND=8), INTENT(IN)                   :: w0_in
+  ! Cavity linewidth/transmission of cavity mode
+  REAL(KIND=8), INTENT(IN)                   :: kappa_in
+  ! Frequency spacing of modes
+  REAL(KIND=8), INTENT(IN)                   :: dw_in
+
+  !------------------------------------!
+  !     MOMENT EQUATION ARRAY STUFF    !
+  !------------------------------------!
+  ! Dimension of M matrix
+  INTEGER, PARAMETER                         :: N_mat = 3
+  ! M matrix (filled as transpose)
+  COMPLEX(KIND=8), DIMENSION(N_mat, N_mat)   :: Mat, Mat_OG
+
+  ! Integer indices for sigma operators
+  INTEGER, PARAMETER                         :: sm = 1, sp = 2, sz = 3
+  ! Integer indices for: a, f^{\dagger}, f^{\dagger} a
+  INTEGER, PARAMETER                         :: f = 1, ft = 2
+  INTEGER, PARAMETER                         :: ff = 1, ftf = 2, ft2 = 3
+  INTEGER, PARAMETER                         :: ftf2 = 1, ft2f = 2
+
+  ! Steady state arrays
+  ! First-order moments: Atomic equations (< \sigma >)
+  COMPLEX(KIND=8), DIMENSION(N_mat)                     :: sigma_ss
+  ! First-order moments: Cavity (< a >, < f^{\dagger} >)
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, 2)             :: f1_ss
+  ! Second-order moments: Cavity and atom (< a \sigma >, < f^{\dagger} \sigma >
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, 2, N_mat)      :: f1sig_ss
+  ! Second-order moments: Cavity (< f^{\dagger} a >)
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, -N_in:N_in, 3) :: f2_ss
 
   !----------------!
   !     OUTPUT     !
   !----------------!
   ! Steady state photon number
-  REAL(KIND=8), INTENT(OUT)                                          :: photon_ss_out
+  REAL(KIND=8), INTENT(OUT)                              :: photon_ss_out
   ! Non-homogeneous vector
-  COMPLEX(KIND=8), DIMENSION(N_mat), INTENT(OUT)                     :: B_OG_out
+  COMPLEX(KIND=8), DIMENSION(N_mat), INTENT(OUT)         :: B_OG_out
 
   ! Time integration arrays
   ! First-order moments: Atomic equations (< \sigma >)
-  COMPLEX(KIND=8), DIMENSION(N_mat), INTENT(OUT)                     :: sigma_out
+  COMPLEX(KIND=8), DIMENSION(N_mat), INTENT(OUT)         :: sigma_out
   ! First-order moments: Cavity (< f >, < f^{\dagger} >)
-  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, 2), INTENT(OUT)             :: f1_out
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, 2), INTENT(OUT) :: f1_out
 
   !----------------------------!
   !     OTHER USEFUL STUFF     !
@@ -819,30 +1185,20 @@ SUBROUTINE G1_InitialConditions(gamma_in, Omega_in, &
   f1sig_ss = 0.0d0
   ! Second-order: Cavity
   f2_ss = 0.0d0
-  ! Third-order: Cavity and Atom
-  f2sig_ss = 0.0d0
-  ! Third-order: Cavity
-  f3_ss = 0.0d0
-  ! Fourth-order: Cavity and atom
-  ALLOCATE(f3sig_ss(-N_in:N_in, -N_in:N_in, -N_in:N_in, 2, N_mat)); f3sig_ss = 0.0d0
-  ! Fourth-order: Cavity
-  ALLOCATE(f4_ss(-N_in:N_in, -N_in:N_in, -N_in:N_in, -N_in:N_in)); f4_ss = 0.0d0
 
-  !==============================================================================!
-  !                        CALCULATE STEADY-STATE MOMENTS                        !
-  !==============================================================================!
-  CALL SteadyStateMoments(Gamma_in, Omega_in, &
-                        & epsilon_in, N_in, phase_in, &
-                        & w0_in, kappa_in, dw_in, &
-                        & photon_ss_out, sigma_ss, .FALSE., &
-                        & f1_ss, f1sig_ss, &
-                        & f2_ss, f2sig_ss, &
-                        & f3_ss, f3sig_ss, &
-                        & f4_ss)
+  !============================================================================!
+  !                       CALCULATE STEADY-STATE MOMENTS                       !
+  !============================================================================!
+  CALL SteadyStateMoments_G1(gamma_in, Omega_in, &
+                           & epsilon_in, N_in, phase_in, &
+                           & w0_in, kappa_in, dw_in, &
+                           & photon_ss_out, sigma_ss, &
+                           & f1_ss, f1sig_ss, &
+                           & f2_ss)
 
-  !==============================================================================!
-  !         CALCULATE FIRST-ORDER CORRELATION FUNCTION INITIAL CONDITIONS        !
-  !==============================================================================!
+  !============================================================================!
+  !        CALCULATE FIRST-ORDER CORRELATION FUNCTION INITIAL CONDITIONS       !
+  !============================================================================!
   ! Set initial conditions and non-homogeneous vector
   ! < \sigma (\tau = 0) a_{k} (0) > = < a_{k} \sigma >_{ss},
   ! and
@@ -870,9 +1226,9 @@ SUBROUTINE G1_CalculateRK4(gamma_in, Omega_in, &
                          & dt_in, tau_steps_in, &
                          & g1_array_out, WRITE_DATA_IN, filename_data_in)
 
-  !==============================================================================!
-  !                    DEFINING AND DECLARING VARIABLES/ARRAYS                   !
-  !==============================================================================!
+  !============================================================================!
+  !                   DEFINING AND DECLARING VARIABLES/ARRAYS                  !
+  !============================================================================!
 
   IMPLICIT NONE
 
@@ -967,9 +1323,9 @@ SUBROUTINE G1_CalculateRK4(gamma_in, Omega_in, &
   ! Complex data
   COMPLEX(KIND=8)                           :: moment_out
 
-  !==============================================================================!
-  !                DEFINING ANALYTIC MATRICES/EIGENVALUES/VECTORS                !
-  !==============================================================================!
+  !============================================================================!
+  !               DEFINING ANALYTIC MATRICES/EIGENVALUES/VECTORS               !
+  !============================================================================!
   !------------------------!
   !     BLOCH MATRIX M     !
   !------------------------!
@@ -1030,18 +1386,18 @@ SUBROUTINE G1_CalculateRK4(gamma_in, Omega_in, &
   ALLOCATE(g1_array_out(0:tau_steps_in)); g1_array_out = 0.0d0
   photon_ss = 0.0d0
 
-  !==============================================================================!
-  !                         CALCULATE INITIAL CONDITIONS                         !
-  !==============================================================================!
+  !============================================================================!
+  !                        CALCULATE INITIAL CONDITIONS                        !
+  !============================================================================!
   CALL G1_InitialConditions(gamma_in, Omega_in, &
                           & epsilon_in, N_in, phase_in, &
                           & w0_in, kappa_in, dw_in, &
                           & photon_ss, B_OG, &
                           & sigma, f1)
 
-  !==============================================================================!
-  !                  CALCULATE SECOND-ORDER CORRELATION FUNCTION                 !
-  !==============================================================================!
+  !============================================================================!
+  !                 CALCULATE SECOND-ORDER CORRELATION FUNCTION                !
+  !============================================================================!
   ! Calculate the sample rate for writing data to the file
   IF (tau_steps_in > 100000) THEN
     sample_rate = NINT(DBLE(tau_steps_in) / 1d5)
@@ -1148,7 +1504,6 @@ END SUBROUTINE G1_CalculateRK4
 !==============================================================================!
 !                          G2 CORRELATION SUBROUTINES                          !
 !==============================================================================!
-
 ! Subroutine to calculate the initial conditions for the auto-correlations
 SUBROUTINE G2_InitialConditions(gamma_in, Omega_in, &
                               & epsilon_in, N_in, phase_in, &
@@ -1156,9 +1511,9 @@ SUBROUTINE G2_InitialConditions(gamma_in, Omega_in, &
                               & photon_ss_out, B_OG_out, &
                               & sigma_out, f1_out, f1sig_out, f2_out)
 
-  !==============================================================================!
-  !                    DEFINING AND DECLARING VARIABLES/ARRAYS                   !
-  !==============================================================================!
+  !============================================================================!
+  !                   DEFINING AND DECLARING VARIABLES/ARRAYS                  !
+  !============================================================================!
 
   IMPLICIT NONE
 
@@ -1262,21 +1617,21 @@ SUBROUTINE G2_InitialConditions(gamma_in, Omega_in, &
   ! Fourth-order: Cavity
   ALLOCATE(f4_ss(-N_in:N_in, -N_in:N_in, -N_in:N_in, -N_in:N_in)); f4_ss = 0.0d0
 
-  !==============================================================================!
-  !                        CALCULATE STEADY-STATE MOMENTS                        !
-  !==============================================================================!
-  CALL SteadyStateMoments(Gamma_in, Omega_in, &
+  !============================================================================!
+  !                       CALCULATE STEADY-STATE MOMENTS                       !
+  !============================================================================!
+  CALL SteadyStateMoments(gamma_in, Omega_in, &
                         & epsilon_in, N_in, phase_in, &
                         & w0_in, kappa_in, dw_in, &
-                        & photon_ss_out, sigma_ss, .TRUE., &
+                        & photon_ss_out, sigma_ss, &
                         & f1_ss, f1sig_ss, &
                         & f2_ss, f2sig_ss, &
                         & f3_ss, f3sig_ss, &
                         & f4_ss)
 
-  !==============================================================================!
-  !        CALCULATE SECOND-ORDER CORRELATION FUNCTION INITIAL CONDITIONS        !
-  !==============================================================================!
+  !============================================================================!
+  !       CALCULATE SECOND-ORDER CORRELATION FUNCTION INITIAL CONDITIONS       !
+  !============================================================================!
   ! Set initial conditions and non-homogeneous vector
   ! < f^{\dagger}_{j}(0) \sigma(\tau = 0) f_{m}(0) > =
   !                          < f^{\dagger}_{j} f_{m} \sigma >_{ss},
@@ -1329,6 +1684,151 @@ SUBROUTINE G2_InitialConditions(gamma_in, Omega_in, &
 
 END SUBROUTINE G2_InitialConditions
 
+! Subroutine to calculate the initial value of the correlation function
+SUBROUTINE G2_InitialValue(gamma_in, Omega_in, &
+                         & epsilon_in, N_in, phase_in, &
+                         & w0_in, kappa_in, dw_in, &
+                         & g2_initial_out)
+
+  !============================================================================!
+  !                   DEFINING AND DECLARING VARIABLES/ARRAYS                  !
+  !============================================================================!
+
+  IMPLICIT NONE
+
+  !---------------!
+  !     INPUT     !
+  !---------------!
+  ! Atomic decay rate
+  REAL(KIND=8), INTENT(IN)                   :: gamma_in
+  ! Driving amplitude
+  REAL(KIND=8), INTENT(IN)                   :: Omega_in
+
+  ! Filter parameter stuff
+  ! Percentage of fluorecence aimed at cavity
+  REAL(KIND=8), INTENT(IN)                   :: epsilon_in
+  ! Number of mode either side of w0, 2N + 1 total mode
+  INTEGER, INTENT(IN)                        :: N_in
+  ! Phase modulation of mode coupling
+  REAL(KIND=8), INTENT(IN)                   :: phase_in
+  ! Central mode frequency of the filter cavity, with N mode frequencies either side
+  REAL(KIND=8), INTENT(IN)                   :: w0_in
+  ! Cavity linewidth/transmission of cavity mode
+  REAL(KIND=8), INTENT(IN)                   :: kappa_in
+  ! Frequency spacing of modes
+  REAL(KIND=8), INTENT(IN)                   :: dw_in
+
+  !------------------------------------!
+  !     MOMENT EQUATION ARRAY STUFF    !
+  !------------------------------------!
+  ! Dimension of M matrix
+  INTEGER, PARAMETER                         :: N_mat = 3
+  ! M matrix (filled as transpose)
+  COMPLEX(KIND=8), DIMENSION(N_mat, N_mat)   :: Mat, Mat_OG
+
+  ! Integer indices for sigma operators
+  INTEGER, PARAMETER                         :: sm = 1, sp = 2, sz = 3
+  ! Integer indices for: a, f^{\dagger}, f^{\dagger} a
+  INTEGER, PARAMETER                         :: f = 1, ft = 2
+  INTEGER, PARAMETER                         :: ff = 1, ftf = 2, ft2 = 3
+  INTEGER, PARAMETER                         :: ftf2 = 1, ft2f = 2
+
+  ! Steady state arrays
+  ! First-order moments: Atomic equations (< \sigma >)
+  COMPLEX(KIND=8), DIMENSION(N_mat)                                  :: sigma_ss
+  ! First-order moments: Cavity (< a >, < f^{\dagger} >)
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, 2)                          :: f1_ss
+  ! Second-order moments: Cavity and atom (< a \sigma >, < f^{\dagger} \sigma >
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, 2, N_mat)                   :: f1sig_ss
+  ! Second-order moments: Cavity (< f^{\dagger} a >)
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, -N_in:N_in, 3)              :: f2_ss
+  ! Third-order moments: Cavity and atom (< a^{2} \sigma >, < a^{\dagger 2} \sigma >, < f^{\dagger} a \sigma >)
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, -N_in:N_in, 3, N_mat)       :: f2sig_ss
+  ! Third-order moments: Cavity (< a^{2} f^{\dagger} >, < a^{\dagger 2} a >)
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, -N_in:N_in, -N_in:N_in, 2)  :: f3_ss
+  ! Fourth-order moments: Cavity and atom ( < f^{\dagger} a^{2} \sigma >, < a^{\dagger 2} a \sigma >)
+  COMPLEX(KIND=8), DIMENSION(:, :, :, :, :), ALLOCATABLE             :: f3sig_ss
+  ! Fourth-order moments: Cavity (< a^{\dagger 2} a^{2} >)
+  COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE                :: f4_ss
+
+  !----------------!
+  !     OUTPUT     !
+  !----------------!
+  ! Initial correlation value g^{(2)}(\tau = 0)
+  REAL(KIND=8)                                                       :: photon_ss
+  ! Initial correlation value g^{(2)}(\tau = 0)
+  REAL(KIND=8), INTENT(OUT)                                          :: g2_initial_out
+
+  !----------------------------!
+  !     OTHER USEFUL STUFF     !
+  !----------------------------!
+  ! Integer counter
+  INTEGER                               :: j, k, l, m
+  ! Imaginary i
+  COMPLEX(KIND=8), PARAMETER            :: i = CMPLX(0.0d0, 1.0d0, 8)
+  ! Temporary value
+  COMPLEX(KIND=8)                       :: moment_out
+
+  !------------------------------------------!
+  !     INITALISE OPERATOR MOMENT ARRAYS     !
+  !------------------------------------------!
+  ! Steady states
+  ! First-order: Cavity
+  f1_ss = 0.0d0
+  ! Second-order: Cavity and Atom
+  f1sig_ss = 0.0d0
+  ! Second-order: Cavity
+  f2_ss = 0.0d0
+  ! Third-order: Cavity and Atom
+  f2sig_ss = 0.0d0
+  ! Third-order: Cavity
+  f3_ss = 0.0d0
+  ! Fourth-order: Cavity and atom
+  ALLOCATE(f3sig_ss(-N_in:N_in, -N_in:N_in, -N_in:N_in, 2, N_mat)); f3sig_ss = 0.0d0
+  ! Fourth-order: Cavity
+  ALLOCATE(f4_ss(-N_in:N_in, -N_in:N_in, -N_in:N_in, -N_in:N_in)); f4_ss = 0.0d0
+
+  !============================================================================!
+  !                       CALCULATE STEADY-STATE MOMENTS                       !
+  !============================================================================!
+  CALL SteadyStateMoments(gamma_in, Omega_in, &
+                        & epsilon_in, N_in, phase_in, &
+                        & w0_in, kappa_in, dw_in, &
+                        & photon_ss, sigma_ss, &
+                        & f1_ss, f1sig_ss, &
+                        & f2_ss, f2sig_ss, &
+                        & f3_ss, f3sig_ss, &
+                        & f4_ss)
+
+  !============================================================================!
+  !          CALCULATE SECOND-ORDER CORRELATION FUNCTION INITIAL VALUE         !
+  !============================================================================!
+  ! Initialise values
+  moment_out = 0.0d0
+  g2_initial_out = 0.0d0
+
+  ! Cycle through modes
+  DO m = -N_in, N_in
+    DO l = -N_in, N_in
+      DO k = -N_in, N_in
+        DO j = -N_in, N_in
+          ! Sum over all fourth-order moments
+          moment_out = moment_out + f4_ss(j, k, l, m)
+
+          ! Close j loop
+        END DO
+        ! Close k loop
+      END DO
+      ! Close l loop
+    END DO
+    ! Close m loop
+  END DO
+
+  ! Normalise by steady state photon number
+  g2_initial_out = REAL(moment_out) / (photon_ss ** 2)
+
+END SUBROUTINE G2_InitialValue
+
 ! Subroutine to calculate the time evolution of the g2 correlation
 SUBROUTINE G2_CalculateRK4(gamma_in, Omega_in, &
                          & epsilon_in, N_in, phase_in, &
@@ -1336,9 +1836,9 @@ SUBROUTINE G2_CalculateRK4(gamma_in, Omega_in, &
                          & dt_in, tau_steps_in, &
                          & g2_array_out, WRITE_DATA_IN, filename_data_in)
 
-  !==============================================================================!
-  !                    DEFINING AND DECLARING VARIABLES/ARRAYS                   !
-  !==============================================================================!
+  !============================================================================!
+  !                   DEFINING AND DECLARING VARIABLES/ARRAYS                  !
+  !============================================================================!
 
   IMPLICIT NONE
 
@@ -1439,9 +1939,9 @@ SUBROUTINE G2_CalculateRK4(gamma_in, Omega_in, &
   ! Complex data
   COMPLEX(KIND=8)                          :: moment_out
 
-  !==============================================================================!
-  !                DEFINING ANALYTIC MATRICES/EIGENVALUES/VECTORS                !
-  !==============================================================================!
+  !============================================================================!
+  !               DEFINING ANALYTIC MATRICES/EIGENVALUES/VECTORS               !
+  !============================================================================!
   !------------------------!
   !     BLOCH MATRIX M     !
   !------------------------!
@@ -1508,18 +2008,18 @@ SUBROUTINE G2_CalculateRK4(gamma_in, Omega_in, &
   ALLOCATE(g2_array_out(0:tau_steps_in)); g2_array_out = 0.0d0
   photon_ss = 0.0d0
 
-  !==============================================================================!
-  !                         CALCULATE INITIAL CONDITIONS                         !
-  !==============================================================================!
+  !============================================================================!
+  !                        CALCULATE INITIAL CONDITIONS                        !
+  !============================================================================!
   CALL G2_InitialConditions(gamma_in, Omega_in, &
                           & epsilon_in, N_in, phase_in, &
                           & w0_in, kappa_in, dw_in, &
                           & photon_ss, B_OG, &
                           & sigma, f1, f1sig, f2)
 
-  !==============================================================================!
-  !                  CALCULATE SECOND-ORDER CORRELATION FUNCTION                 !
-  !==============================================================================!
+  !============================================================================!
+  !                 CALCULATE SECOND-ORDER CORRELATION FUNCTION                !
+  !============================================================================!
   ! Calculate the sample rate for writing data to the file
   IF (tau_steps_in > 100000) THEN
     sample_rate = NINT(DBLE(tau_steps_in) / 1d5)

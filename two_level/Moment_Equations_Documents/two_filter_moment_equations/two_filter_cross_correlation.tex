@@ -1,0 +1,439 @@
+\documentclass{article}
+
+%--------------------------------------------------------------------------------%
+%                                  PACKAGES                                      %
+%--------------------------------------------------------------------------------
+% Fonts and Math packages
+\usepackage{braket}   % braket notation |i>, <i|
+\usepackage{amsfonts} % Math fonts
+\usepackage{amsmath}  % Math symbols
+\usepackage{amssymb}  % Math symbols
+
+% Formatting packages
+\usepackage[labelfont=bf]{caption} % Figure titles are bold
+\usepackage{graphicx} % Include figures
+\usepackage{fullpage} % Make article full page
+\usepackage{float}    % Force figures (with !)
+\usepackage{bbold}    % Bold face (for identity 1 and real/complex R/C symbol)
+\usepackage{bm}
+
+% Other packages
+\usepackage{hyperref} % Clickable links in pdf
+
+% Define \ddt command to represent d/dt as a fraction to save time
+\newcommand{\ddt}[1][]{\frac{\mathrm{d} #1}{\mathrm{d}t}}
+\newcommand{\ddtau}{\frac{\mathrm{d}}{\mathrm{d}\tau}}
+\newcommand{\ssth}{\textsuperscript{th}}
+
+\allowdisplaybreaks
+
+\title{Two-Level Atom: Two Multi-Mode Filters Moment Equations}
+\author{Jacob Ngaha}
+
+\begin{document}
+
+\maketitle
+
+\section{Hamiltonian and Master Equation}
+
+The Hamiltonian is
+\begin{align}\label{hamiltonian}
+	H = \hbar \frac{\Omega}{2} \left(\sigma_{+} + \sigma_{-}\right) + \hbar \sum_{j=-N}^{N} \left( \omega_{j}^{(a)} a^{\dagger}_{j} a_{j} + \omega_{j}^{(b)} b^{\dagger}_{j} b_{j} \right) &+ \frac{i \hbar}{2} \sum_{j=-N}^{N} \left( \mathcal{E}_{j}^{(a) *} a_{j} \sigma_{+} - \mathcal{E}_{j}^{(a)} \sigma_{-} a^{\dagger}_{j} \right) \nonumber \\
+	&+ \frac{i \hbar}{2} \sum_{j=-N}^{N} \left( \mathcal{E}_{j}^{(b) *} b_{j} \sigma_{+} - \mathcal{E}_{j}^{(b)} \sigma_{-} b^{\dagger}_{j} \right)
+\end{align}
+where $\Omega$ is the Rabi frequency, $\sigma_{+}$ and $\sigma_{-}$ are the atomic raising and lowering operators, $a^{\dagger}~(b^{\dagger})$ and $a~(b)$ are the cavity photon creation and annihilation operators for filter A~(B), $N$ is the number of modes either side of the central mode ($2N+1$ total modes),
+\begin{equation}
+	\omega_{j}^{(a)} = \omega_{0}^{(a)} + j \delta\omega^{(a)}, \quad \omega_{j}^{(b)} = \omega_{0}^{(b)} + j \delta\omega^{(b)}
+\end{equation}
+is the resonance frequency of the \textit{j}\ssth mode, with central frequency $\omega_{0}^{(a/b)}$ and mode frequency spacing $\delta\omega^{(a/b)}$, and
+\begin{equation}
+	\mathcal{E}_{j}^{(a)} = \sqrt{\frac{\epsilon \gamma \kappa_{a}}{2 \left( 2N + 1 \right)}} e^{i m \varphi_{j}}, \quad \mathcal{E}_{j}^{(b)} = \sqrt{\frac{\epsilon \gamma \kappa_{a}}{2 \left( 2N + 1 \right)}} e^{i m \varphi_{j}},
+\end{equation}
+is the cascaded systems coupling of the \textit{j}\ssth mode for filter A~(B), where $\gamma$ is the atomic decay rate, $\kappa_{a}~(\kappa_{b})$ is the cavity decay rate for filter A~(B), $\epsilon$ is the percentage of fluorescence sent to the filter, and
+\begin{equation}
+	\varphi_{j} = \frac{j \pi}{N},
+\end{equation}
+sets the size of the frequency dependent time delay, with integer $m$.
+
+The master equation is
+\begin{align}\label{master_equation_full}
+	\ddt[\rho] = \frac{1}{i \hbar} [H, \rho] &+ \frac{\gamma}{2}(1 - \epsilon) \left(2 \sigma_{-} \rho \sigma_{+} - \sigma_{+} \sigma_{-} \rho - \rho \sigma_{+} \sigma_{-}\right) \nonumber \\
+	&+ \frac{\kappa_{a}}{2} \sum_{j=-N}^{N} \left( 2 a_{j} \rho a^{\dagger}_{j} - a^{\dagger}_{j} a_{j} \rho - \rho a^{\dagger}_{j} a_{j} \right) \\
+	&+ \frac{1}{2} \sum_{j=-N}^{N} \left(2 C_{j}^{(a)} \rho C^{(a) \dagger}_{j} - C^{(a) \dagger}_{j} C_{j}^{(a)} \rho - \rho C^{(a) \dagger}_{j} C_{j}^{(a)} \right) \nonumber \\
+	&+ \frac{\kappa_{b}}{2} \sum_{j=-N}^{N} \left( 2 b_{j} \rho b^{\dagger}_{j} - b^{\dagger}_{j} b_{j} \rho - \rho b^{\dagger}_{j} b_{j} \right) \\
+	&+ \frac{1}{2} \sum_{j=-N}^{N} \left(2 C_{j}^{(b)} \rho C^{(b) \dagger}_{j} - C^{(b) \dagger}_{j} C_{j}^{(b)} \rho - \rho C^{(b) \dagger}_{j} C_{j}^{(b)} \right), \nonumber
+\end{align}
+where
+\begin{equation}
+	C_{j} = \sqrt{\frac{\epsilon \gamma}{2N + 1}} \sigma_{-} + \sqrt{\kappa} e^{i m \varphi_{j}} a_{j},
+\end{equation}
+is the cascaded systems decay operator. Expanding the master equation out into neat terms, we arrive at:
+\begin{align}
+	\ddt[\rho] &= -i \frac{\Omega}{2} \left( \sigma_{+}\rho - \rho \sigma_{+} \right) - i \frac{\Omega}{2} \left( \sigma_{-} \rho - \rho \sigma_{-} \right) + \frac{\gamma}{2} \left( 2 \sigma_{-} \rho \sigma_{+} - \sigma_{+} \sigma_{-} \rho - \rho \sigma_{+} \sigma_{-} \right) \nonumber \\
+	% FILTER A
+	&\quad -i \sum_{j=-N}^{N} \omega_{j}^{(a)} \left( a^{\dagger}_{j} a_{j} \rho - \rho a^{\dagger}_{j} a_{j} \right) + \kappa_{a} \sum_{j=-N}^{N} \left( 2 a_{j} \rho a^{\dagger}_{j} - a^{\dagger}_{j} a_{j} \rho - \rho a^{\dagger}_{j} a_{j} \right) \nonumber \\
+	&\quad - \sum_{j=-N}^{N} \mathcal{E}_{j}^{(a)} \left( a^{\dagger}_{j} \sigma_{-} \rho - \sigma_{-} \rho a^{\dagger}_{j} \right) - \sum_{j=-N}^{N} \mathcal{E}_{j}^{(a) *} \left( \rho \sigma_{+} a_{j} - a_{j} \rho \sigma_{+} \right) \nonumber \\
+	% FILTER B
+	&\quad -i \sum_{j=-N}^{N} \omega_{j}^{(b)} \left( b^{\dagger}_{j} b_{j} \rho - \rho b^{\dagger}_{j} b_{j} \right) + \kappa_{b} \sum_{j=-N}^{N} \left( 2 b_{j} \rho b^{\dagger}_{j} - b^{\dagger}_{j} b_{j} \rho - \rho b^{\dagger}_{j} b_{j} \right) \nonumber \\
+	&\quad - \sum_{j=-N}^{N} \mathcal{E}_{j}^{(b)} \left( b^{\dagger}_{j} \sigma_{-} \rho - \sigma_{-} \rho b^{\dagger}_{j} \right) - \sum_{j=-N}^{N} \mathcal{E}_{j}^{(b) *} \left( \rho \sigma_{+} b_{j} - b_{j} \rho \sigma_{+} \right) .
+\end{align}
+
+\section{Operator Averages}
+
+\subsection{First-Order: Atomic Equations}
+
+We may write the Bloch equations in matrix form:
+\begin{equation}
+	\ddt \langle \bm{\sigma} \rangle = \bm{M} \langle \bm{\sigma} \rangle + \bm{M},
+\end{equation}
+where
+\begin{equation}
+	\langle \bm{\sigma} \rangle = 
+	\begin{pmatrix}
+		\langle \sigma_{-} \rangle \\
+		\langle \sigma_{+} \rangle \\
+		\langle \sigma_{z} \rangle
+	\end{pmatrix}
+	, \quad \bm{B} = 
+	\begin{pmatrix}
+		0 \\
+		0 \\
+		- \gamma
+	\end{pmatrix},
+\end{equation}
+and
+\begin{equation}
+	\bm{M} = 
+	\begin{pmatrix}
+		-\frac{\gamma}{2} & 0 & i \frac{\Omega}{2} \\
+		0 & -\frac{\gamma}{2} & -i \frac{\Omega}{2} \\
+		i \Omega & -i \Omega & -\gamma
+	\end{pmatrix}.
+\end{equation}
+This differential equation has the solution
+\begin{equation}
+	\langle \bm{\sigma}(t) \rangle = e^{\bm{M} t} \left( \langle \bm{\sigma}(0) \rangle - \langle \bm{\sigma} \rangle_{ss} \right) + \langle \bm{\sigma} \rangle_{ss},
+\end{equation}
+where
+\begin{equation}
+	\langle \bm{\sigma} \rangle_{ss} = -\bm{M}^{-1} \bm{B} = \frac{1}{2\Omega^{2} + \gamma^{2}}
+	\begin{pmatrix}
+		-i \gamma \Omega \\
+		i \gamma \Omega \\
+		-\gamma^{2}
+	\end{pmatrix}.
+\end{equation}
+
+\subsection{First-Order: Cavity Equations}
+
+\begin{subequations}
+	\begin{align}
+		\ddt \langle a_{j} \rangle &= -\left( \kappa_{a} + i \omega_{j}^{(a)} \right) \langle a_{j} \rangle - \mathcal{E}_{j}^{(a)} \langle \sigma_{-} \rangle, \\
+		\ddt \langle a^{\dagger}_{j} \rangle &= -\left( \kappa_{a} - i \omega_{j}^{(a)} \right) \langle a^{\dagger}_{j} \rangle - \mathcal{E}_{j}^{(a) *} \langle \sigma_{+} \rangle, \\
+		%-----------------%
+		\cline{1-2}
+		%-----------------%
+		\ddt \langle b_{j} \rangle &= -\left( \kappa_{b} + i \omega_{j}^{(b)} \right) \langle b_{j} \rangle - \mathcal{E}_{j}^{(b)} \langle \sigma_{-} \rangle, \\
+		\ddt \langle b^{\dagger}_{j} \rangle &= -\left( \kappa_{b} - i \omega_{j}^{(b)} \right) \langle b^{\dagger}_{j} \rangle - \mathcal{E}_{j}^{(b) *} \langle \sigma_{+} \rangle.
+	\end{align}
+\end{subequations}
+
+\subsection{Second-Order: Cavity-Atom Coupled Equations}
+
+Using the vector notation, we have moment equations
+
+\begin{subequations}
+	\begin{align}
+		\ddt \langle a_{j} \bm{\sigma} \rangle &= \bm{M}_{j}^{(a)} \langle a_{j} \bm{\sigma} \rangle + 
+		\begin{pmatrix}
+			0 \\
+			-\frac{1}{2} \mathcal{E}_{j}^{(a)} \left( \langle \sigma_{z} \rangle + 1 \right) \\
+			-\gamma \langle a_{j} \rangle + \mathcal{E}_{j}^{(a)} \langle \sigma_{-} \rangle
+		\end{pmatrix}, \\
+		\ddt \langle b_{j} \bm{\sigma} \rangle &= \bm{M}_{j}^{(b)} \langle b_{j} \bm{\sigma} \rangle + 
+		\begin{pmatrix}
+			0 \\
+			-\frac{1}{2} \mathcal{E}_{j}^{(b)} \left( \langle \sigma_{z} \rangle + 1 \right) \\
+			-\gamma \langle b_{j} \rangle + \mathcal{E}_{j}^{(b)} \langle \sigma_{-} \rangle
+		\end{pmatrix},
+	\end{align}
+\end{subequations}
+where
+\begin{subequations}
+	\begin{gather}
+		\bm{M}_{j}^{(a)} = \bm{M} - \left( \kappa_{a} + i \omega_{j}^{(a)} \right) \mathbb{1}, \\
+		\bm{M}_{j}^{(b)} = \bm{M} - \left( \kappa_{b} + i \omega_{j}^{(b)} \right) \mathbb{1};
+	\end{gather}
+\end{subequations}
+and
+\begin{subequations}
+	\begin{align}
+		\ddt \langle a^{\dagger}_{j} \bm{\sigma} \rangle &= \bm{M}_{j}^{(a^{\dagger})} \langle a^{\dagger}_{j} \bm{\sigma} \rangle + 
+		\begin{pmatrix}
+			-\frac{1}{2} \mathcal{E}_{j}^{(a) *} \left( \langle \sigma_{z} \rangle + 1 \right) \\
+			0 \\
+			-\gamma \langle a^{\dagger}_{j} \rangle + \mathcal{E}_{j}^{(a) *} \langle \sigma_{+} \rangle
+		\end{pmatrix}, \\
+		\ddt \langle b^{\dagger}_{j} \bm{\sigma} \rangle &= \bm{M}_{}^{(b^{\dagger})} \langle b^{\dagger}_{j} \bm{\sigma} \rangle + 
+		\begin{pmatrix}
+			-\frac{1}{2} \mathcal{E}_{j}^{(b) *} \left( \langle \sigma_{z} \rangle + 1 \right) \\
+			0 \\
+			-\gamma \langle b^{\dagger}_{j} \rangle + \mathcal{E}_{j}^{(b) *} \langle \sigma_{+} \rangle
+		\end{pmatrix},
+	\end{align}
+\end{subequations}
+where
+\begin{subequations}
+	\begin{gather}
+		\bm{M}_{j}^{(a^{\dagger})} = \bm{M} - \left( \kappa_{a} - i \omega_{j}^{(a)} \right) \mathbb{1}, \\
+		\bm{M}_{j}^{(b^{\dagger})} = \bm{M} - \left( \kappa_{b} - i \omega_{j}^{(b)} \right) \mathbb{1},
+	\end{gather}
+\end{subequations}
+
+\subsection{Second-Order: Cavity Equations}
+
+\begin{subequations}
+	\begin{align}
+		\ddt \langle a_{j} b_{k} \rangle &= -\left( \kappa_{a} + \kappa_{b} + i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) \right) \langle a_{j} b_{k} \rangle - \mathcal{E}_{j}^{(a)} \langle b_{k} \sigma_{-} \rangle - \mathcal{E}_{k}^{(b)} \langle a_{j} \sigma_{-} \rangle, \\
+		\ddt \langle a^{\dagger}_{j} b^{\dagger}_{k} \rangle &= -\left( \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) \right) \langle a^{\dagger}_{j} b^{\dagger}_{k} \rangle - \mathcal{E}_{j}^{(a) *} \langle b^{\dagger}_{k} \sigma_{+} \rangle - \mathcal{E}_{k}^{(b) *} \langle a^{\dagger}_{j} \sigma_{+} \rangle, \\
+		%-----------------%
+		\cline{1-2}
+		%-----------------%
+		\ddt \langle a^{\dagger}_{j} a_{k} \rangle &= -\left( 2 \kappa_{a} - i \left( \omega_{j}^{(a)}- \omega_{k}^{(a)} \right) \right) \langle a^{\dagger}_{j} a_{k} \rangle - \mathcal{E}_{j}^{(a) *} \langle a_{k} \sigma_{+} \rangle - \mathcal{E}_{k}^{(a)} \langle a^{\dagger}_{j} \sigma_{-} \rangle, \\
+		\ddt \langle b^{\dagger}_{j} b_{k} \rangle &= -\left( 2 \kappa_{b} - i \left( \omega_{j}^{(b)}- \omega_{k}^{(b)} \right) \right) \langle b^{\dagger}_{j} b_{k} \rangle - \mathcal{E}_{j}^{(b) *} \langle b_{k} \sigma_{+} \rangle - \mathcal{E}_{k}^{(b)} \langle b^{\dagger}_{j} \sigma_{-} \rangle, \\
+		%-----------------%
+		\cline{1-2}
+		%-----------------%
+		\ddt \langle a^{\dagger}_{j} b_{k} \rangle &= -\left( \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(a)}- \omega_{k}^{(b)} \right) \right) \langle a^{\dagger}_{j} b_{k} \rangle - \mathcal{E}_{j}^{(a) *} \langle b_{k} \sigma_{+} \rangle - \mathcal{E}_{k}^{(b)} \langle a^{\dagger}_{j} \sigma_{-} \rangle, \\
+		\ddt \langle b^{\dagger}_{j} a_{k} \rangle &= -\left( \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(b)}- \omega_{k}^{(a)} \right) \right) \langle b^{\dagger}_{j} a_{k} \rangle - \mathcal{E}_{j}^{(b) *} \langle a_{k} \sigma_{+} \rangle - \mathcal{E}_{k}^{(a)} \langle b^{\dagger}_{j} \sigma_{-} \rangle.
+	\end{align}
+\end{subequations}
+
+\subsection{Third-Order: Cavity-Atom Coupled Equations}
+
+Using the vector notation, we have moment equations
+
+\begin{subequations}
+	\begin{equation}
+		\ddt \langle a_{j} b_{k} \bm{\sigma} \rangle = \bm{M}_{j, k}^{(ab)} \langle a_{j} b_{k} \bm{\sigma} \rangle + 
+		\begin{pmatrix}
+			0 \\
+			-\frac{1}{2} \mathcal{E}_{j}^{(a)} \left( \langle b_{k} \sigma_{z} \rangle + \langle b_{k} \rangle \right) - \frac{1}{2} \mathcal{E}_{k}^{(b)} \left( \langle a_{j} \sigma_{z} \rangle + \langle a_{j} \rangle \right) \\
+			-\gamma \langle a_{j} b_{k} \rangle + \mathcal{E}_{j}^{(a)} \langle b_{k} \sigma_{-} \rangle + \mathcal{E}_{k}^{(b)} \langle a_{j} \sigma_{-} \rangle
+		\end{pmatrix},
+	\end{equation}
+	\begin{equation}
+		\ddt \langle a^{\dagger}_{j} b^{\dagger}_{k} \bm{\sigma} \rangle = \bm{M}_{j, k}^{(a^{\dagger} b^{\dagger})} \langle a^{\dagger}_{j} b^{\dagger}_{k} \bm{\sigma} \rangle + 
+		\begin{pmatrix}
+			-\frac{1}{2} \mathcal{E}_{j}^{(a) *} \left( \langle b^{\dagger}_{k} \sigma_{z} \rangle + \langle b^{\dagger}_{k} \rangle \right) - \frac{1}{2} \mathcal{E}_{k}^{(b) *} \left( \langle a^{\dagger}_{j} \sigma_{z} \rangle + \langle a^{\dagger}_{j} \rangle \right) \\
+			0 \\
+			-\gamma \langle a^{\dagger}_{j} b^{\dagger}_{k} \rangle + \mathcal{E}_{j}^{(a) *} \langle b^{\dagger}_{k} \sigma_{+} \rangle + \mathcal{E}_{k}^{(b) *} \langle a^{\dagger}_{j} \sigma_{+} \rangle
+		\end{pmatrix},
+	\end{equation}
+\end{subequations}
+where
+\begin{subequations}
+	\begin{align}
+		\bm{M}_{j, k}^{(a b)} &= \bm{M} - \left( \kappa_{a} + \kappa_{b} + i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) \right) \mathbb{1}, \\
+		\bm{M}_{j, k}^{(a^{\dagger} b^{\dagger})} &= \bm{M} - \left( \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) \right) \mathbb{1};
+	\end{align}
+\end{subequations}
+and
+\begin{subequations}
+	\begin{equation}
+		\ddt \langle a^{\dagger}_{j} a_{k} \bm{\sigma} \rangle = \bm{M}_{j, k}^{(a^{\dagger} a)} \langle a^{\dagger}_{j} a_{k} \bm{\sigma} \rangle + 
+		\begin{pmatrix}
+			-\frac{1}{2} \mathcal{E}_{j}^{(a) *} \left( \langle a_{k} \sigma_{z} \rangle + \langle a_{k} \rangle \right) \\
+			-\frac{1}{2} \mathcal{E}_{k}^{(a)} \left( \langle a^{\dagger}_{j} \sigma_{z} \rangle + \langle a^{\dagger}_{j} \rangle \right) \\
+			-\gamma \langle a^{\dagger}_{j} a_{k} \rangle + \mathcal{E}_{j}^{(a) *} \langle a_{k} \sigma_{+} \rangle + \mathcal{E}_{k}^{(a)} \langle a^{\dagger}_{j} \sigma_{-} \rangle
+		\end{pmatrix},
+	\end{equation}
+	\begin{equation}
+		\ddt \langle b^{\dagger}_{j} b_{k} \bm{\sigma} \rangle = \bm{M}_{j, k}^{(b^{\dagger} b)} \langle b^{\dagger}_{j} b_{k} \bm{\sigma} \rangle + 
+		\begin{pmatrix}
+			-\frac{1}{2} \mathcal{E}_{j}^{(b) *} \left( \langle b_{k} \sigma_{z} \rangle + \langle b_{k} \rangle \right) \\
+			-\frac{1}{2} \mathcal{E}_{k}^{(b)} \left( \langle b^{\dagger}_{j} \sigma_{z} \rangle + \langle b^{\dagger}_{j} \rangle \right) \\
+			-\gamma \langle b^{\dagger}_{j} b_{k} \rangle + \mathcal{E}_{j}^{(b) *} \langle b_{k} \sigma_{+} \rangle + \mathcal{E}_{k}^{(b)} \langle b^{\dagger}_{j} \sigma_{-} \rangle
+		\end{pmatrix},
+	\end{equation}
+\end{subequations}
+where
+\begin{subequations}
+	\begin{align}
+		\bm{M}_{j, k}^{(a^{\dagger} a)} &= \bm{M} - \left( 2 \kappa_{a} - i \left( \omega_{j}^{(a)} - \omega_{k}^{(a)} \right) \right) \mathbb{1}, \\
+		\bm{M}_{j, k}^{(b^{\dagger} b)} &= \bm{M} - \left( 2 \kappa_{b} - i \left( \omega_{j}^{(b)} - \omega_{k}^{(b)} \right) \right) \mathbb{1};
+	\end{align}
+\end{subequations}
+and
+\begin{subequations}
+	\begin{equation}
+		\ddt \langle a^{\dagger}_{j} b_{k} \bm{\sigma} \rangle = \bm{M}_{j, k}^{(a^{\dagger} b)} \langle a^{\dagger}_{j} b_{k} \bm{\sigma} \rangle + 
+		\begin{pmatrix}
+			-\frac{1}{2} \mathcal{E}_{j}^{(a) *} \left( \langle b{k} \sigma_{z} \rangle + \langle b_{k} \rangle \right) \\
+			-\frac{1}{2} \mathcal{E}_{k}^{(b)} \left( \langle a^{\dagger}_{j} \sigma_{z} \rangle + \langle a^{\dagger}_{j} \rangle \right) \\
+			-\gamma \langle a^{\dagger}_{j} b_{k} \rangle + \mathcal{E}_{j}^{(a) *} \langle b_{k} \sigma_{+} \rangle + \mathcal{E}_{k}^{(b)} \langle a^{\dagger}_{j} \sigma_{-} \rangle
+		\end{pmatrix},
+	\end{equation}
+	\begin{equation}
+		\ddt \langle b^{\dagger}_{j} a_{k} \bm{\sigma} \rangle = \bm{M}_{j, k}^{(b^{\dagger} a)} \langle b^{\dagger}_{j} a_{k} \bm{\sigma} \rangle + 
+		\begin{pmatrix}
+			-\frac{1}{2} \mathcal{E}_{j}^{(b) *} \left( \langle a_{k} \sigma_{z} \rangle + \langle a_{k} \rangle \right) \\
+			-\frac{1}{2} \mathcal{E}_{k}^{(a)} \left( \langle b^{\dagger}_{j} \sigma_{z} \rangle + \langle b^{\dagger}_{j} \rangle \right) \\
+			-\gamma \langle b^{\dagger}_{j} a_{k} \rangle + \mathcal{E}_{j}^{(b) *} \langle a_{k} \sigma_{+} \rangle + \mathcal{E}_{k}^{(a)} \langle b^{\dagger}_{j} \sigma_{-} \rangle
+		\end{pmatrix},
+	\end{equation}
+\end{subequations}
+where
+\begin{subequations}
+	\begin{align}
+		\bm{M}_{j, k}^{(a^{\dagger} b)} &= \bm{M} - \left( \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(a)} - \omega_{k}^{(b)} \right) \right) \mathbb{1}, \\
+		\bm{M}_{j, k}^{(b^{\dagger} a)} &= \bm{M} - \left( \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(b)} - \omega_{k}^{(a)} \right) \right) \mathbb{1};
+	\end{align}
+\end{subequations}
+
+\subsection{Third-Order: Cavity Equations}
+
+\begin{subequations}
+	\begin{align}
+		\ddt \langle a^{\dagger}_{j} a_{k} b_{l} \rangle &= -\left( 2\kappa_{a} + \kappa_{b} - i \omega_{j}^{(a)} + i \left( \omega_{k}^{(a)} + \omega_{l}^{(b)} \right) \right) \langle a^{\dagger}_{j} a_{k} b_{l} \rangle \nonumber \\
+		&\quad - \mathcal{E}_{j}^{(a) *} \langle a_{k} b_{l} \sigma_{+} \rangle - \mathcal{E}_{k}^{(a)} \langle a^{\dagger}_{j} b_{l} \sigma_{-} \rangle - \mathcal{E}_{l}^{(b)} \langle a^{\dagger}_{j} a_{k} \sigma_{-} \rangle , \\
+		\ddt \langle b^{\dagger}_{j} b_{k} a_{l} \rangle &= -\left( \kappa_{a} + 2\kappa_{b} - i \omega_{j}^{(b)} + i \left( \omega_{k}^{(b)} + \omega_{l}^{(a)} \right) \right) \langle b^{\dagger}_{j} b_{k} a_{l} \rangle \nonumber \\
+		&\quad - \mathcal{E}_{j}^{(b) *} \langle b_{k} a_{l} \sigma_{+} \rangle - \mathcal{E}_{k}^{(b)} \langle b^{\dagger}_{j} a_{l} \sigma_{-} \rangle - \mathcal{E}_{l}^{(a)} \langle b^{\dagger}_{j} b_{k} \sigma_{-} \rangle ,
+	\end{align}
+\end{subequations}
+and
+\begin{subequations}
+	\begin{align}
+		\ddt \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle &= -\left( 2\kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(b)} + \omega_{k}^{(a)} \right) + i \omega_{l}^{(a)} \right) \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle \nonumber \\
+		&\quad - \mathcal{E}_{j}^{(b) *} \langle a^{\dagger}_{k} a_{l} \sigma_{+} \rangle - \mathcal{E}_{k}^{(a) *} \langle b^{\dagger}_{j} a_{l} \sigma_{+} \rangle - \mathcal{E}_{l}^{(a)} \langle b^{\dagger}_{j} a^{\dagger}_{k} \sigma_{-} \rangle , \\
+		\ddt \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \rangle &= -\left( \kappa_{a} + 2\kappa_{b} - i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) + i \omega_{l}^{(b)} \right) \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \rangle \nonumber \\
+		&\quad - \mathcal{E}_{j}^{(a) *} \langle b^{\dagger}_{k} b_{l} \sigma_{+} \rangle - \mathcal{E}_{k}^{(b) *} \langle a^{\dagger}_{j} b_{l} \sigma_{+} \rangle - \mathcal{E}_{l}^{(b)} \langle a^{\dagger}_{j} b^{\dagger}_{k} \sigma_{-} \rangle .
+	\end{align}
+\end{subequations}
+
+\subsection{Fourth-Order: Cavity-Atom Coupled Equations}
+
+Using the vector notation, we have moment equations
+\begin{subequations}
+	\begin{align}
+		\ddt \langle a^{\dagger}_{j} a_{k} b_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(a^{\dagger} a b)} \langle a^{\dagger}_{j} a_{k} b_{l} \bm{\sigma} \rangle + 
+		\begin{pmatrix}
+			-\frac{1}{2} \mathcal{E}_{j}^{(a) *} \left( \langle a_{k} b_{l} \sigma_{z} \rangle + \langle a_{k} b_{l} \rangle \right) \\
+			-\frac{1}{2} \mathcal{E}_{k}^{(a)} \left( \langle a^{\dagger}_{j} b_{l} \sigma_{z} \rangle + \langle a^{\dagger}_{j} b_{l} \rangle \right) - \frac{1}{2} \mathcal{E}_{l}^{(b)} \left( \langle a^{\dagger}_{j} a_{k} \sigma_{z} \rangle + \langle a^{\dagger}_{j} a_{k} \rangle \right) \\
+			-\gamma \langle a^{\dagger}_{j} a_{k} b_{l} \rangle + \mathcal{E}_{j}^{(a) *} \langle a_{k} b_{l} \sigma_{+} \rangle + \mathcal{E}_{k}^{(a)} \langle a^{\dagger}_{j} b_{l} \sigma_{-} \rangle + \mathcal{E}_{l}^{(b)} \langle a^{\dagger}_{j} a_{k} \sigma_{-} \rangle
+		\end{pmatrix}, \\
+		\ddt \langle b^{\dagger}_{j} b_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(b^{\dagger} b a)} \langle b^{\dagger}_{j} b_{k} a_{l} \bm{\sigma} \rangle + 
+		\begin{pmatrix}
+			-\frac{1}{2} \mathcal{E}_{j}^{(b) *} \left( \langle b_{k} a_{l} \sigma_{z} \rangle + \langle b_{k} a_{l} \rangle \right) \\
+			-\frac{1}{2} \mathcal{E}_{k}^{(b)} \left( \langle b^{\dagger}_{j} a_{l} \sigma_{z} \rangle + \langle b^{\dagger}_{j} a_{l} \rangle \right) - \frac{1}{2} \mathcal{E}_{l}^{(a)} \left( \langle b^{\dagger}_{j} b_{k} \sigma_{z} \rangle + \langle b^{\dagger}_{j} b_{k} \rangle \right) \\
+			-\gamma \langle b^{\dagger}_{j} a_{k} a_{l} \rangle + \mathcal{E}_{j}^{(b) *} \langle b_{k} a_{l} \sigma_{+} \rangle + \mathcal{E}_{k}^{(b)} \langle b^{\dagger}_{j} a_{l} \sigma_{-} \rangle + \mathcal{E}_{l}^{(a)} \langle b^{\dagger}_{j} b_{k} \sigma_{-} \rangle
+		\end{pmatrix},
+	\end{align}
+\end{subequations}
+where
+\begin{subequations}
+	\begin{align}
+		\bm{M}_{j, k, l}^{(a^{\dagger} a b)} &= \bm{M} - \left( 2\kappa_{a} + \kappa_{b} - i \omega_{j}^{(a)} + i \left( \omega_{k}^{(a)} + \omega_{l}^{(b)} \right) \right) \mathbb{1}, \\
+		\bm{M}_{j, k, l}^{(b^{\dagger} b a)} &= \bm{M} - \left( \kappa_{a} + 2\kappa_{b} - i \omega_{j}^{(b)} + i \left( \omega_{k}^{(b)} + \omega_{l}^{(a)} \right) \right) \mathbb{1};
+	\end{align}
+\end{subequations}
+and
+\begin{subequations}
+	\begin{align}
+		\ddt \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(b^{\dagger} a^{\dagger} a)} \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \bm{\sigma} \rangle +
+		\begin{pmatrix}
+			-\frac{1}{2} \mathcal{E}_{j}^{(b) *} \left( \langle a^{\dagger}_{k} a_{l} \sigma_{z} \rangle + \langle a^{\dagger}_{k} a_{l} \rangle \right) - \frac{1}{2} \mathcal{E}_{k}^{(a) *} \left( \langle b^{\dagger}_{j} a_{l} \sigma_{z} \rangle + \langle b^{\dagger}_{j} a_{l} \rangle \right) \\
+			-\frac{1}{2} \mathcal{E}_{l}^{(a)} \left( \langle b^{\dagger}_{j} a^{\dagger}_{k} \sigma_{z} \rangle + \langle b^{\dagger}_{j} a^{\dagger}_{k} \rangle \right) \\
+			-\gamma \langle b^{\dagger}_{j} a^{\dagger}_{k} a_{l} \rangle + \mathcal{E}_{j}^{(b) *} \langle a^{\dagger}_{k} a_{l} \sigma_{+} \rangle + \mathcal{E}_{k}^{(a) *} \langle b^{\dagger}_{j} a_{l} \sigma_{+} \rangle + \mathcal{E}_{l}^{(a)} \langle b^{\dagger}_{j} a^{\dagger}_{k} \sigma_{-} \rangle
+		\end{pmatrix}, \\
+		\ddt \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \bm{\sigma} \rangle &= \bm{M}_{j, k, l}^{(a^{\dagger} b^{\dagger} b)} \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \bm{\sigma} \rangle +
+		\begin{pmatrix}
+			-\frac{1}{2} \mathcal{E}_{j}^{(a) *} \left( \langle b^{\dagger}_{k} b_{l} \sigma_{z} \rangle + \langle b^{\dagger}_{k} b_{l} \rangle \right) - \frac{1}{2} \mathcal{E}_{k}^{(b) *} \left( \langle a^{\dagger}_{j} b_{l} \sigma_{z} \rangle + \langle a^{\dagger}_{j} b_{l} \rangle \right) \\
+			-\frac{1}{2} \mathcal{E}_{l}^{(b)} \left( \langle a^{\dagger}_{j} b^{\dagger}_{k} \sigma_{z} \rangle + \langle a^{\dagger}_{j} b^{\dagger}_{k} \rangle \right) \\
+			-\gamma \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \rangle + \mathcal{E}_{j}^{(a) *} \langle b^{\dagger}_{k} b_{l} \sigma_{+} \rangle + \mathcal{E}_{k}^{(b) *} \langle a^{\dagger}_{j} b_{l} \sigma_{+} \rangle + \mathcal{E}_{l}^{(b)} \langle a^{\dagger}_{j} b^{\dagger}_{k} \sigma_{-} \rangle
+		\end{pmatrix},
+	\end{align}
+\end{subequations}
+where
+\begin{subequations}
+	\begin{align}
+		\bm{M}_{j, k, l}^{(b^{\dagger} a^{\dagger} a)} &= \bm{M} - \left( 2 \kappa_{a} + \kappa_{b} - i \left( \omega_{j}^{(b)} + \omega_{k}^{(a)} \right) - i \omega_{l}^{(a)} \right) \mathbb{1}, \\
+		\bm{M}_{j, k, l}^{(a^{\dagger} b^{\dagger} b)} &= \bm{M} - \left( \kappa_{a} + 2 \kappa_{b} - i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) - i \omega_{l}^{(b)} \right) \mathbb{1}. 
+	\end{align}
+\end{subequations}
+
+\subsection{Fourth-Order: Cavity Equation}
+
+Finally, we have
+\begin{align}
+	\ddt \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} a_{m} \rangle &= -\left( 2\kappa_{a} + 2 \kappa_{b} - i \left( \omega_{j}^{(a)} + \omega_{k}^{(b)} \right) + i \left( \omega_{l}^{(b)} + \omega_{m}^{(a)} \right) \right) \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} a_{m} \rangle \nonumber \\
+	&\quad - \mathcal{E}_{j}^{(a) *} \langle b^{\dagger}_{k} b_{l} a_{m} \sigma_{+} \rangle - \mathcal{E}_{k}^{(b) *} \langle a^{\dagger}_{j} a_{m} b_{l} \sigma_{+} \rangle \nonumber \\
+	&\quad - \mathcal{E}_{l}^{(b)} \langle b^{\dagger}_{k} a^{\dagger}_{j} a_{m} \sigma_{-} \rangle - \mathcal{E}_{m}^{(a)} \langle a^{\dagger}_{j} b^{\dagger}_{k} b_{l} \sigma_{-} \rangle.
+\end{align}
+
+\section{Second-Order Cross-Correlation Function}
+
+The second-order correlation function for the filtered output field in the steady state is given by
+\begin{equation}
+	G^{(2)}_{\mathrm{cross}}(\tau) = \langle A^{\dagger}(0) B^{\dagger} B(\tau) A(0) \rangle = \sum_{j,k=-N}^{N} \langle A^{\dagger}(0) b^{\dagger}_{j} b_{k} (\tau) A(0) \rangle,
+\end{equation}
+with the normalised second-order correlation function given by
+\begin{equation}
+	g^{(2)}_{\mathrm{cross}}(\tau) = \frac{G^{(2)}_{\mathrm{cross}}(\tau)}{\langle A^{\dagger} A \rangle_{ss} \langle B^{\dagger} B \rangle_{ss}}.
+\end{equation}
+Using the Quantum Regression Theorem, we can solve for the second-order correlation function by solving the following moment equations
+\begin{subequations}
+	\begin{gather}
+		\ddtau \langle A^{\dagger}(0) \bm{\sigma} A(0) \rangle = \bm{M} \langle A^{\dagger}(0) \bm{\sigma} A(0) \rangle + \bm{B}, \\
+		\ddtau \langle A^{\dagger}(0) b^{\dagger}_{j}(\tau) A(0) \rangle = -\left( \kappa_{b} - i \omega_{j}^{(b)} \right) \langle A^{\dagger}(0) b^{\dagger}_{j}(\tau) A(0) \rangle - \mathcal{E}_{j}^{(b) *} \langle A^{\dagger}(0) \sigma_{+}(\tau) A(0) \rangle, \\
+		\ddtau \langle A^{\dagger}(0) b_{j}(\tau) A(0) \rangle = -\left( \kappa_{b} + i \omega_{j}^{(b)} \right) \langle A^{\dagger}(0) b_{j}(\tau) A(0) \rangle - \mathcal{E}_{j}^{(b)} \langle A^{\dagger}(0) \sigma_{-}(\tau) A(0) \rangle,
+	\end{gather}
+\end{subequations}
+with
+\begin{equation}
+	\langle \bm{\sigma} \rangle = 
+	\begin{pmatrix}
+		\langle A^{\dagger}(0) \sigma_{-}(\tau) A(0) \rangle \\
+		\langle A^{\dagger}(0) \sigma_{+}(\tau) A(0) \rangle \\
+		\langle A^{\dagger}(0) \sigma_{z}(\tau) A(0) \rangle \\
+	\end{pmatrix}, \quad \bm{B} = 
+	\begin{pmatrix}
+		0 \\
+		0 \\
+		-\gamma \langle A^{\dagger} A \rangle_{ss}
+	\end{pmatrix}.
+\end{equation}
+We also need to solve
+\begin{subequations}
+	\begin{equation}
+		\ddtau \langle A^{\dagger}(0) b_{j} \bm{\sigma}(\tau) A(0) \rangle = \bm{M}_{j}^{(b)} \langle A^{\dagger}(0) b_{j} \bm{\sigma}(\tau) A(0) \rangle + 
+		\begin{pmatrix}
+			0 \\
+			-\frac{1}{2} \mathcal{E}_{j}^{(b)} \left( \langle A^{\dagger}(0) \sigma_{z}(\tau) A(0) \rangle + \langle A^{\dagger} A \rangle_{ss} \right) \\
+			-\gamma \langle A^{\dagger}(0) b_{j}(\tau) A(0) \rangle + \mathcal{E}_{j}^{(b)} \langle A^{\dagger}(0) \sigma_{-}(\tau) A(0) \rangle
+		\end{pmatrix},
+	\end{equation}
+	and
+	\begin{equation}
+		\ddtau \langle A^{\dagger}(0) b^{\dagger}_{j} \bm{\sigma}(\tau) A(0) \rangle = \bm{M}_{j}^{(b^{\dagger})} \langle A^{\dagger}(0) b^{\dagger}_{j} \bm{\sigma}(\tau) A(0) \rangle + 
+		\begin{pmatrix}
+			-\frac{1}{2} \mathcal{E}_{j}^{(b) *} \left( \langle A^{\dagger}(0) \sigma_{z}(\tau) A(0) \rangle + \langle A^{\dagger} A \rangle_{ss} \right) \\
+			0 \\
+			-\gamma \langle A^{\dagger}(0) b^{\dagger}_{j}(\tau) A(0) \rangle + \mathcal{E}_{j}^{*} \langle A^{\dagger}(0) \sigma_{+}(\tau) A(0) \rangle
+		\end{pmatrix}.
+	\end{equation}
+\end{subequations}
+where
+\begin{subequations}
+	\begin{align}
+		\bm{M}_{j}^{(b)} &= \bm{M} - \left( \kappa_{b} + i \omega_{j}^{(b)} \right) \mathbb{1}, \\
+		\bm{M}_{j}^{(b^{\dagger})} &= \bm{M} - \left( \kappa_{b} - i \omega_{j}^{(b)} \right) \mathbb{1}.
+	\end{align}
+\end{subequations}
+Finally, we will also need to solve
+\begin{align}
+	\ddtau \langle A^{\dagger}(0) b^{\dagger}_{k} b_{l}(\tau) A(0) \rangle &= -\left( 2 \kappa_{b} - i \left( \omega_{k}^{(b)} - \omega_{l}^{(b)} \right) \right) \langle A^{\dagger}(0) b^{\dagger}_{k} b_{l}(\tau) A(0) \rangle \nonumber \\
+	&\quad -\mathcal{E}_{k}^{(b) *} \langle A^{\dagger}(0) b_{l} \sigma_{+}(\tau) A(0) \rangle - \mathcal{E}_{l}^{(b)} \langle A^{\dagger}(0) b_{k}^{\dagger} \sigma_{-}(\tau) A(0) \rangle.
+\end{align}
+
+\end{document}

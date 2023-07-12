@@ -3,14 +3,12 @@ This is part of the PhD project of Jacob Peter Kia Ngaha. Contact email: j.ngaha
 
 We simulate a two- or three-level atom, emitting fluorescence into a filter consisting of *2N+1* single-mode cavities, equally spaced in frequency with spacing *δω*. We couple the atom into the cavity by using *[open quantum cascaded system theory](https://link.aps.org/doi/10.1103/PhysRevLett.70.2273 "Phys. Rev. Lett. 70, 2273 (1993)")*.
 
-This repository is split into three main directories: **two_level**, **three_level**, and **plots_for_thesis**. The folders **two_level** and **three_level** each contain a pdf of the relevant moment equations, as well as the LaTeX files for that pdf, and programs that:
+This repository is split into two main directories: **two_level** and **three_level**. Each directory contains a pdf of the relevant moment equations, as well as the LaTeX files for that pdf, and programs that:
 - numerically integrate the operator moments, 
 - solve for the steady state moments, 
 - solve for the first-order correlation function,
 - solve for the second-order correlation function, and
 - solve for the second-order cross-correlation of two different filters.
-
-The folder **plots_for_thesis** contain all of the simulation code, data, and plotting files used for each of the figures presented in the PhD Thesis.
 
 The programs are written in Fortran90 and and can be compiled using Intel's oneAPI `ifort` compiler, with the command in Linux
 ```

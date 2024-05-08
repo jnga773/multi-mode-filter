@@ -1,0 +1,48 @@
+&ATOM
+  ! Parameters in terms of decay rate gamma
+  ! Atom decay rate
+  gamma = 1.0d0
+  ! Drive strength (Rabi Frequency)
+  ! Omega = 0.001d0
+  Omega = 15.707963267948966d0
+  ! Omega = 1000.0d0
+/
+
+&FILTER
+  ! Number of modes either side of d0 (2N + 1 total modes)
+  N = 80
+  ! Halfwidth of cavity (Either \kappa if N = 0 or N \delta\omega)
+  halfwidth = 8.0d0
+  ! Linewidth of individual cavity modes
+  kappa = 2.5d0
+  ! Phase modulation of mode coupling
+  phase = 1.0d0
+/
+
+&CAVITYA
+  ! Central resonance frequency of cavity A
+  w0a = 15.707963267948966d0
+  ! w0a = 0.0d0
+  ! w0a = 15.707963267948966d0
+/
+
+&SCANPARAMS
+  ! First scan parameter
+  scan_start = 1.0d-5
+  ! Last scan parameter
+  scan_end = 1.0d2
+  ! Step size of scans
+  scan_steps = 100
+/
+
+&TIME
+  ! Time step
+  dt = 0.001d0
+  ! Maximum time to integrate for steady state in units of \gamma \tau
+  t_max = 10.0d0
+  ! Maximum g1 time in units of \gamma \tau
+  tau1_max = 100.0d0
+  ! max g2 time in units of \gamma \tau
+  tau2_max = 10.0d0
+/
+ 

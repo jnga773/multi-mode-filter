@@ -1,0 +1,160 @@
+#-----------------------------------------------------------------------------#
+#                       Jacob's MatPlotLib RCParams File                      #
+#-----------------------------------------------------------------------------#
+#---------------#
+#     LaTeX     #
+#---------------#
+# Use LaTeX
+text.usetex:                       True
+# Some default LaTeX packages
+text.latex.preamble:               \usepackage{amsmath, amssymb, braket, bm, dsfont}
+
+#--------------#
+#     Font     #
+#--------------#
+# Font family
+font.family:                      serif
+
+# Set fonts to Computer Modern
+# font.serif:                     Computer Modern Roman
+# font.sans-serif:                Computer Modern Sans Serif
+# font.monospace:                 DejaVu Sans Mono
+
+# Font sizes
+font.size:                        11.0
+# Legend size
+legend.fontsize:                  8.0
+# Axis label size
+axes.labelsize:                   11.0
+# Tick label font size
+xtick.labelsize:                  10.0
+ytick.labelsize:                  10.0
+
+#-------------------------#
+#     Figure Settings     #
+#-------------------------#
+# Default figure size (in inches)
+figure.figsize:                   6.0, 3.0
+# Default DPI resolution
+figure.dpi:                       100
+# Default layout to tight_layout()
+figure.autolayout:                True
+
+# Padding (in inches) around axes; defaults to 3/72 inches, i.e. 3 points. (0.04167in)
+figure.constrained_layout.h_pad:  0.0
+figure.constrained_layout.w_pad:  0.0
+
+# Spacing between subplots, relative to the subplot sizes.  Much smaller than for
+# tight_layout (figure.subplot.hspace, figure.subplot.wspace) as constrained_layout
+# already takes surrounding texts (titles, labels, # ticklabels) into account.
+figure.constrained_layout.hspace: 0.0
+figure.constrained_layout.wspace: 0.0
+
+#--------------------#
+#     Linestyles     #
+#--------------------#
+# Default linewidth for plots
+lines.linewidth:                  1.5
+# Default linewidth for axis box
+axes.linewidth:                   0.8
+
+# Linestyle spacing for dashed, dotted, and dash-dot lines
+# lines.dashed_pattern:             10.0, 3.0
+lines.dashed_pattern:             7.5, 3.0
+lines.dashdot_pattern:            6.4, 1.6, 1, 1.6
+lines.dotted_pattern:             1, 1.65
+lines.scale_dashes:               True
+
+#---------------#
+#     Grids     #
+#---------------#
+# Default grid to be off
+axes.grid:                        False
+# Display grid for both axes
+axes.grid.axis:                   both
+# Grid lines for major or minor (or both) ticks
+axes.grid.which:                  major
+
+# Grid colour
+grid.color:                       (0.15, 0.15, 0.15)
+# Grid alpha
+grid.alpha:                       0.15
+# Grid linestyle
+grid.linestyle:                   -
+# Grid linewidth
+grid.linewidth:                   0.8
+
+#-----------------------#
+#     Tick Settings     #
+#-----------------------#
+# Major tick sizes (in pts)
+xtick.major.size:                 3.5
+# Minor tick sizes (in pts)
+xtick.minor.size:                 2.0
+
+# Draw x-ticks on bottom
+xtick.bottom:                     True
+# Draw y-ticks on left
+ytick.left:                       True
+
+# Draw x-ticks on top
+xtick.top:                        False
+# Draw y-ticks on right
+ytick.right:                      False
+
+# Turn on minor ticks
+xtick.minor.visible:              True
+ytick.minor.visible:              True
+
+# Tick direction
+xtick.direction:                  out
+ytick.direction:                  out
+
+# Major and minor ticks
+xtick.major.top:                  True
+xtick.major.bottom:               True
+xtick.minor.top:                  True
+xtick.minor.bottom:               True
+
+ytick.major.left:                 True
+ytick.major.right:                True
+ytick.minor.left:                 True
+ytick.minor.right:                True
+
+#----------------#
+#     Legend     #
+#----------------#
+# Legend location
+legend.loc:                       upper right
+# Rounded box or square box
+legend.fancybox:                  False
+# Transparency
+legend.framealpha:                0.8
+# Box colour
+legend.facecolor:                 inherit
+legend.edgecolor:                 0.8
+
+# Length of legend lines
+legend.handlelength:              5.0 
+
+#------------------------#
+#     Saving Figures     #
+#------------------------#
+# Figure DPI
+savefig.dpi:                      200
+# Default figure format
+savefig.format:                   pdf
+# Save background as transparent
+savefig.transparent:              False
+
+# Tight bbox
+savefig.bbox:                     standard
+# Padding around figure when saving  when bbox is set to 'tight'
+savefig.pad_inches:               0.0
+
+### SVG backend params
+# Write raster image data directly into the SVG file
+svg.image_inline:                 True
+# How to handle SVG fonts: path: Embed characters as paths -- supported  by most SVG renderers
+#                          None: Assume fonts are installed on the machine where the SVG will be viewed.
+svg.fonttype:                     path

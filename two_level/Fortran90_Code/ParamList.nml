@@ -8,7 +8,7 @@
 
 &FILTER
   ! Number of modes either side of d0 (2N + 1 total modes)
-  N = 80
+  N = 50
   ! Halfwidth of cavity (Either \kappa if N = 0 or N \delta\omega)
   halfwidth = 14.5d0
   ! Linewidth of individual cavity modes

@@ -429,6 +429,9 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
   ! Calculate steady states
   CALL MatrixInverseSS(N_mat, Mat_OG, B_OG, sigma_out)
 
+  ! Add OMP clauses
+  !$OMP PARALLEL DO PRIVATE(j, Mat, B_vec) COLLAPSE(1)
+
   ! Cycle through modes
   DO j = -N_in, N_in
     !-----------------------------!
@@ -539,9 +542,14 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
 
     ! Close j loop
   END DO
+  !$OMP END PARALLEL DO
 
   moment_out = 0.0d0
   moment_out2 = 0.0d0
+
+  ! Add OMP clauses
+  !$OMP PARALLEL DO PRIVATE(j, k, Mat, B_vec) REDUCTION(+:moment_out, moment_out2) COLLAPSE(2)
+
   ! Cycle through modes
   DO k = -N_in, N_in
     DO j = -N_in, N_in
@@ -552,7 +560,7 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
       ! < f_{j} g_{k} > !
       !-----------------!
       f2_out(j, k, fg) = -gkl(j, f) * f1sig_out(k, g, sm) + &
-                       & -gkl(k, g) * f1sig_out(j, f, sm)
+                       & (-gkl(k, g)) * f1sig_out(j, f, sm)
       f2_out(j, k, fg) = f2_out(j, k, fg) / &
                        & (kappa(f) + kappa(g) + i * (wl(j, f) + wl(k, g)))
 
@@ -560,7 +568,7 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
       ! < f^{\dagger}_{j} g^{\dagger}_{k} > !
       !-------------------------------------!
       f2_out(j, k, ftgt) = -CONJG(gkl(j, f)) * f1sig_out(k, gt, sp) + &
-                         & -CONJG(gkl(k, g)) * f1sig_out(j, ft, sp)
+                         & (-CONJG(gkl(k, g))) * f1sig_out(j, ft, sp)
       f2_out(j, k, ftgt) = f2_out(j, k, ftgt) / &
                          & (kappa(f) + kappa(g) - i * (wl(j, f) + wl(k, g)))
 
@@ -568,7 +576,7 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
       ! < f^{\dagger}_{j} f_{k} > !
       !---------------------------!
       f2_out(j, k, ftf) = -CONJG(gkl(j, f)) * f1sig_out(k, f, sp) + &
-                        & -gkl(k, f) * f1sig_out(j, ft, sm)
+                        & (-gkl(k, f)) * f1sig_out(j, ft, sm)
       f2_out(j, k, ftf) = f2_out(j, k, ftf) / &
                         & ((2.0d0 * kappa(f)) - i * (wl(j, f) - wl(k, f)))
       ! Update photon number
@@ -578,7 +586,7 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
       ! < g^{\dagger}_{j} g_{k} > !
       !---------------------------!
       f2_out(j, k, gtg) = -CONJG(gkl(j, g)) * f1sig_out(k, g, sp) + &
-                        & -gkl(k, g) * f1sig_out(j, gt, sm)
+                        & (-gkl(k, g)) * f1sig_out(j, gt, sm)
       f2_out(j, k, gtg) = f2_out(j, k, gtg) / &
                         & ((2.0d0 * kappa(g)) - i * (wl(j, g) - wl(k, g)))
       ! Update photon number
@@ -588,7 +596,7 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
       ! < f^{\dagger}_{j} g_{k} > !
       !---------------------------!
       f2_out(j, k, ftg) = -CONJG(gkl(j, f)) * f1sig_out(k, g, sp) + &
-                        & -gkl(k, g) * f1sig_out(j, ft, sm)
+                        & (-gkl(k, g)) * f1sig_out(j, ft, sm)
       f2_out(j, k, ftg) = f2_out(j, k, ftg) / &
                         & (kappa(f) + kappa(g) - i * (wl(j, f) - wl(k, g)))
 
@@ -596,7 +604,7 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
       ! < g^{\dagger}_{j} f_{k} > !
       !---------------------------!
       f2_out(j, k, gtf) = -CONJG(gkl(j, g)) * f1sig_out(k, f, sp) + &
-                        & -gkl(k, f) * f1sig_out(j, gt, sm)
+                        & (-gkl(k, f)) * f1sig_out(j, gt, sm)
       f2_out(j, k, gtf) = f2_out(j, k, gtf) / &
                         & (kappa(f) + kappa(g) - i * (wl(j, g) - wl(k, f)))
 
@@ -616,9 +624,9 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
       B_vec = 0.0d0
       B_vec(1) = 0.0d0
       B_vec(2) = -0.5d0 * gkl(j, f) * f1sig_out(k, g, sz) + &
-               & -0.5d0 * gkl(j, f) * f1_out(k, g) + &
-               & -0.5d0 * gkl(k, g) * f1sig_out(j, f, sz) + &
-               & -0.5d0 * gkl(k, g) * f1_out(j, f)
+               & (-0.5d0) * gkl(j, f) * f1_out(k, g) + &
+               & (-0.5d0) * gkl(k, g) * f1sig_out(j, f, sz) + &
+               & (-0.5d0) * gkl(k, g) * f1_out(j, f)
       B_vec(3) = -gamma_in * f2_out(j, k, fg) + &
                & gkl(j, f) * f1sig_out(k, g, sm) + &
                & gkl(k, g) * f1sig_out(j, f, sm)
@@ -638,9 +646,9 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
       ! Set the non-homogeneous vector
       B_vec = 0.0d0
       B_vec(1) = -0.5d0 * CONJG(gkl(j, f)) * f1sig_out(k, gt, sz) + &
-               & -0.5d0 * CONJG(gkl(j, f)) * f1_out(k, gt) + &
-               & -0.5d0 * CONJG(gkl(k, g)) * f1sig_out(j, ft, sz) + &
-               & -0.5d0 * CONJG(gkl(k, g)) * f1_out(j, ft)
+               & (-0.5d0) * CONJG(gkl(j, f)) * f1_out(k, gt) + &
+               & (-0.5d0) * CONJG(gkl(k, g)) * f1sig_out(j, ft, sz) + &
+               & (-0.5d0) * CONJG(gkl(k, g)) * f1_out(j, ft)
       B_vec(2) = 0.0d0
       B_vec(3) = -gamma_in * f2_out(j, k, ftgt) + &
                & CONJG(gkl(j, f)) * f1sig_out(k, gt, sp) + &
@@ -661,9 +669,9 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
       ! Set the non-homogeneous vector
       B_vec = 0.0d0
       B_vec(1) = -0.5d0 * CONJG(gkl(j, f)) * f1sig_out(k, f, sz) + &
-               & -0.5d0 * CONJG(gkl(j, f)) * f1_out(k, f)
+               & (-0.5d0) * CONJG(gkl(j, f)) * f1_out(k, f)
       B_vec(2) = -0.5d0 * gkl(k, f) * f1sig_out(j, ft, sz) + &
-               & -0.5d0 * gkl(k, f) * f1_out(j, ft)
+               & (-0.5d0) * gkl(k, f) * f1_out(j, ft)
       B_vec(3) = -gamma_in * f2_out(j, k, ftf) + &
                & CONJG(gkl(j, f)) * f1sig_out(k, f, sp) + &
                & gkl(k, f) * f1sig_out(j, ft, sm)
@@ -683,9 +691,9 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
       ! Set the non-homogeneous vector
       B_vec = 0.0d0
       B_vec(1) = -0.5d0 * CONJG(gkl(j, g)) * f1sig_out(k, g, sz) + &
-               & -0.5d0 * CONJG(gkl(j, g)) * f1_out(k, g)
+               & (-0.5d0) * CONJG(gkl(j, g)) * f1_out(k, g)
       B_vec(2) = -0.5d0 * gkl(k, g) * f1sig_out(j, gt, sz) + &
-               & -0.5d0 * gkl(k, g) * f1_out(j, gt)
+               & (-0.5d0) * gkl(k, g) * f1_out(j, gt)
       B_vec(3) = -gamma_in * f2_out(j, k, gtg) + &
                & CONJG(gkl(j, g)) * f1sig_out(k, g, sp) + &
                & gkl(k, g) * f1sig_out(j, gt, sm)
@@ -705,9 +713,9 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
       ! Set the non-homogeneous vector
       B_vec = 0.0d0
       B_vec(1) = -0.5d0 * CONJG(gkl(j, f)) * f1sig_out(k, g, sz) + &
-               & -0.5d0 * CONJG(gkl(j, f)) * f1_out(k, g)
+               & (-0.5d0) * CONJG(gkl(j, f)) * f1_out(k, g)
       B_vec(2) = -0.5d0 * gkl(k, g) * f1sig_out(j, ft, sz) + &
-               & -0.5d0 * gkl(k, g) * f1_out(j, ft)
+               & (-0.5d0) * gkl(k, g) * f1_out(j, ft)
       B_vec(3) = -gamma_in * f2_out(j, k, ftg) + &
                & CONJG(gkl(j, f)) * f1sig_out(k, g, sp) + &
                & gkl(k, g) * f1sig_out(j, ft, sm)
@@ -727,9 +735,9 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
       ! Set the non-homogeneous vector
       B_vec = 0.0d0
       B_vec(1) = -0.5d0 * CONJG(gkl(j, g)) * f1sig_out(k, f, sz) + &
-               & -0.5d0 * CONJG(gkl(j, g)) * f1_out(k, f)
+               & (-0.5d0) * CONJG(gkl(j, g)) * f1_out(k, f)
       B_vec(2) = -0.5d0 * gkl(k, f) * f1sig_out(j, gt, sz) + &
-               & -0.5d0 * gkl(k, f) * f1_out(j, gt)
+               & (-0.5d0) * gkl(k, f) * f1_out(j, gt)
       B_vec(3) = -gamma_in * f2_out(j, k, gtf) + &
                & CONJG(gkl(j, g)) * f1sig_out(k, f, sp) + &
                & gkl(k, f) * f1sig_out(j, gt, sm)
@@ -741,11 +749,15 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
     END DO
     ! Close k loop
   END DO
+  !$OMP END PARALLEL DO
 
   ! Update steady state photon number
   photon_out = 0.0d0
   photon_out(f) = REAL(moment_out)
   photon_out(g) = REAL(moment_out2)
+
+  ! Add OMP clauses
+  !$OMP PARALLEL DO PRIVATE(j, k, l, Mat, B_vec) COLLAPSE(3)
 
   ! Cycle through modes
   DO l = -N_in, N_in
@@ -758,8 +770,8 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
         ! < f^{\dagger}_{j} f_{k} g_{l} > !
         !---------------------------------!
         f3_out(j, k, l, ftfg) = -CONJG(gkl(j, f)) * f2sig_out(k, l, fg, sp) + &
-                              & -gkl(k, f) * f2sig_out(j, l, ftg, sm) + &
-                              & -gkl(l, g) * f2sig_out(j, k, ftf, sm)
+                              & (-gkl(k, f)) * f2sig_out(j, l, ftg, sm) + &
+                              & (-gkl(l, g)) * f2sig_out(j, k, ftf, sm)
         f3_out(j, k, l, ftfg) = f3_out(j, k, l, ftfg) / &
                               & ((2.0d0 * kappa(f)) + kappa(g) - i * (wl(j, f) - wl(k, f) - wl(l, g)))
 
@@ -767,8 +779,8 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
         ! < g^{\dagger}_{j} g_{k} f_{l} > !
         !---------------------------------!
         f3_out(j, k, l, gtgf) = -CONJG(gkl(j, g)) * f2sig_out(l, k, fg, sp) + &
-                              & -gkl(k, g) * f2sig_out(j, l, gtf, sm) + &
-                              & -gkl(l, f) * f2sig_out(j, k, gtg, sm)
+                              & (-gkl(k, g)) * f2sig_out(j, l, gtf, sm) + &
+                              & (-gkl(l, f)) * f2sig_out(j, k, gtg, sm)
         f3_out(j, k, l, gtgf) = f3_out(j, k, l, gtgf) / &
                               & (kappa(f) + (2.0d0 * kappa(g)) - i * (wl(j, g) - wl(k, g) - wl(l, f)))
 
@@ -776,8 +788,8 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
         ! < g^{\dagger}_{j} f^{\dagger}_{k} f_{l} > !
         !-------------------------------------------!
         f3_out(j, k, l, gtftf) = -CONJG(gkl(j, g)) * f2sig_out(k, l, ftf, sp) + &
-                               & -CONJG(gkl(k, f)) * f2sig_out(j, l, gtf, sp) + &
-                               & -gkl(l, f) * f2sig_out(k, j, ftgt, sm)
+                               & (-CONJG(gkl(k, f))) * f2sig_out(j, l, gtf, sp) + &
+                               & (-gkl(l, f)) * f2sig_out(k, j, ftgt, sm)
         f3_out(j, k, l, gtftf) = f3_out(j, k, l, gtftf) / &
                                & ((2.0d0 * kappa(f)) + kappa(g) - i * (wl(j, g) + wl(k, f) - wl(l, f)))
 
@@ -785,8 +797,8 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
         ! < f^{\dagger}_{j} g^{\dagger}_{k} b{l} > !
         !-------------------------------------------!
         f3_out(j, k, l, ftgtg) = -CONJG(gkl(j, f)) * f2sig_out(k, l, gtg, sp) + &
-                               & -CONJG(gkl(k, g)) * f2sig_out(j, l, ftg, sp) + &
-                               & -gkl(l, g) * f2sig_out(j, k, ftgt, sm)
+                               & (-CONJG(gkl(k, g))) * f2sig_out(j, l, ftg, sp) + &
+                               & (-gkl(l, g)) * f2sig_out(j, k, ftgt, sm)
         f3_out(j, k, l, ftgtg) = f3_out(j, k, l, ftgtg) / &
                                & (kappa(f) + (2.0d0 * kappa(g)) - i * (wl(j, f) + wl(k, g) - wl(l, g)))
 
@@ -805,11 +817,11 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
         ! Set the non-homogeneous vector
         B_vec = 0.0d0
         B_vec(1) = -0.5d0 * CONJG(gkl(j, f)) * f2sig_out(k, l, fg, sz) + &
-                 & -0.5d0 * CONJG(gkl(j, f)) * f2_out(k, l, fg)
+                 & (-0.5d0) * CONJG(gkl(j, f)) * f2_out(k, l, fg)
         B_vec(2) = -0.5d0 * gkl(k, f) * f2sig_out(j, l, ftg, sz) + &
-                 & -0.5d0 * gkl(k, f) * f2_out(j, l, ftg) + &
-                 & -0.5d0 * gkl(l, g) * f2sig_out(j, k, ftf, sz) + &
-                 & -0.5d0 * gkl(l, g) * f2_out(j, k, ftf)
+                 & (-0.5d0) * gkl(k, f) * f2_out(j, l, ftg) + &
+                 & (-0.5d0) * gkl(l, g) * f2sig_out(j, k, ftf, sz) + &
+                 & (-0.5d0) * gkl(l, g) * f2_out(j, k, ftf)
         B_vec(3) = -gamma_in * f3_out(j, k, l, ftfg) + &
                  & CONJG(gkl(j, f)) * f2sig_out(k, l, fg, sp) + &
                  & gkl(k, f) * f2sig_out(j, l, ftg, sm) + &
@@ -830,11 +842,11 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
         ! Set the non-homogeneous vector
         B_vec = 0.0d0
         B_vec(1) = -0.5d0 * CONJG(gkl(j, g)) * f2sig_out(l, k, fg, sz) + &
-                 & -0.5d0 * CONJG(gkl(j, g)) * f2_out(l, k, fg)
+                 & (-0.5d0) * CONJG(gkl(j, g)) * f2_out(l, k, fg)
         B_vec(2) = -0.5d0 * gkl(k, g) * f2sig_out(j, l, gtf, sz) + &
-                 & -0.5d0 * gkl(k, g) * f2_out(j, l, gtf) + &
-                 & -0.5d0 * gkl(l, f) * f2sig_out(j, k, gtg, sz) + &
-                 & -0.5d0 * gkl(l, f) * f2_out(j, k, gtg)
+                 & (-0.5d0) * gkl(k, g) * f2_out(j, l, gtf) + &
+                 & (-0.5d0) * gkl(l, f) * f2sig_out(j, k, gtg, sz) + &
+                 & (-0.5d0) * gkl(l, f) * f2_out(j, k, gtg)
         B_vec(3) = -gamma_in * f3_out(j, k, l, gtgf) + &
                  & CONJG(gkl(j, g)) * f2sig_out(l, k, fg, sp) + &
                  & gkl(k, g) * f2sig_out(j, l, gtf, sm) + &
@@ -855,11 +867,11 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
         ! Set the non-homogeneous vector
         B_vec = 0.0d0
         B_vec(1) = -0.5d0 * CONJG(gkl(j, g)) * f2sig_out(k, l, ftf, sz) + &
-                 & -0.5d0 * CONJG(gkl(j, g)) * f2_out(k, l, ftf) + &
-                 & -0.5d0 * CONJG(gkl(k, f)) * f2sig_out(j, l, gtf, sz) + &
-                 & -0.5d0 * CONJG(gkl(k, f)) * f2_out(j, l, gtf)
+                 & (-0.5d0) * CONJG(gkl(j, g)) * f2_out(k, l, ftf) + &
+                 & (-0.5d0) * CONJG(gkl(k, f)) * f2sig_out(j, l, gtf, sz) + &
+                 & (-0.5d0) * CONJG(gkl(k, f)) * f2_out(j, l, gtf)
         B_vec(2) = -0.5d0 * gkl(l, f) * f2sig_out(k, j, ftgt, sz) + &
-                 & -0.5d0 * gkl(l, f) * f2_out(k, j, ftgt)
+                 & (-0.5d0) * gkl(l, f) * f2_out(k, j, ftgt)
         B_vec(3) = -gamma_in * f3_out(j, k, l, gtftf) + &
                  & CONJG(gkl(j, g)) * f2sig_out(k, l, ftf, sp) + &
                  & CONJG(gkl(k, f)) * f2sig_out(j, l, gtf, sp) + &
@@ -880,11 +892,11 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
         ! Set the non-homogeneous vector
         B_vec = 0.0d0
         B_vec(1) = -0.5d0 * CONJG(gkl(j, f)) * f2sig_out(k, l, gtg, sz) + &
-                 & -0.5d0 * CONJG(gkl(j, f)) * f2_out(k, l, gtg) + &
-                 & -0.5d0 * CONJG(gkl(k, g)) * f2sig_out(j, l, ftg, sz) + &
-                 & -0.5d0 * CONJG(gkl(k, g)) * f2_out(j, l, ftg)
+                 & (-0.5d0) * CONJG(gkl(j, f)) * f2_out(k, l, gtg) + &
+                 & (-0.5d0) * CONJG(gkl(k, g)) * f2sig_out(j, l, ftg, sz) + &
+                 & (-0.5d0) * CONJG(gkl(k, g)) * f2_out(j, l, ftg)
         B_vec(2) = -0.5d0 * gkl(l, g) * f2sig_out(j, k, ftgt, sz) + &
-                 & -0.5d0 * gkl(l, g) * f2_out(j, k, ftgt)
+                 & (-0.5d0) * gkl(l, g) * f2_out(j, k, ftgt)
         B_vec(3) = -gamma_in * f3_out(j, k, l, ftgtg) + &
                  & CONJG(gkl(j, f)) * f2sig_out(k, l, gtg, sp) + &
                  & CONJG(gkl(k, g)) * f2sig_out(j, l, ftg, sp) + &
@@ -899,6 +911,10 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
     END DO
     ! Close l loop
   END DO
+  !$OMP END PARALLEL DO
+
+  ! Add OMP clauses
+  !$OMP PARALLEL DO PRIVATE(j, k, l, m) COLLAPSE(4)
 
   ! Cycle through modes
   DO m = -N_in, N_in
@@ -912,9 +928,9 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
           ! < f^{\dagger}_{j} g^{\dagger}_{k} g_{l} f_{m} > !
           !-------------------------------------------------!
           f4_out(j, k, l, m) = -CONJG(gkl(j, f)) * f3sig_out(k, l, m, gtgf, sp) + &
-                             & -CONJG(gkl(k, g)) * f3sig_out(j, m, l, ftfg, sp) + &
-                             & -gkl(l, g) * f3sig_out(k, j, m, gtftf, sm) + &
-                             & -gkl(m, f) * f3sig_out(j, k, l, ftgtg, sm)
+                             & (-CONJG(gkl(k, g))) * f3sig_out(j, m, l, ftfg, sp) + &
+                             & (-gkl(l, g)) * f3sig_out(k, j, m, gtftf, sm) + &
+                             & (-gkl(m, f)) * f3sig_out(j, k, l, ftgtg, sm)
           f4_out(j, k, l, m) = f4_out(j, k, l, m) / &
                              & (((2.0d0 * kappa(f)) + (2.0d0 * kappa(g))) - i * (wl(j, f) + wl(k, g)) + i * (wl(l, g) + wl(m, f)))
           ! Close j loop
@@ -925,6 +941,7 @@ SUBROUTINE SteadyStateMoments(gamma_in, Omega_in, &
     END DO
     ! Close m loop
   END DO
+  !$OMP END PARALLEL DO
 
 END SUBROUTINE SteadyStateMoments
 
@@ -1117,7 +1134,8 @@ END SUBROUTINE G2_InitialConditions
 ! Subroutine to calculate the initial value of the correlation function
 SUBROUTINE G2_InitialValue(gamma_in, Omega_in, &
                          & epsilon_in, N_in, phase_in, &
-                         & w0_in, kappa_in, dw_in, &
+                         & w0a_in, kappaa_in, dwa_in, &
+                         & w0b_in, kappab_in, dwb_in, &
                          & g2_initial_out)
 
   !============================================================================!
@@ -1142,11 +1160,11 @@ SUBROUTINE G2_InitialValue(gamma_in, Omega_in, &
   ! Phase modulation of mode coupling
   REAL(KIND=8), INTENT(IN)                   :: phase_in
   ! Central mode frequency of the filter cavity, with N mode frequencies either side
-  REAL(KIND=8), INTENT(IN)                   :: w0_in
+  REAL(KIND=8), INTENT(IN)                   :: w0a_in, w0b_in
   ! Cavity linewidth/transmission of cavity mode
-  REAL(KIND=8), INTENT(IN)                   :: kappa_in
+  REAL(KIND=8), INTENT(IN)                   :: kappaa_in, kappab_in
   ! Frequency spacing of modes
-  REAL(KIND=8), INTENT(IN)                   :: dw_in
+  REAL(KIND=8), INTENT(IN)                   :: dwa_in, dwb_in
 
   !------------------------------------!
   !     MOMENT EQUATION ARRAY STUFF    !
@@ -1158,34 +1176,34 @@ SUBROUTINE G2_InitialValue(gamma_in, Omega_in, &
 
   ! Integer indices for sigma operators
   INTEGER, PARAMETER                         :: sm = 1, sp = 2, sz = 3
-  ! Integer indices for: a, f^{\dagger}, f^{\dagger} a
+  ! Integer indices for: f, f^{\dagger}, f^{2}, f^{\dagger}^{2} ... etc
   INTEGER, PARAMETER                         :: f = 1, ft = 2
-  INTEGER, PARAMETER                         :: ff = 1, ftf = 2, ft2 = 3
-  INTEGER, PARAMETER                         :: ftf2 = 1, ft2f = 2
+  INTEGER, PARAMETER                         :: fg = 1, ftgt = 2, ftf = 3, gtg = 4, ftg = 5, gtf = 6
+  INTEGER, PARAMETER                         :: ftfg = 1, gtgf = 2, gtftf = 3, ftgtg = 4
 
   ! Steady state arrays
   ! First-order moments: Atomic equations (< \sigma >)
-  COMPLEX(KIND=8), DIMENSION(N_mat)                                  :: sigma_ss
+  COMPLEX(KIND=8), DIMENSION(N_mat)                                 :: sigma_ss
   ! First-order moments: Cavity (< a >, < f^{\dagger} >)
-  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, 2)                          :: f1_ss
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, 4)                         :: f1_ss
   ! Second-order moments: Cavity and atom (< a \sigma >, < f^{\dagger} \sigma >
-  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, 2, N_mat)                   :: f1sig_ss
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, 4, N_mat)                  :: f1sig_ss
   ! Second-order moments: Cavity (< f^{\dagger} a >)
-  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, -N_in:N_in, 3)              :: f2_ss
-  ! Third-order moments: Cavity and atom (< a^{2} \sigma >, < a^{\dagger 2} \sigma >, < f^{\dagger} a \sigma >)
-  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, -N_in:N_in, 3, N_mat)       :: f2sig_ss
-  ! Third-order moments: Cavity (< a^{2} f^{\dagger} >, < a^{\dagger 2} a >)
-  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, -N_in:N_in, -N_in:N_in, 2)  :: f3_ss
-  ! Fourth-order moments: Cavity and atom ( < f^{\dagger} a^{2} \sigma >, < a^{\dagger 2} a \sigma >)
-  COMPLEX(KIND=8), DIMENSION(:, :, :, :, :), ALLOCATABLE             :: f3sig_ss
-  ! Fourth-order moments: Cavity (< a^{\dagger 2} a^{2} >)
-  COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE                :: f4_ss
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, -N_in:N_in, 6)             :: f2_ss
+  ! Third-order moments: Cavity and atom (< f^{2} \sigma >, < f^{\dagger 2} \sigma >, < f^{\dagger} a \sigma >)
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, -N_in:N_in, 6, N_mat)      :: f2sig_ss
+  ! Third-order moments: Cavity (< f^{2} f^{\dagger} >, < f^{\dagger 2} a >)
+  COMPLEX(KIND=8), DIMENSION(-N_in:N_in, -N_in:N_in, -N_in:N_in, 4) :: f3_ss
+  ! Fourth-order moments: Cavity and atom ( < f^{\dagger} f^{2} \sigma >, < f^{\dagger 2} a \sigma >)
+  COMPLEX(KIND=8), DIMENSION(:, :, :, :, :), ALLOCATABLE            :: f3sig_ss
+  ! Fourth-order moments: Cavity (< f^{\dagger 2} f^{2} >)
+  COMPLEX(KIND=8), DIMENSION(:, :, :, :), ALLOCATABLE               :: f4_ss
 
   !----------------!
   !     OUTPUT     !
   !----------------!
   ! Initial correlation value g^{(2)}(\tau = 0)
-  REAL(KIND=8)                                                       :: photon_ss
+  REAL(KIND=8), DIMENSION(2)                                         :: photon_ss
   ! Initial correlation value g^{(2)}(\tau = 0)
   REAL(KIND=8), INTENT(OUT)                                          :: g2_initial_out
 
@@ -1214,7 +1232,7 @@ SUBROUTINE G2_InitialValue(gamma_in, Omega_in, &
   ! Third-order: Cavity
   f3_ss = 0.0d0
   ! Fourth-order: Cavity and atom
-  ALLOCATE(f3sig_ss(-N_in:N_in, -N_in:N_in, -N_in:N_in, 2, N_mat)); f3sig_ss = 0.0d0
+  ALLOCATE(f3sig_ss(-N_in:N_in, -N_in:N_in, -N_in:N_in, 4, N_mat)); f3sig_ss = 0.0d0
   ! Fourth-order: Cavity
   ALLOCATE(f4_ss(-N_in:N_in, -N_in:N_in, -N_in:N_in, -N_in:N_in)); f4_ss = 0.0d0
 
@@ -1223,7 +1241,8 @@ SUBROUTINE G2_InitialValue(gamma_in, Omega_in, &
   !===========================================================================!
   CALL SteadyStateMoments(gamma_in, Omega_in, &
                         & epsilon_in, N_in, phase_in, &
-                        & w0_in, kappa_in, dw_in, &
+                        & w0a_in, kappaa_in, dwa_in, &
+                        & w0b_in, kappab_in, dwb_in, &
                         & photon_ss, sigma_ss, &
                         & f1_ss, f1sig_ss, &
                         & f2_ss, f2sig_ss, &
@@ -1255,7 +1274,7 @@ SUBROUTINE G2_InitialValue(gamma_in, Omega_in, &
   END DO
 
   ! Normalise by steady state photon number
-  g2_initial_out = REAL(moment_out) / (photon_ss ** 2)
+  g2_initial_out = REAL(moment_out) / (photon_ss(1) * photon_ss(2))
 
 END SUBROUTINE G2_InitialValue
 
@@ -1535,25 +1554,25 @@ SUBROUTINE G2_CalculateRK4(gamma_in, Omega_in, &
       ! < f_{j} > !
       !-----------!
       k1_f1(j, f) = -dt_in * (kappa + i * wl(j)) * f1(j, f) + &
-                  & -dt_in * gkl(j) * sigma(sm)
+                  & (-dt_in) * gkl(j) * sigma(sm)
       k2_f1(j, f) = -dt_in * (kappa + i * wl(j)) * (f1(j, f) + 0.5d0 * k1_f1(j, f)) + &
-                  & -dt_in * gkl(j) * (sigma(sm) + 0.5d0 * k1_sigma(sm))
+                  & (-dt_in) * gkl(j) * (sigma(sm) + 0.5d0 * k1_sigma(sm))
       k3_f1(j, f) = -dt_in * (kappa + i * wl(j)) * (f1(j, f) + 0.5d0 * k2_f1(j, f)) + &
-                  & -dt_in * gkl(j) * (sigma(sm) + 0.5d0 * k2_sigma(sm))
+                  & (-dt_in) * gkl(j) * (sigma(sm) + 0.5d0 * k2_sigma(sm))
       k4_f1(j, f) = -dt_in * (kappa + i * wl(j)) * (f1(j, f) + k3_f1(j, f)) + &
-                  & -dt_in * gkl(j) * (sigma(sm) + k3_sigma(sm))
+                  & (-dt_in) * gkl(j) * (sigma(sm) + k3_sigma(sm))
 
       !---------------------!
       ! < f^{\dagger}_{j} > !
       !---------------------!
       k1_f1(j, ft) = -dt_in * (kappa - i * wl(j)) * f1(j, ft) + &
-                  & -dt_in * CONJG(gkl(j)) * sigma(sp)
+                  & (-dt_in) * CONJG(gkl(j)) * sigma(sp)
       k2_f1(j, ft) = -dt_in * (kappa - i * wl(j)) * (f1(j, ft) + 0.5d0 * k1_f1(j, ft)) + &
-                  & -dt_in * CONJG(gkl(j)) * (sigma(sp) + 0.5d0 * k1_sigma(sp))
+                  & (-dt_in) * CONJG(gkl(j)) * (sigma(sp) + 0.5d0 * k1_sigma(sp))
       k3_f1(j, ft) = -dt_in * (kappa - i * wl(j)) * (f1(j, ft) + 0.5d0 * k2_f1(j, ft)) + &
-                  & -dt_in * CONJG(gkl(j)) * (sigma(sp) + 0.5d0 * k2_sigma(sp))
+                  & (-dt_in) * CONJG(gkl(j)) * (sigma(sp) + 0.5d0 * k2_sigma(sp))
       k4_f1(j, ft) = -dt_in * (kappa - i * wl(j)) * (f1(j, ft) + k3_f1(j, ft)) + &
-                  & -dt_in * CONJG(gkl(j)) * (sigma(sp) + k3_sigma(sp))
+                  & (-dt_in) * CONJG(gkl(j)) * (sigma(sp) + k3_sigma(sp))
 
       !---------------------------------------!
       !     SECOND-ORDER: CAVITY AND ATOM     !
@@ -1664,17 +1683,17 @@ SUBROUTINE G2_CalculateRK4(gamma_in, Omega_in, &
         ! < f^{\dagger}_{j} f_{k} > !
         !---------------------------!
         k1_f2(j, k) = -dt_in * (2.0d0 * kappa - i * (wl(j) - wl(k))) * f2(j, k) + &
-                    & -dt_in * CONJG(gkl(j)) * f1sig(k, f, sp) + &
-                    & -dt_in * gkl(k) * f1sig(j, ft, sm)
+                    & (-dt_in) * CONJG(gkl(j)) * f1sig(k, f, sp) + &
+                    & (-dt_in) * gkl(k) * f1sig(j, ft, sm)
         k2_f2(j, k) = -dt_in * (2.0d0 * kappa - i * (wl(j) - wl(k))) * (f2(j, k) + 0.5d0 * k1_f2(j, k)) + &
-                    & -dt_in * CONJG(gkl(j)) * (f1sig(k, f, sp) + 0.5d0 * k1_f1sig(k, f, sp)) + &
-                    & -dt_in * gkl(k) * (f1sig(j, ft, sm) + 0.5d0 * k1_f1sig(j, ft, sm))
+                    & (-dt_in) * CONJG(gkl(j)) * (f1sig(k, f, sp) + 0.5d0 * k1_f1sig(k, f, sp)) + &
+                    & (-dt_in) * gkl(k) * (f1sig(j, ft, sm) + 0.5d0 * k1_f1sig(j, ft, sm))
         k3_f2(j, k) = -dt_in * (2.0d0 * kappa - i * (wl(j) - wl(k))) * (f2(j, k) + 0.5d0 * k2_f2(j, k)) + &
-                    & -dt_in * CONJG(gkl(j)) * (f1sig(k, f, sp) + 0.5d0 * k2_f1sig(k, f, sp)) + &
-                    & -dt_in * gkl(k) * (f1sig(j, ft, sm) + 0.5d0 * k2_f1sig(j, ft, sm))
+                    & (-dt_in) * CONJG(gkl(j)) * (f1sig(k, f, sp) + 0.5d0 * k2_f1sig(k, f, sp)) + &
+                    & (-dt_in) * gkl(k) * (f1sig(j, ft, sm) + 0.5d0 * k2_f1sig(j, ft, sm))
         k4_f2(j, k) = -dt_in * (2.0d0 * kappa - i * (wl(j) - wl(k))) * (f2(j, k) + k3_f2(j, k)) + &
-                    & -dt_in * CONJG(gkl(j)) * (f1sig(k, f, sp) + k3_f1sig(k, f, sp)) + &
-                    & -dt_in * gkl(k) * (f1sig(j, ft, sm) + k3_f1sig(j, ft, sm))
+                    & (-dt_in) * CONJG(gkl(j)) * (f1sig(k, f, sp) + k3_f1sig(k, f, sp)) + &
+                    & (-dt_in) * gkl(k) * (f1sig(j, ft, sm) + k3_f1sig(j, ft, sm))
 
         ! Close k loop
       END DO
